@@ -1,31 +1,25 @@
 export interface Venue {
   id: string;
   name: string;
-  venueType: string;
   description: string;
-  price: number;
-  formattedPrice?: string;
-  image: string;
-  category: string;
   location: string;
+  images: string[];
+  pricePerHour: number;
+  minimumHours: number;
   capacity: {
-    min: number;
-    max: number;
+    [key: string]: number;
   };
   amenities: string[];
+  tags: string[];
+  rating: number;
+  reviewCount: number;
+  rules: string[];
+  cancellationPolicy: string;
   features: Array<{
     title: string;
     description: string;
     icon: string;
   }>;
-  availability: {
-    startDate: string;
-    endDate: string;
-    timeSlots: string[];
-  };
-  images: string[];
-  type: 'venue';
-  basePrice: number;
 }
 
 export {}; 

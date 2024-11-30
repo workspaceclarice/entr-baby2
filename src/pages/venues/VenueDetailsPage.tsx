@@ -1,185 +1,223 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { 
+  MapPinIcon, 
+  TagIcon, 
+  ShareIcon,
+  CheckCircleIcon,
+  UserGroupIcon,
+  ClockIcon
+} from '@heroicons/react/24/outline';
+import { HeartIcon, StarIcon } from '@heroicons/react/24/solid';
 import { venues } from '../../data/venues';
-import VenueBookingWidget from '../../components/venues/VenueBookingWidget';
-import { StarIcon, LocationIcon, UsersIcon, CheckIcon, PriceIcon } from '../../components/icons';
+import VenueBookingFlow from '../../components/venues/VenueBookingFlow';
 
 const VenueDetailsPage: React.FC = () => {
-  const { id } = useParams();
-  const venue = venues.find(v => v.id === id) || venues[0];
+  const { id } = useParams<{ id: string }>();
+  const [showBookingFlow, setShowBookingFlow] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
+  const [activeTab, setActiveTab] = useState<'overview' | 'packages' | 'gallery' | 'faq'>('overview');
 
-  const renderVenueDetails = () => (
-    <div className="space-y-12">
-      {/* Venue Details Summary */}
-      <section className="bg-white rounded-xl p-8 shadow-sm">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="flex items-start space-x-3">
-            <UsersIcon className="w-6 h-6 text-gray-400" />
-            <div>
-              <h3 className="font-medium text-gray-900">Capacity</h3>
-              <p className="text-gray-600">{venue.capacity.min} - {venue.capacity.max} guests</p>
-            </div>
-          </div>
-          <div className="flex items-start space-x-3">
-            <LocationIcon className="w-6 h-6 text-gray-400" />
-            <div>
-              <h3 className="font-medium text-gray-900">Location</h3>
-              <p className="text-gray-600">{venue.location}</p>
-            </div>
-          </div>
-          <div className="flex items-start space-x-3">
-            <PriceIcon className="w-6 h-6 text-gray-400" />
-            <div>
-              <h3 className="font-medium text-gray-900">Starting Price</h3>
-              <p className="text-gray-600">${venue.basePrice} per event</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* About Section */}
-      <section className="bg-white rounded-xl p-8 shadow-sm">
-        <h2 className="text-2xl font-semibold mb-6">About This Venue</h2>
-        <p className="text-gray-600 whitespace-pre-line leading-relaxed">
-          {venue.description}
-        </p>
-      </section>
-
-      {/* Amenities */}
-      <section className="bg-white rounded-xl p-8 shadow-sm">
-        <h2 className="text-2xl font-semibold mb-6">Amenities</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          {venue.amenities.map((amenity, index) => (
-            <div key={index} className="flex items-center space-x-2">
-              <CheckIcon className="w-5 h-5 text-green-500" />
-              <span className="text-gray-600">{amenity}</span>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Photo Gallery */}
-      <section>
-        <h2 className="text-2xl font-semibold mb-6">Gallery</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          {venue.images.map((photo, index) => (
-            <div 
-              key={index}
-              className={`relative rounded-lg overflow-hidden ${
-                index === 0 ? 'col-span-2 row-span-2' : ''
-              }`}
-            >
-              <img
-                src={photo}
-                alt={`${venue.name} - Photo ${index + 1}`}
-                className="w-full h-full object-cover aspect-square"
-              />
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Reviews Section */}
-      {venue.reviews && venue.reviews.length > 0 && (
-        <section className="bg-white rounded-xl p-8 shadow-sm">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl font-semibold">Reviews</h2>
-            <div className="flex items-center">
-              <StarIcon className="w-6 h-6 text-yellow-400" />
-              <span className="ml-2 font-semibold">{venue.rating}</span>
-              <span className="mx-2 text-gray-400">·</span>
-              <span className="text-gray-600">{venue.reviewCount} reviews</span>
-            </div>
-          </div>
-
-          <div className="space-y-8">
-            {venue.reviews.map((review, index) => (
-              <div key={index} className="border-b border-gray-100 last:border-0 pb-8 last:pb-0">
-                <div className="flex items-start space-x-4">
-                  <img 
-                    src={review.userImage} 
-                    alt={review.userName}
-                    className="w-12 h-12 rounded-full"
-                  />
-                  <div className="flex-1">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <h4 className="font-medium text-gray-900">{review.userName}</h4>
-                        <p className="text-sm text-gray-500">{review.eventType}</p>
-                      </div>
-                      <div className="flex items-center">
-                        <StarIcon className="w-5 h-5 text-yellow-400" />
-                        <span className="ml-1 font-medium">{review.rating}</span>
-                      </div>
-                    </div>
-                    <p className="mt-2 text-gray-600">{review.content}</p>
-                    <p className="mt-2 text-sm text-gray-500">{review.date}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-    </div>
-  );
+  const venue = venues.find(v => v.id === id);
+  if (!venue) return <div>Venue not found</div>;
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <div className="relative h-[50vh] bg-black">
+      <div className="relative h-[50vh]">
         <img
           src={venue.images[0]}
           alt={venue.name}
-          className="w-full h-full object-cover opacity-90"
+          className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
         
+        {/* Action Buttons */}
+        <div className="absolute top-4 right-4 flex space-x-2">
+          <button 
+            onClick={() => setIsLiked(!isLiked)}
+            className="p-2 bg-white/10 backdrop-blur-md rounded-full"
+          >
+            <HeartIcon className={`h-6 w-6 ${isLiked ? 'text-red-500' : 'text-white'}`} />
+          </button>
+          <button className="p-2 bg-white/10 backdrop-blur-md rounded-full">
+            <ShareIcon className="h-6 w-6 text-white" />
+          </button>
+        </div>
+
         {/* Venue Info */}
-        <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
-          <div className="max-w-7xl mx-auto">
-            <div className="space-y-4">
-              <div className="inline-block px-4 py-1 rounded-full bg-blue-500 text-white text-sm font-medium">
-                {venue.type}
+        <div className="absolute bottom-4 left-0 right-0 px-4">
+          <div className="max-w-7xl mx-auto text-white">
+            <div className="flex items-center space-x-2 mb-2">
+              {venue.tags.map((tag, index) => (
+                <span key={index} className="px-2 py-1 text-xs bg-white/20 backdrop-blur-sm rounded-full">
+                  {tag}
+                </span>
+              ))}
+            </div>
+            <h1 className="text-4xl font-light mb-2">{venue.name}</h1>
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center">
+                <StarIcon className="h-5 w-5 text-yellow-400" />
+                <span className="ml-1">{venue.rating} ({venue.reviewCount} reviews)</span>
               </div>
-              <h1 className="text-4xl font-bold">{venue.name}</h1>
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center">
-                  <StarIcon className="h-5 w-5 text-yellow-400" />
-                  <span className="ml-1 font-medium">{venue.rating}</span>
-                  <span className="mx-1">·</span>
-                  <span>{venue.reviewCount} reviews</span>
-                </div>
-                <span>·</span>
-                <div className="flex items-center">
-                  <LocationIcon className="h-5 w-5 mr-1" />
-                  <span>{venue.location}</span>
-                </div>
+              <div className="flex items-center">
+                <MapPinIcon className="h-5 w-5 mr-1" />
+                <span>{venue.location}</span>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Mobile Estimator - Moved outside grid for better mobile layout */}
-        <div className="lg:hidden mb-8">
-          <VenueBookingWidget venue={venue} />
+      {/* Navigation Tabs */}
+      <div className="border-b bg-white">
+        <div className="max-w-7xl mx-auto px-4">
+          <nav className="flex space-x-8">
+            {['overview', 'packages', 'gallery', 'faq'].map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab as typeof activeTab)}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === tab
+                    ? 'border-purple-500 text-purple-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                {tab.charAt(0).toUpperCase() + tab.slice(1)}
+              </button>
+            ))}
+          </nav>
         </div>
+      </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-          {/* Left Column - Venue Info */}
-          <div className="lg:col-span-2">
-            {renderVenueDetails()}
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Left Column - Content */}
+          <div className="lg:w-2/3">
+            {activeTab === 'overview' && (
+              <div className="space-y-8">
+                {/* Description */}
+                <div>
+                  <h2 className="text-2xl font-light mb-4">About this venue</h2>
+                  <p className="text-gray-600 leading-relaxed">{venue.description}</p>
+                </div>
+
+                {/* Features */}
+                <div>
+                  <h2 className="text-2xl font-light mb-4">Features</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {venue.features.map((feature, index) => (
+                      <div key={index} className="bg-white p-4 rounded-lg shadow-sm">
+                        <span className="text-2xl">{feature.icon}</span>
+                        <h3 className="font-medium mt-2">{feature.title}</h3>
+                        <p className="text-sm text-gray-600 mt-1">{feature.description}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Capacity */}
+                <div>
+                  <h2 className="text-2xl font-light mb-4">Capacity</h2>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {Object.entries(venue.capacity).map(([layout, count]) => (
+                      <div key={layout} className="bg-white p-4 rounded-lg shadow-sm">
+                        <h3 className="text-sm text-gray-500 capitalize">{layout}</h3>
+                        <p className="text-2xl font-light mt-1">{count}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Amenities */}
+                <div>
+                  <h2 className="text-2xl font-light mb-4">Amenities</h2>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {venue.amenities.map((amenity, index) => (
+                      <div key={index} className="flex items-center space-x-2">
+                        <CheckCircleIcon className="h-5 w-5 text-green-500" />
+                        <span className="text-gray-600">{amenity}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Rules */}
+                <div>
+                  <h2 className="text-2xl font-light mb-4">Venue Rules</h2>
+                  <div className="bg-white rounded-lg p-6 shadow-sm">
+                    <ul className="space-y-4">
+                      {venue.rules.map((rule, index) => (
+                        <li key={index} className="flex items-start">
+                          <span className="text-gray-400 mr-2">•</span>
+                          <span className="text-gray-600">{rule}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'gallery' && (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {venue.images.map((image, index) => (
+                  <img
+                    key={index}
+                    src={image}
+                    alt={`${venue.name} - ${index + 1}`}
+                    className="rounded-lg w-full h-48 object-cover"
+                  />
+                ))}
+              </div>
+            )}
           </div>
 
-          {/* Right Column - Desktop Estimator */}
-          <div className="hidden lg:block lg:col-span-1">
-            <VenueBookingWidget venue={venue} />
+          {/* Right Column - Booking */}
+          <div className="lg:w-1/3">
+            <div className="sticky top-4 bg-white rounded-xl shadow-sm p-6">
+              <div className="mb-6">
+                <div className="flex justify-between items-baseline">
+                  <span className="text-3xl font-light">${venue.pricePerHour}</span>
+                  <span className="text-gray-500">per hour</span>
+                </div>
+                <div className="flex items-center space-x-4 mt-4 text-sm text-gray-500">
+                  <div className="flex items-center">
+                    <ClockIcon className="h-5 w-5 mr-1" />
+                    <span>{venue.minimumHours}hr minimum</span>
+                  </div>
+                  <div className="flex items-center">
+                    <UserGroupIcon className="h-5 w-5 mr-1" />
+                    <span>Up to {Math.max(...Object.values(venue.capacity))}</span>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setShowBookingFlow(true)}
+                className="w-full py-3 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition-colors"
+              >
+                Check Availability
+              </button>
+
+              <p className="text-sm text-gray-500 text-center mt-4">
+                {venue.cancellationPolicy}
+              </p>
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Booking Flow */}
+      {showBookingFlow && (
+        <VenueBookingFlow
+          venue={venue}
+          onClose={() => setShowBookingFlow(false)}
+        />
+      )}
     </div>
   );
 };
