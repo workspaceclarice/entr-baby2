@@ -1,101 +1,95 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth, googleProvider } from '../config/firebase';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, signOut } from 'firebase/auth';
-import { User } from 'firebase/auth';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, signOut, User, UserCredential } from 'firebase/auth';
 
 interface UserProfile {
   id: string;
   email: string;
   firstName: string;
-  lastName?: string;
-  profileImage?: string;
-  role: 'customer' | 'vendor';
+  lastName: string;
+  profileImage: string;
+  role: string;
+  name?: string;  // Optional for backward compatibility
 }
 
 interface AuthContextType {
   currentUser: User | null;
   userProfile: UserProfile | null;
-  userType: 'customer' | 'vendor' | null;
+  userType: string | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  loginWithGoogle: () => Promise<void>;
   signup: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
+  loginWithGoogle: () => Promise<UserCredential>;  // Changed return type
   logout: () => Promise<void>;
+  googleSignIn: () => Promise<void>;
 }
 
-export const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType | null>(null);
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const [userType, setUserType] = useState<'customer' | 'vendor' | null>(null);
+  const [userType, setUserType] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  const signup = async (email: string, password: string) => {
+    await createUserWithEmailAndPassword(auth, email, password);
+  };
+
   const login = async (email: string, password: string) => {
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-    } catch (error) {
-      console.error('Login error:', error);
-      throw error;
-    }
+    await signInWithEmailAndPassword(auth, email, password);
   };
 
   const loginWithGoogle = async () => {
-    try {
-      await signInWithPopup(auth, googleProvider);
-    } catch (error) {
-      console.error('Google login error:', error);
-      throw error;
-    }
+    const result = await signInWithPopup(auth, googleProvider);
+    // Here you might want to create/update user profile in your database
+    navigate('/dashboard');
+    return result;
   };
 
-  const signup = async (email: string, password: string) => {
+  const googleSignIn = async () => {
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      await signInWithPopup(auth, googleProvider);
+      navigate('/vendor/dashboard');
     } catch (error) {
-      console.error('Signup error:', error);
+      console.error('Google sign in error:', error);
       throw error;
     }
   };
 
   const logout = async () => {
-    try {
-      const currentUserType = userType; // Store the type before logout
-      await signOut(auth);
-      // Route based on stored user type
-      if (currentUserType === 'vendor') {
-        navigate('/vendors/landing');
-      } else {
-        navigate('/');
-      }
-    } catch (error) {
-      console.error('Logout error:', error);
-      throw error;
-    }
+    await signOut(auth);
+    setUserProfile(null);
+    setUserType(null);
+    navigate('/');
   };
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       setCurrentUser(user);
       if (user) {
-        // Mock user profile - replace with actual profile fetch
-        const mockProfile: UserProfile = {
+        // Here you would typically fetch the user's profile from your database
+        const nameParts = user.displayName?.split(' ') || ['', ''];
+        setUserProfile({
           id: user.uid,
           email: user.email || '',
-          firstName: user.displayName?.split(' ')[0] || '',
-          profileImage: user.photoURL || '',
-          role: 'customer' // Default role, should be fetched from your backend
-        };
-        setUserProfile(mockProfile);
-        // Here you would typically fetch the user type from your database
-        // For now, we'll check if the user logged in through the vendor flow
-        const isVendor = localStorage.getItem('userType') === 'vendor';
-        setUserType(isVendor ? 'vendor' : 'customer');
-      } else {
-        setUserProfile(null);
-        setUserType(null);
+          firstName: nameParts[0],
+          lastName: nameParts[1] || '',
+          profileImage: user.photoURL || `https://ui-avatars.com/api/?name=${nameParts[0]}+${nameParts[1]}`,
+          role: 'user', // You might want to fetch this from your database
+          name: user.displayName || 'User'
+        });
+        setUserType('user'); // Or fetch from database
       }
       setLoading(false);
     });
@@ -108,10 +102,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     userProfile,
     userType,
     loading,
+    signup,
     login,
     loginWithGoogle,
-    signup,
-    logout
+    logout,
+    googleSignIn
   };
 
   return (
@@ -121,10 +116,4 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 };
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-}; 
+export default AuthContext; 

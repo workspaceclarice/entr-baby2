@@ -96,14 +96,14 @@ export const DiscoveryPage: React.FC<DiscoveryPageProps> = ({ category }) => {
               </div>
             </div>
 
-            {/* Search Bar */}
-            <div className="relative">
+            {/* Updated Search Bar - Aligned Left */}
+            <div className="relative w-full max-w-2xl">
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={`Search ${category.toLowerCase()}...`}
-                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-6 py-3 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               />
             </div>
           </div>
