@@ -39,10 +39,13 @@ export interface Service {
   isAvailable: boolean;
   gallery: string[];
   packages: ServicePackage[];
-  faq?: Array<{
-    question: string;
-    answer: string;
-  }>;
+}
+
+export interface AdditionalItem {
+  id: string;
+  name: string;
+  price: number;
+  selected: boolean;
 }
 
 export {}; 

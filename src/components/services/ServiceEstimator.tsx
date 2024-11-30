@@ -6,7 +6,7 @@ import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
 
 export interface ServiceEstimatorProps {
   service: Service;
-  onBookNow: () => void;
+  onBookNow: (selectedItems: AdditionalItem[]) => void;
   selectedPackage: ServicePackage | null;
 }
 
@@ -87,6 +87,10 @@ const ServiceEstimator: React.FC<ServiceEstimatorProps> = ({ service, onBookNow,
         item.id === itemId ? { ...item, selected: !item.selected } : item
       )
     );
+  };
+
+  const handleBookNow = () => {
+    onBookNow(additionalItems.filter(item => item.selected));
   };
 
   return (
@@ -181,7 +185,7 @@ const ServiceEstimator: React.FC<ServiceEstimatorProps> = ({ service, onBookNow,
           </span>
         </div>
         <button
-          onClick={onBookNow}
+          onClick={handleBookNow}
           disabled={!date || !startTime || !endTime || !!timeError}
           className="w-full py-3 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
         >

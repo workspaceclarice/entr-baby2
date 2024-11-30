@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { MapPinIcon, TagIcon, ShareIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 import { HeartIcon, StarIcon } from '@heroicons/react/24/solid';
-import { Service, ServicePackage } from '../../types/service';
+import { Service, ServicePackage, AdditionalItem } from '../../types/service';
 import { services } from '../../data/services';
 import ServiceEstimator from '../../components/services/ServiceEstimator';
 import ServiceBookingFlow from '../../components/services/ServiceBookingFlow';
@@ -16,6 +16,10 @@ const ServiceDetailsPage: React.FC = () => {
   const [showBookingFlow, setShowBookingFlow] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState<ServicePackage | null>(null);
+  const [selectedDate, setSelectedDate] = useState<string>('');
+  const [selectedStartTime, setSelectedStartTime] = useState<string>('');
+  const [selectedEndTime, setSelectedEndTime] = useState<string>('');
+  const [selectedAdditionalItems, setSelectedAdditionalItems] = useState<AdditionalItem[]>([]);
   const [activeTab, setActiveTab] = useState<'overview' | 'packages' | 'gallery' | 'faq'>('overview');
 
   const service = services.find(s => s.id === id);
@@ -100,6 +104,11 @@ const ServiceDetailsPage: React.FC = () => {
         answer: 'Yes, we offer a variety of high-quality prints, canvas wraps, and custom-designed albums. These can be ordered directly through your online gallery or discussed during our consultation.'
       }
     ]
+  };
+
+  const handleBookNow = (items: AdditionalItem[]) => {
+    setSelectedAdditionalItems(items);
+    setShowBookingFlow(true);
   };
 
   return (
@@ -344,7 +353,7 @@ const ServiceDetailsPage: React.FC = () => {
               <div className="sticky top-4">
                 <ServiceEstimator
                   service={service}
-                  onBookNow={() => setShowBookingFlow(true)}
+                  onBookNow={handleBookNow}
                   selectedPackage={selectedPackage}
                 />
               </div>
@@ -358,6 +367,10 @@ const ServiceDetailsPage: React.FC = () => {
         <ServiceBookingFlow
           service={service}
           selectedPackage={selectedPackage}
+          initialDate={selectedDate}
+          initialStartTime={selectedStartTime}
+          initialEndTime={selectedEndTime}
+          additionalItems={selectedAdditionalItems}
           onClose={() => {
             setShowBookingFlow(false);
             setSelectedPackage(null);
