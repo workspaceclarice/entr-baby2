@@ -46,14 +46,14 @@ export const events: Event[] = [
     location: 'San Francisco, CA',
     price: '0',
     category: 'networking',
-    image: 'https://images.unsplash.com/photo-1511795409834-432f7b1dd2d8',
+    image: 'https://images.unsplash.com/photo-1511795409834-432f7b1dd2d8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2340&q=80',
     ticketsAvailable: 100,
     isRSVP: true,
+    attendeeCount: 85,
     organizer: {
       name: 'SF Startups',
-      image: 'https://example.com/organizer3.jpg'
-    },
-    attendeeCount: 85
+      image: 'https://images.unsplash.com/photo-1556761175-b413da4baf72?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80'
+    }
   }
 ];
 

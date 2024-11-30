@@ -1,193 +1,201 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Service } from '../../types';
+import React, { useState, useEffect } from 'react';
+import { Service, ServicePackage } from '../../types/service';
+import { CalendarIcon, ExclamationCircleIcon } from '@heroicons/react/24/outline';
 
-interface ServiceEstimatorProps {
+export interface ServiceEstimatorProps {
   service: Service;
-  onBookNow: (details: {
-    selectedPackage: string;
-    selectedAddons: string[];
-    date: string;
-    startTime: string;
-    endTime: string;
-  }) => void;
+  onBookNow: () => void;
+  selectedPackage: ServicePackage | null;
 }
 
-export const ServiceEstimator: React.FC<ServiceEstimatorProps> = ({ service, onBookNow }) => {
-  const [selectedPackage, setSelectedPackage] = useState<string | null>(null);
-  const [selectedAddons, setSelectedAddons] = useState<string[]>([]);
+interface AdditionalItem {
+  id: string;
+  name: string;
+  price: number;
+  selected: boolean;
+}
+
+const ServiceEstimator: React.FC<ServiceEstimatorProps> = ({ service, onBookNow, selectedPackage }) => {
   const [date, setDate] = useState('');
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
+  const [timeError, setTimeError] = useState<string | null>(null);
+  const [additionalItems, setAdditionalItems] = useState<AdditionalItem[]>([
+    { id: 'extra1', name: 'Additional Staff', price: 150, selected: false },
+    { id: 'extra2', name: 'Premium Equipment', price: 200, selected: false },
+    { id: 'extra3', name: 'Setup & Breakdown', price: 100, selected: false },
+  ]);
 
-  const calculateTotal = () => {
-    if (!selectedPackage || !service.packages) return 0;
-    const package_ = service.packages.find(p => p.id === selectedPackage);
-    if (!package_) return 0;
+  const validateTimes = (start: string, end: string) => {
+    if (!start || !end) return null;
 
-    const addonsTotal = selectedAddons.reduce((sum, addonId) => {
-      const addon = service.addons?.find(a => a.id === addonId);
-      return sum + (addon?.price || 0);
-    }, 0);
+    const [startHour, startMinute] = start.split(':').map(Number);
+    const [endHour, endMinute] = end.split(':').map(Number);
+    
+    const startDate = new Date();
+    startDate.setHours(startHour, startMinute);
+    
+    const endDate = new Date();
+    endDate.setHours(endHour, endMinute);
 
-    return package_.price + addonsTotal;
+    // Minimum 2 hours, maximum 12 hours
+    const hoursDiff = (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60);
+
+    if (endDate <= startDate) {
+      return "End time must be after start time";
+    }
+    if (hoursDiff < 2) {
+      return "Minimum booking duration is 2 hours";
+    }
+    if (hoursDiff > 12) {
+      return "Maximum booking duration is 12 hours";
+    }
+    return null;
   };
 
-  const handleBookNow = () => {
-    if (!selectedPackage) return;
-    onBookNow({
-      selectedPackage,
-      selectedAddons,
-      date,
-      startTime,
-      endTime
-    });
+  useEffect(() => {
+    const error = validateTimes(startTime, endTime);
+    setTimeError(error);
+  }, [startTime, endTime]);
+
+  const calculateHours = () => {
+    if (!startTime || !endTime || timeError) return 0;
+    const [startHour, startMinute] = startTime.split(':').map(Number);
+    const [endHour, endMinute] = endTime.split(':').map(Number);
+    const start = startHour * 60 + startMinute;
+    const end = endHour * 60 + endMinute;
+    return Math.max(0, (end - start) / 60);
+  };
+
+  const calculateTotal = () => {
+    const packagePrice = selectedPackage ? selectedPackage.price : service.basePrice;
+    const additionalItemsTotal = additionalItems
+      .filter(item => item.selected)
+      .reduce((sum, item) => sum + item.price, 0);
+    const hours = calculateHours();
+    const hourlyRate = packagePrice / 4;
+    const totalHoursCost = hours * hourlyRate;
+
+    return totalHoursCost + additionalItemsTotal;
+  };
+
+  const toggleItem = (itemId: string) => {
+    setAdditionalItems(items =>
+      items.map(item =>
+        item.id === itemId ? { ...item, selected: !item.selected } : item
+      )
+    );
   };
 
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-lg sticky top-24 border border-gray-200">
-      {/* Price Display */}
-      <div className="flex items-baseline mb-6">
-        <span className="text-2xl font-semibold">${calculateTotal()}</span>
-        <span className="text-lg text-gray-600 ml-2">starting price</span>
-      </div>
-
-      {/* Date and Time Selection Box */}
-      <div className="border border-gray-300 rounded-xl overflow-hidden mb-6">
-        {/* Date Selection */}
-        <div className="p-4 border-b border-gray-300">
-          <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-2">
-            Date
-          </label>
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            className="w-full text-lg border-none p-0 focus:ring-0"
-            min={new Date().toISOString().split('T')[0]}
-          />
-        </div>
-
-        {/* Time Selection */}
-        <div className="p-4">
+    <div className="bg-white rounded-xl shadow-sm p-6">
+      {/* Date and Time Selection */}
+      <div className="mb-6">
+        <h3 className="text-lg font-medium text-gray-900 mb-4">Select Date & Time</h3>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Date
+            </label>
+            <div className="relative">
+              <input
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                min={new Date().toISOString().split('T')[0]}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              />
+              <CalendarIcon className="absolute right-3 top-2.5 h-5 w-5 text-gray-400" />
+            </div>
+          </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Start Time
               </label>
               <input
                 type="time"
                 value={startTime}
                 onChange={(e) => setStartTime(e.target.value)}
-                className="w-full text-lg border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
+                  timeError ? 'border-red-300' : 'border-gray-300'
+                }`}
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 End Time
               </label>
               <input
                 type="time"
                 value={endTime}
                 onChange={(e) => setEndTime(e.target.value)}
-                className="w-full text-lg border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
+                  timeError ? 'border-red-300' : 'border-gray-300'
+                }`}
               />
             </div>
           </div>
+          {timeError ? (
+            <div className="flex items-center text-sm text-red-600">
+              <ExclamationCircleIcon className="h-4 w-4 mr-1" />
+              {timeError}
+            </div>
+          ) : startTime && endTime && (
+            <div className="text-sm text-gray-500">
+              Duration: {calculateHours()} hours
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Package Selection */}
+      {/* Additional Items */}
       <div className="mb-6">
-        <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-2">
-          Select Package
-        </label>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">Additional Items</h3>
         <div className="space-y-3">
-          {service.packages?.map((pkg) => (
+          {additionalItems.map((item) => (
             <label
-              key={pkg.id}
-              className={`block relative p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                selectedPackage === pkg.id
-                  ? 'border-purple-500 bg-purple-50'
-                  : 'border-gray-200 hover:border-gray-300'
-              }`}
+              key={item.id}
+              className="flex items-center justify-between p-3 rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors"
             >
-              <input
-                type="radio"
-                name="package"
-                value={pkg.id}
-                checked={selectedPackage === pkg.id}
-                onChange={(e) => setSelectedPackage(e.target.value)}
-                className="hidden"
-              />
-              <div className="space-y-2">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <span className="block font-medium text-gray-900">{pkg.name}</span>
-                    <span className="block text-sm text-gray-500">{pkg.description}</span>
-                  </div>
-                  <span className="font-semibold">${pkg.price}</span>
-                </div>
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={item.selected}
+                  onChange={() => toggleItem(item.id)}
+                  className="h-4 w-4 text-purple-600 rounded border-gray-300 focus:ring-purple-500"
+                />
+                <span className="ml-3 text-gray-900">{item.name}</span>
               </div>
+              <span className="text-gray-600">${item.price}</span>
             </label>
           ))}
         </div>
       </div>
 
-      {/* Add-ons Selection */}
-      {selectedPackage && service.addons && (
-        <div className="mb-6">
-          <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-2">
-            Additional Services
-          </label>
-          <div className="space-y-3">
-            {service.addons.map((addon) => (
-              <label
-                key={addon.id}
-                className={`block relative p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                  selectedAddons.includes(addon.id)
-                    ? 'border-purple-500 bg-purple-50'
-                    : 'border-gray-200 hover:border-gray-300'
-                }`}
-              >
-                <input
-                  type="checkbox"
-                  checked={selectedAddons.includes(addon.id)}
-                  onChange={(e) => {
-                    if (e.target.checked) {
-                      setSelectedAddons([...selectedAddons, addon.id]);
-                    } else {
-                      setSelectedAddons(selectedAddons.filter(id => id !== addon.id));
-                    }
-                  }}
-                  className="hidden"
-                />
-                <div className="flex justify-between items-start">
-                  <div>
-                    <span className="block font-medium text-gray-900">{addon.name}</span>
-                    <span className="block text-sm text-gray-500">{addon.description}</span>
-                  </div>
-                  <span className="font-semibold">+${addon.price}</span>
-                </div>
-              </label>
-            ))}
-          </div>
+      {/* Total and Book Button */}
+      <div className="border-t pt-6">
+        <div className="flex justify-between items-center mb-4">
+          <span className="text-gray-900 font-medium">Estimated Total</span>
+          <span className="text-2xl font-semibold text-gray-900">
+            ${calculateTotal()}
+          </span>
         </div>
-      )}
-
-      {/* Book Now Button */}
-      <button
-        onClick={handleBookNow}
-        disabled={!selectedPackage || !date || !startTime || !endTime}
-        className="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-4 px-4 rounded-xl font-semibold text-lg hover:from-purple-700 hover:to-purple-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        Book Now
-      </button>
-
-      <p className="text-center text-sm text-gray-500 mt-4">
-        You won't be charged yet
-      </p>
+        <button
+          onClick={onBookNow}
+          disabled={!date || !startTime || !endTime || !!timeError}
+          className="w-full py-3 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+        >
+          Book Now
+        </button>
+        {(!date || !startTime || !endTime || timeError) && (
+          <p className="text-sm text-gray-500 text-center mt-2">
+            {timeError || 'Please select date and time to continue'}
+          </p>
+        )}
+      </div>
     </div>
   );
 };

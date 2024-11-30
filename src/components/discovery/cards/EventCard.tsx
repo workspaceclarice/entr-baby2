@@ -8,9 +8,8 @@ interface EventCardProps {
 }
 
 const EventCard: React.FC<EventCardProps> = ({ event }) => {
-  const formatPrice = (price: string): string => {
-    if (price === 'Free' || price === '0') return 'Free';
-    return price;
+  const formatPrice = (price: string) => {
+    return price === '0' ? 'Free' : `$${price}`;
   };
 
   const displayPrice = event.formattedPrice || formatPrice(event.price);

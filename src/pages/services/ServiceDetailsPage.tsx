@@ -1,293 +1,367 @@
 import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Service } from '../../types';
+import { useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { MapPinIcon, TagIcon, ShareIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
+import { HeartIcon, StarIcon } from '@heroicons/react/24/solid';
+import { Service, ServicePackage } from '../../types/service';
+import { services } from '../../data/services';
 import ServiceEstimator from '../../components/services/ServiceEstimator';
 import ServiceBookingFlow from '../../components/services/ServiceBookingFlow';
-import { services } from '../../data/services'; // Import services data
-
-interface ServiceDetailsTab {
-  id: string;
-  name: string;
-}
-
-const tabs: ServiceDetailsTab[] = [
-  { id: 'overview', name: 'Overview' },
-  { id: 'pricing', name: 'Pricing & Packages' },
-  { id: 'portfolio', name: 'Portfolio' },
-  { id: 'reviews', name: 'Reviews' },
-  { id: 'faq', name: 'FAQ' }
-];
+import VendorProfile from '../../components/vendors/VendorProfile';
+import { Disclosure, Transition } from '@headlessui/react';
+import { ChevronDownIcon } from '@heroicons/react/24/outline';
 
 const ServiceDetailsPage: React.FC = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
   const [showBookingFlow, setShowBookingFlow] = useState(false);
-  const [selectedTime, setSelectedTime] = useState('');
+  const [isLiked, setIsLiked] = useState(false);
+  const [selectedPackage, setSelectedPackage] = useState<ServicePackage | null>(null);
+  const [activeTab, setActiveTab] = useState<'overview' | 'packages' | 'gallery' | 'faq'>('overview');
 
-  // Find the service based on ID
-  const service = services.find(s => s.id === id) || services[0];
+  const service = services.find(s => s.id === id);
+  if (!service) return <div>Service not found</div>;
 
-  const handleBookNow = (details: {
-    selectedPackage: string;
-    selectedAddons: string[];
-    date: string;
-    startTime: string;
-    endTime: string;
-  }) => {
-    // Show booking flow immediately instead of navigating
-    setShowBookingFlow(true);
+  // Mock data for the service details
+  const mockServiceDetails = {
+    vendorProfile: {
+      vendorId: 'v1',
+      name: 'Elite Photography Studio',
+      image: 'https://images.unsplash.com/photo-1556157382-97eda2d62296',
+      bio: 'Award-winning photography studio specializing in events and portraits. Our team of professional photographers brings creative vision and technical expertise to every shoot.',
+      rating: 4.9,
+      reviewCount: 128,
+      responseTime: '1 hour',
+      memberSince: 'Jan 2020',
+      isVerified: true
+    },
+    highlights: [
+      { icon: '📸', text: '10+ Years Experience' },
+      { icon: '🏆', text: 'Award Winning' },
+      { icon: '⚡', text: 'Quick Response' },
+      { icon: '✨', text: 'Premium Equipment' }
+    ],
+    testimonials: [
+      {
+        id: 't1',
+        author: 'Sarah M.',
+        image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330',
+        rating: 5,
+        text: 'Absolutely amazing service! The team was professional, creative, and delivered stunning photos.',
+        date: '2 weeks ago'
+      },
+      {
+        id: 't2',
+        author: 'Michael R.',
+        image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e',
+        rating: 5,
+        text: 'Elite Photography exceeded all our expectations. They captured every special moment perfectly.',
+        date: '1 month ago'
+      }
+    ],
+    faq: [
+      {
+        question: 'What is your cancellation policy?',
+        answer: 'Free cancellation up to 48 hours before the event. Cancellations within 48 hours may be subject to a fee of 25% of the total booking amount. In case of emergencies, please contact us to discuss options.'
+      },
+      {
+        question: 'Do you provide raw files?',
+        answer: 'We provide fully edited high-resolution images in both digital and print formats. Raw files are available for an additional fee and are typically requested by clients who have their own post-processing preferences.'
+      },
+      {
+        question: 'How long does it take to get the photos?',
+        answer: "You will receive a curated preview within 48 hours of the event. The full gallery will be delivered within 2 weeks, professionally edited and ready for download."
+      },
+      {
+        question: 'What equipment do you use?',
+        answer: 'We use professional-grade Canon and Sony mirrorless cameras, along with a variety of premium lenses suitable for different lighting conditions and styles. Our equipment is regularly maintained and we always carry backup gear.'
+      },
+      {
+        question: 'Do you have backup photographers?',
+        answer: 'Yes, we maintain a network of professional photographers who can step in if needed. For large events, we typically recommend having a second shooter regardless, to ensure comprehensive coverage.'
+      },
+      {
+        question: 'What is your payment structure?',
+        answer: 'We require a 30% deposit to secure your date, with the remaining balance due one week before the event. We accept all major credit cards, bank transfers, and digital payment methods.'
+      },
+      {
+        question: 'Do you travel for events?',
+        answer: 'Yes, we are available for events worldwide. Travel fees may apply for locations outside of our base area. Please contact us for a custom quote including travel arrangements.'
+      },
+      {
+        question: 'What happens if there is bad weather?',
+        answer: 'For outdoor shoots, we monitor weather conditions closely and will work with you to either proceed with indoor alternatives or reschedule if necessary, at no additional cost.'
+      },
+      {
+        question: 'How many photos will we receive?',
+        answer: 'The number of photos varies depending on the package and event duration, but you can typically expect 50-75 edited photos per hour of coverage. All photos are carefully curated and edited to our professional standards.'
+      },
+      {
+        question: 'Do you offer prints or albums?',
+        answer: 'Yes, we offer a variety of high-quality prints, canvas wraps, and custom-designed albums. These can be ordered directly through your online gallery or discussed during our consultation.'
+      }
+    ]
   };
-
-  const renderServiceDetails = () => (
-    <div className="space-y-12">
-      {/* Service Details Summary */}
-      <section className="bg-white rounded-xl p-8 shadow-sm">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="flex items-start space-x-3">
-            <ClockIcon className="w-6 h-6 text-gray-400" />
-            <div>
-              <h3 className="font-medium text-gray-900">Minimum Duration</h3>
-              <p className="text-gray-600">4 hours</p>
-            </div>
-          </div>
-          <div className="flex items-start space-x-3">
-            <LocationIcon className="w-6 h-6 text-gray-400" />
-            <div>
-              <h3 className="font-medium text-gray-900">Service Area</h3>
-              <p className="text-gray-600">{service.location}</p>
-            </div>
-          </div>
-          <div className="flex items-start space-x-3">
-            <CheckCircleIcon className="w-6 h-6 text-gray-400" />
-            <div>
-              <h3 className="font-medium text-gray-900">Response Time</h3>
-              <p className="text-gray-600">Usually within 24 hours</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* About Section */}
-      <section className="bg-white rounded-xl p-8 shadow-sm">
-        <h2 className="text-2xl font-semibold mb-6">About This Service</h2>
-        <p className="text-gray-600 whitespace-pre-line leading-relaxed">
-          {service.description}
-        </p>
-      </section>
-
-      {/* Features Grid */}
-      <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {service.features?.map((feature: { title: string; description: string; icon: string }, index: number) => (
-          <div key={index} className="bg-white rounded-xl p-6 shadow-sm">
-            <div className="text-3xl mb-4">{feature.icon}</div>
-            <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
-            <p className="text-gray-600">{feature.description}</p>
-          </div>
-        ))}
-      </section>
-
-      {/* Photo Gallery Grid - Moved to before reviews */}
-      <section>
-        <h2 className="text-2xl font-semibold mb-6">Gallery</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          {service.gallery?.map((photo: string, index: number) => (
-            <div 
-              key={index}
-              className={`relative rounded-lg overflow-hidden ${
-                index === 0 ? 'col-span-2 row-span-2' : ''
-              }`}
-            >
-              <img
-                src={photo}
-                alt={`${service.vendorName} - Photo ${index + 1}`}
-                className="w-full h-full object-cover aspect-square"
-              />
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Client Reviews */}
-      <section className="bg-white rounded-xl p-8 shadow-sm">
-        <div className="flex items-center justify-between mb-8">
-          <h2 className="text-2xl font-semibold">Client Reviews</h2>
-          <div className="flex items-center">
-            <StarIcon className="w-6 h-6 text-yellow-400" />
-            <span className="ml-2 font-semibold">{service.rating}</span>
-            <span className="mx-2 text-gray-400">·</span>
-            <span className="text-gray-600">{service.reviewCount} reviews</span>
-          </div>
-        </div>
-
-        <div className="space-y-8">
-          {[
-            {
-              name: "Sarah M.",
-              image: "https://picsum.photos/seed/review1/100/100",
-              rating: 5,
-              date: "2 weeks ago",
-              eventType: "Wedding Reception",
-              review: "Elite DJs was absolutely amazing! Our DJ read the crowd perfectly and kept everyone dancing all night. The lighting setup was beautiful and really added to the atmosphere. Highly recommend!"
-            },
-            {
-              name: "Michael R.",
-              image: "https://picsum.photos/seed/review2/100/100",
-              rating: 5,
-              date: "1 month ago",
-              eventType: "Corporate Event",
-              review: "Very professional service from start to finish. Great communication during planning, and excellent execution during the event. The sound quality was top-notch."
-            },
-            {
-              name: "Jessica L.",
-              image: "https://picsum.photos/seed/review3/100/100",
-              rating: 4,
-              date: "2 months ago",
-              eventType: "Birthday Party",
-              review: "Great music selection and very accommodating with our requests. Would definitely book again!"
-            }
-          ].map((review, index) => (
-            <div key={index} className="border-b border-gray-100 last:border-0 pb-8 last:pb-0">
-              <div className="flex items-start space-x-4">
-                <img 
-                  src={review.image} 
-                  alt={review.name}
-                  className="w-12 h-12 rounded-full"
-                />
-                <div className="flex-1">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h4 className="font-medium text-gray-900">{review.name}</h4>
-                      <p className="text-sm text-gray-500">{review.eventType}</p>
-                    </div>
-                    <div className="flex items-center">
-                      <StarIcon className="w-5 h-5 text-yellow-400" />
-                      <span className="ml-1 font-medium">{review.rating}</span>
-                    </div>
-                  </div>
-                  <p className="mt-2 text-gray-600">{review.review}</p>
-                  <p className="mt-2 text-sm text-gray-500">{review.date}</p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-    </div>
-  );
-
-  const ClockIcon: React.FC<{ className?: string }> = ({ className }) => (
-    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-    </svg>
-  );
-
-  const CheckCircleIcon: React.FC<{ className?: string }> = ({ className }) => (
-    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-    </svg>
-  );
-
-  const StarIcon: React.FC<{ className?: string }> = ({ className }) => (
-    <svg className={className} fill="currentColor" viewBox="0 0 20 20">
-      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-    </svg>
-  );
-
-  const LocationIcon: React.FC<{ className?: string }> = ({ className }) => (
-    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-    </svg>
-  );
-
-  const CheckIcon: React.FC<{ className?: string }> = ({ className }) => (
-    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-    </svg>
-  );
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <div className="relative h-[50vh] bg-black">
+      <div className="relative h-[40vh]">
         <img
           src={service.profileImage}
-          alt={service.vendorName}
-          className="w-full h-full object-cover opacity-90"
+          alt={service.title}
+          className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
         
-        {/* Vendor Profile Preview - Now clickable */}
-        <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
-          <div className="max-w-7xl mx-auto">
-            <div className="flex items-center space-x-6">
-              {/* Make the entire vendor section clickable */}
-              <div 
-                onClick={() => navigate(`/vendors/${service.vendorId}`)}
-                className="flex items-center space-x-6 cursor-pointer hover:opacity-90 transition-opacity"
-              >
-                <img
-                  src={service.vendorImage}
-                  alt={service.vendorName}
-                  className="w-24 h-24 rounded-full border-4 border-white shadow-xl"
-                />
-                <div>
-                  <div className="inline-block px-4 py-1 rounded-full bg-blue-500 text-white text-sm font-medium mb-4">
-                    {service.serviceType}
-                  </div>
-                  <h1 className="text-4xl font-bold mb-2">{service.vendorName}</h1>
-                  <div className="flex items-center space-x-4">
-                    <div className="flex items-center">
-                      <StarIcon className="h-5 w-5 text-yellow-400" />
-                      <span className="ml-1 font-medium">{service.rating}</span>
-                      <span className="mx-1">·</span>
-                      <span>{service.reviewCount} reviews</span>
-                    </div>
-                    <span>·</span>
-                    <div className="flex items-center">
-                      <LocationIcon className="h-5 w-5 mr-1" />
-                      <span>{service.location}</span>
-                    </div>
-                  </div>
-                </div>
+        {/* Action Buttons */}
+        <div className="absolute top-4 right-4 flex space-x-2">
+          <button onClick={() => setIsLiked(!isLiked)} className="p-2 bg-white/10 backdrop-blur-md rounded-full">
+            <HeartIcon className={`h-6 w-6 ${isLiked ? 'text-red-500' : 'text-white'}`} />
+          </button>
+          <button className="p-2 bg-white/10 backdrop-blur-md rounded-full">
+            <ShareIcon className="h-6 w-6 text-white" />
+          </button>
+        </div>
+
+        {/* Service Info */}
+        <div className="absolute bottom-4 left-0 right-0 px-4">
+          <div className="max-w-7xl mx-auto text-white">
+            <h1 className="text-3xl font-light mb-2">{service.title}</h1>
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center">
+                <MapPinIcon className="h-5 w-5 mr-1" />
+                <span>{service.location}</span>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Mobile Estimator */}
-        <div className="lg:hidden mb-8">
-          <ServiceEstimator 
-            service={service}
-            onBookNow={handleBookNow}
-          />
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-          {/* Left Column - Service Info */}
-          <div className="lg:col-span-2">
-            {renderServiceDetails()}
-          </div>
-
-          {/* Right Column - Desktop Estimator */}
-          <div className="hidden lg:block lg:col-span-1">
-            <ServiceEstimator 
-              service={service}
-              onBookNow={handleBookNow}
-            />
-          </div>
+      {/* Navigation Tabs */}
+      <div className="border-b bg-white">
+        <div className="max-w-7xl mx-auto px-4">
+          <nav className="flex space-x-8">
+            {['overview', 'packages', 'gallery', 'faq'].map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab as typeof activeTab)}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === tab
+                    ? 'border-purple-500 text-purple-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                {tab.charAt(0).toUpperCase() + tab.slice(1)}
+              </button>
+            ))}
+          </nav>
         </div>
       </div>
 
-      {/* Booking Flow Modal */}
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Left Column - Content */}
+          <div className={`${activeTab === 'overview' ? 'lg:w-2/3' : 'w-full'}`}>
+            {activeTab === 'overview' && (
+              <div className="space-y-8">
+                {/* Vendor Profile */}
+                <VendorProfile {...mockServiceDetails.vendorProfile} />
+
+                {/* Highlights */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {mockServiceDetails.highlights.map((highlight, index) => (
+                    <div key={index} className="bg-white rounded-lg p-4 text-center">
+                      <span className="text-2xl">{highlight.icon}</span>
+                      <p className="mt-2 text-sm font-medium text-gray-600">{highlight.text}</p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Description */}
+                <div>
+                  <h2 className="text-2xl font-light mb-4">About this service</h2>
+                  <p className="text-gray-600 leading-relaxed">{service.description}</p>
+                </div>
+
+                {/* Features */}
+                <div>
+                  <h2 className="text-2xl font-light mb-4">What's included</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {service.features.map((feature, index) => (
+                      <div key={index} className="flex items-start space-x-3">
+                        <span className="text-2xl">{feature.icon}</span>
+                        <div>
+                          <h3 className="font-medium">{feature.title}</h3>
+                          <p className="text-sm text-gray-600">{feature.description}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Testimonials */}
+                <div>
+                  <h2 className="text-2xl font-light mb-4">What people are saying</h2>
+                  <div className="grid gap-6">
+                    {mockServiceDetails.testimonials.map((testimonial) => (
+                      <div key={testimonial.id} className="bg-white rounded-xl p-6 shadow-sm">
+                        <div className="flex items-start space-x-4">
+                          <img
+                            src={testimonial.image}
+                            alt={testimonial.author}
+                            className="w-12 h-12 rounded-full"
+                          />
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between">
+                              <h3 className="font-medium">{testimonial.author}</h3>
+                              <span className="text-sm text-gray-500">{testimonial.date}</span>
+                            </div>
+                            <div className="flex items-center mt-1 mb-2">
+                              {[...Array(testimonial.rating)].map((_, i) => (
+                                <StarIcon key={i} className="h-4 w-4 text-yellow-400" />
+                              ))}
+                            </div>
+                            <p className="text-gray-600">{testimonial.text}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'packages' && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {service.packages.map((pkg) => (
+                  <div
+                    key={pkg.id}
+                    className={`bg-white rounded-xl p-6 shadow-sm ${
+                      pkg.isPopular ? 'ring-2 ring-purple-500' : ''
+                    }`}
+                  >
+                    {pkg.isPopular && (
+                      <span className="inline-block px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm mb-4">
+                        Most Popular
+                      </span>
+                    )}
+                    <h3 className="text-xl font-medium mb-2">{pkg.name}</h3>
+                    <p className="text-3xl font-light mb-4">${pkg.price}</p>
+                    <p className="text-sm text-gray-600 mb-4">{pkg.description}</p>
+                    <ul className="space-y-2 mb-6">
+                      {pkg.features.map((feature, index) => (
+                        <li key={index} className="flex items-center text-sm">
+                          <CheckCircleIcon className="h-5 w-5 text-green-500 mr-2" />
+                          {feature}
+                        </li>
+                      ))}
+                    </ul>
+                    <button
+                      onClick={() => {
+                        setSelectedPackage(pkg);
+                        setShowBookingFlow(true);
+                      }}
+                      className="w-full py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                    >
+                      Select Package
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {activeTab === 'gallery' && (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {service.gallery.map((image, index) => (
+                  <img
+                    key={index}
+                    src={image}
+                    alt={`Gallery ${index + 1}`}
+                    className="rounded-lg w-full h-64 object-cover"
+                  />
+                ))}
+              </div>
+            )}
+
+            {activeTab === 'faq' && (
+              <div className="max-w-3xl mx-auto">
+                <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+                  <div className="p-6 border-b border-gray-200">
+                    <h2 className="text-2xl font-light">Frequently Asked Questions</h2>
+                    <p className="mt-2 text-gray-600">Everything you need to know about our photography services.</p>
+                  </div>
+                  <div className="divide-y divide-gray-200">
+                    {mockServiceDetails.faq.map((item, index) => (
+                      <Disclosure key={index}>
+                        {({ open }) => (
+                          <>
+                            <Disclosure.Button className="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50">
+                              <span className="text-gray-900 font-medium">{item.question}</span>
+                              <ChevronDownIcon
+                                className={`${
+                                  open ? 'transform rotate-180' : ''
+                                } w-5 h-5 text-gray-500 transition-transform duration-200`}
+                              />
+                            </Disclosure.Button>
+                            <Transition
+                              enter="transition duration-100 ease-out"
+                              enterFrom="transform scale-95 opacity-0"
+                              enterTo="transform scale-100 opacity-100"
+                              leave="transition duration-75 ease-out"
+                              leaveFrom="transform scale-100 opacity-100"
+                              leaveTo="transform scale-95 opacity-0"
+                            >
+                              <Disclosure.Panel className="px-6 py-4 bg-gray-50">
+                                <p className="text-gray-600 leading-relaxed">
+                                  {item.answer}
+                                </p>
+                              </Disclosure.Panel>
+                            </Transition>
+                          </>
+                        )}
+                      </Disclosure>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Contact Support */}
+                <div className="mt-8 text-center">
+                  <p className="text-gray-600">
+                    Still have questions?{' '}
+                    <button className="text-purple-600 font-medium hover:text-purple-700">
+                      Contact our support team
+                    </button>
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Right Column - Estimator (only shown in overview tab) */}
+          {activeTab === 'overview' && (
+            <div className="lg:w-1/3">
+              <div className="sticky top-4">
+                <ServiceEstimator
+                  service={service}
+                  onBookNow={() => setShowBookingFlow(true)}
+                  selectedPackage={selectedPackage}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Booking Flow */}
       {showBookingFlow && (
         <ServiceBookingFlow
           service={service}
-          onClose={() => setShowBookingFlow(false)}
+          selectedPackage={selectedPackage}
+          onClose={() => {
+            setShowBookingFlow(false);
+            setSelectedPackage(null);
+          }}
         />
       )}
     </div>

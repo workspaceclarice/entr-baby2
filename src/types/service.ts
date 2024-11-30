@@ -1,3 +1,14 @@
+export interface ServicePackage {
+  id: string;
+  name: string;
+  price: number;
+  description: string;
+  features: string[];
+  duration: string;
+  includes: string[];
+  isPopular?: boolean;
+}
+
 export interface Service {
   id: string;
   title: string;
@@ -11,21 +22,27 @@ export interface Service {
   basePrice: number;
   profileImage: string;
   type: string;
+  tags: string[];
   vendorId: string;
   vendorImage: string;
   vendorBio: string;
   serviceType: string;
-  features?: Array<{
+  features: Array<{
     title: string;
     description: string;
     icon: string;
   }>;
-  gallery?: string[];
   priceRange: {
     min: number;
     max: number;
   };
   isAvailable: boolean;
+  gallery: string[];
+  packages: ServicePackage[];
+  faq?: Array<{
+    question: string;
+    answer: string;
+  }>;
 }
 
 export {}; 

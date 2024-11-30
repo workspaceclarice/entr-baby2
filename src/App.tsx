@@ -17,6 +17,7 @@ import VendorOnboarding from './pages/vendors/onboarding/VendorOnboarding';
 import VendorDashboard from './pages/vendors/dashboard/VendorDashboard';
 import VendorFeatures from './pages/vendors/features/VendorFeatures';
 import VendorPricing from './pages/vendors/pricing/VendorPricing';
+import EventDetailPage from './pages/events/EventDetailPage';
 
 const AppRoutes = () => {
   const location = useLocation();
@@ -36,6 +37,7 @@ const AppRoutes = () => {
         <Route path="/services/:id" element={<ServiceDetailsPage />} />
         <Route path="/services/:id/book" element={<ServiceBookingPage />} />
         <Route path="/dashboard" element={<UnifiedDashboard />} />
+        <Route path="/events/:id" element={<EventDetailPage />} />
 
         {/* Vendor Routes */}
         <Route path="/vendors/landing" element={<VendorLandingPage />} />

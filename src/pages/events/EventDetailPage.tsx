@@ -1,104 +1,183 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { CalendarIcon, MapPinIcon, TicketIcon, ClockIcon } from '@heroicons/react/24/outline';
+import { motion } from 'framer-motion';
+import { MapPinIcon, CalendarIcon, ClockIcon, UserGroupIcon, ShareIcon } from '@heroicons/react/24/outline';
+import { HeartIcon } from '@heroicons/react/24/solid';
+import { Event } from '../../types/event';
+import { events } from '../../data/events';
+import EventCheckout from '../../components/events/EventCheckout';
+import FloatingTicketPurchase from '../../components/events/FloatingTicketPurchase';
+import HostSection from '../../components/events/HostSection';
+import EventLocationMap from '../../components/events/EventLocationMap';
+import { mockEventData } from '../../data/mockEventData';
+import FloatingRSVP from '../../components/events/FloatingRSVP';
+import RSVPFlow from '../../components/events/RSVPFlow';
 
 const EventDetailPage: React.FC = () => {
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
+  const [showCheckout, setShowCheckout] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
+  const [rsvpStatus, setRsvpStatus] = useState<'going' | 'not-going' | 'maybe' | null>(null);
 
-  // Mock data - replace with real data fetch
-  const event = {
-    id: '1',
-    title: 'Summer Music Festival 2024',
-    date: 'Aug 15, 2024',
-    time: '4:00 PM',
-    endTime: '11:00 PM',
-    location: 'Grand Park, Los Angeles',
-    address: '200 N Grand Ave, Los Angeles, CA 90012',
-    image: 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3',
-    price: '$49',
-    category: 'Music',
-    description: 'Join us for the biggest music festival of the summer featuring top artists and bands. Experience live performances across multiple stages, food vendors, and more.',
-    organizer: {
-      name: 'LA Events Co',
-      image: 'https://images.unsplash.com/photo-1549468057-5b7fa1a41d7a',
-    }
+  const event = events.find(e => e.id === id);
+  if (!event) return <div>Event not found</div>;
+
+  const formatTime = (time: string) => {
+    const [hours, minutes] = time.split(':');
+    const hour = parseInt(hours);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const standardHour = hour % 12 || 12;
+    return `${standardHour}:${minutes} ${ampm}`;
+  };
+
+  const handleRSVP = (status: 'going' | 'not-going' | 'maybe') => {
+    setRsvpStatus(status);
+    setShowCheckout(true);
+  };
+
+  const handleRSVPSubmit = (formData: any) => {
+    console.log('RSVP Data:', { status: rsvpStatus, ...formData });
+    setShowCheckout(false);
+    // Handle form submission
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white pb-24">
       {/* Hero Image */}
-      <div className="h-[50vh] relative">
+      <div className="relative h-[45vh]">
         <img
           src={event.image}
           alt={event.title}
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
+        
+        {/* Action Buttons */}
+        <div className="absolute top-4 right-4 flex space-x-2">
+          <button onClick={() => setIsLiked(!isLiked)} className="p-2 bg-white/10 backdrop-blur-md rounded-full">
+            <HeartIcon className={`h-5 w-5 ${isLiked ? 'text-red-500' : 'text-white'}`} />
+          </button>
+          <button className="p-2 bg-white/10 backdrop-blur-md rounded-full">
+            <ShareIcon className="h-5 w-5 text-white" />
+          </button>
+        </div>
       </div>
 
-      {/* Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-32 relative pb-12">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-              <span className="inline-block px-3 py-1 bg-purple-600 text-white text-sm rounded-full mb-4">
-                {event.category}
-              </span>
-              <h1 className="text-3xl font-bold text-gray-900 mb-4">
-                {event.title}
-              </h1>
-              <div className="space-y-4 mb-6">
-                <div className="flex items-center text-gray-600">
-                  <CalendarIcon className="h-5 w-5 mr-2" />
-                  <span>{event.date}</span>
-                </div>
-                <div className="flex items-center text-gray-600">
-                  <ClockIcon className="h-5 w-5 mr-2" />
-                  <span>{event.time} - {event.endTime}</span>
-                </div>
-                <div className="flex items-center text-gray-600">
-                  <MapPinIcon className="h-5 w-5 mr-2" />
-                  <span>{event.address}</span>
-                </div>
-              </div>
-              <div className="prose max-w-none">
-                <h2 className="text-xl font-semibold mb-4">About this event</h2>
-                <p>{event.description}</p>
-              </div>
-            </div>
-
-            {/* Organizer */}
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-xl font-semibold mb-4">Organizer</h2>
-              <div className="flex items-center">
+      {/* Main Content */}
+      <div className="max-w-4xl mx-auto px-4">
+        {/* Host Section - Now Left Aligned */}
+        <div className="py-6 border-b border-gray-100">
+          <div className="flex items-center space-x-4">
+            {mockEventData.hosts.map((host, index) => (
+              <div key={index} className="flex items-center space-x-3">
                 <img
-                  src={event.organizer.image}
-                  alt={event.organizer.name}
-                  className="w-12 h-12 rounded-full"
+                  src={host.image}
+                  alt={host.name}
+                  className="w-12 h-12 rounded-full border-2 border-white shadow-sm"
                 />
-                <div className="ml-4">
-                  <h3 className="font-medium">{event.organizer.name}</h3>
-                  <p className="text-sm text-gray-500">Event Organizer</p>
+                <div>
+                  <p className="text-sm font-medium text-gray-900">{host.name}</p>
+                  <p className="text-xs text-gray-500">{host.role}</p>
                 </div>
               </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Event Details */}
+        <div className="py-6">
+          <h1 className="text-3xl font-light text-gray-900 mb-4">{event.title}</h1>
+          <div className="space-y-2 text-gray-600 mb-8">
+            <div className="flex items-center">
+              <CalendarIcon className="h-4 w-4 mr-3" />
+              <span className="font-light text-sm">
+                {new Date(event.date).toLocaleDateString()} at {formatTime(event.time)}
+              </span>
+            </div>
+            <div className="flex items-center">
+              <MapPinIcon className="h-4 w-4 mr-3" />
+              <span className="font-light text-sm">{event.location}</span>
+            </div>
+            <div className="flex items-center">
+              <UserGroupIcon className="h-4 w-4 mr-3" />
+              <span className="font-light text-sm">{event.attendeeCount} attending</span>
             </div>
           </div>
 
-          {/* Ticket Booking */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-sm p-6 sticky top-24">
-              <div className="flex items-center justify-between mb-6">
-                <span className="text-2xl font-bold text-gray-900">{event.price}</span>
-                <TicketIcon className="h-6 w-6 text-gray-400" />
-              </div>
-              <button className="w-full bg-purple-600 text-white py-3 px-4 rounded-lg hover:bg-purple-700 transition-colors">
-                Get Tickets
-              </button>
+          {/* Description */}
+          <div className="mb-8">
+            <h2 className="text-lg font-medium mb-3">About this Event</h2>
+            <p className="text-gray-600 leading-relaxed font-light text-sm">
+              Join us for an unforgettable evening of music, art, and community. This unique event brings together local talents and established artists for a night of creative expression and celebration. Featuring live performances, interactive art installations, and gourmet refreshments, this event promises to be a highlight of the season.
+              <br /><br />
+              {event.description}
+            </p>
+          </div>
+
+          {/* Photo Gallery */}
+          <div className="mb-8">
+            <h2 className="text-lg font-medium mb-3">Event Gallery</h2>
+            <div className="grid grid-cols-2 gap-4">
+              {mockEventData.gallery.map((image, index) => (
+                <img
+                  key={index}
+                  src={image}
+                  alt={`Event preview ${index + 1}`}
+                  className="rounded-lg w-full h-48 object-cover"
+                />
+              ))}
             </div>
+          </div>
+
+          {/* Location Map */}
+          <div className="mb-8">
+            <h2 className="text-lg font-medium mb-3">Location</h2>
+            <EventLocationMap 
+              location={{ lat: 37.7749, lng: -122.4194 }} 
+              name={event.title}
+            />
+            <a
+              href={`https://maps.google.com/?q=${event.location}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block mt-2 text-purple-600 hover:text-purple-700 text-sm font-light"
+            >
+              Get Directions →
+            </a>
           </div>
         </div>
       </div>
+
+      {/* Floating Action Button */}
+      {event.isRSVP ? (
+        <FloatingRSVP
+          event={event}
+          onRSVP={handleRSVP}
+        />
+      ) : (
+        <FloatingTicketPurchase
+          event={event}
+          onPurchase={() => setShowCheckout(true)}
+        />
+      )}
+
+      {/* RSVP Flow Modal */}
+      {showCheckout && event.isRSVP && rsvpStatus && (
+        <RSVPFlow
+          event={event}
+          status={rsvpStatus}
+          onClose={() => setShowCheckout(false)}
+          onSubmit={handleRSVPSubmit}
+        />
+      )}
+
+      {/* Regular Checkout Modal */}
+      {showCheckout && !event.isRSVP && (
+        <EventCheckout
+          event={event}
+          onClose={() => setShowCheckout(false)}
+        />
+      )}
     </div>
   );
 };
