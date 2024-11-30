@@ -17,6 +17,7 @@ const VendorLoginPage: React.FC = () => {
       setError('');
       setLoading(true);
       await login(email, password);
+      localStorage.setItem('userType', 'vendor');
       navigate('/vendor/dashboard');
     } catch (err) {
       setError('Failed to sign in');

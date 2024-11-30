@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext';
 import VendorDashboardHeader from '../../../components/vendors/common/VendorDashboardHeader';
 import BookingRequestCard from '../../../components/vendors/dashboard/BookingRequestCard';
@@ -68,7 +68,18 @@ const mockBookingRequests: BookingRequest[] = [
 ];
 
 const VendorDashboard: React.FC = () => {
-  const { userProfile } = useAuth();
+  const { userProfile, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      // Route to vendor landing page after logout
+      navigate('/vendors/landing');
+    } catch (error) {
+      console.error('Failed to log out:', error);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -87,6 +98,14 @@ const VendorDashboard: React.FC = () => {
           <Route path="/listings/preview/:type" element={<PreviewPage />} />
         </Routes>
       </div>
+      
+      {/* Logout Button */}
+      <button
+        onClick={handleLogout}
+        className="text-gray-600 hover:text-gray-900"
+      >
+        Sign out
+      </button>
     </div>
   );
 };

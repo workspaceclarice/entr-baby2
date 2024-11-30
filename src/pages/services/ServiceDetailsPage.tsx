@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Service } from '../../types';
 import { motion } from 'framer-motion';
+import ServiceEstimator from '../../components/services/ServiceEstimator';
 import ServiceBookingFlow from '../../components/services/ServiceBookingFlow';
 import { services } from '../../data/services'; // Import services data
 
@@ -21,28 +22,21 @@ const tabs: ServiceDetailsTab[] = [
 const ServiceDetailsPage: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [selectedPackage, setSelectedPackage] = useState<string | null>(null);
-  const [selectedAddons, setSelectedAddons] = useState<string[]>([]);
-  const [date, setDate] = useState('');
-  const [startTime, setStartTime] = useState('');
-  const [endTime, setEndTime] = useState('');
   const [showBookingFlow, setShowBookingFlow] = useState(false);
   const [selectedTime, setSelectedTime] = useState('');
 
   // Find the service based on ID
   const service = services.find(s => s.id === id) || services[0];
 
-  const calculateTotal = () => {
-    if (!selectedPackage || !service.packages) return 0;
-    const package_ = service.packages.find(p => p.id === selectedPackage);
-    if (!package_) return 0;
-
-    const addonsTotal = selectedAddons.reduce((sum, addonId) => {
-      const addon = service.addons?.find(a => a.id === addonId);
-      return sum + (addon?.price || 0);
-    }, 0);
-
-    return package_.price + addonsTotal;
+  const handleBookNow = (details: {
+    selectedPackage: string;
+    selectedAddons: string[];
+    date: string;
+    startTime: string;
+    endTime: string;
+  }) => {
+    // Show booking flow immediately instead of navigating
+    setShowBookingFlow(true);
   };
 
   const renderServiceDetails = () => (
@@ -182,215 +176,6 @@ const ServiceDetailsPage: React.FC = () => {
     </div>
   );
 
-  const handleBookNow = () => {
-    if (!selectedPackage || !date || !startTime || !endTime) {
-      return; // Don't navigate if required fields aren't filled
-    }
-
-    // Get the full package and addon details
-    const selectedPackageDetails = service.packages?.find(p => p.id === selectedPackage);
-    const selectedAddonDetails = selectedAddons.map(addonId => 
-      service.addons?.find(a => a.id === addonId)
-    ).filter(Boolean);
-
-    // Calculate total
-    const total = calculateTotal();
-
-    navigate(`/services/${id}/book`, {
-      state: {
-        service, // Pass the entire service object
-        selectedPackage,
-        selectedPackageDetails,
-        selectedAddons,
-        selectedAddonDetails,
-        date,
-        startTime,
-        endTime,
-        totalAmount: total
-      }
-    });
-  };
-
-  const EstimateWidget = () => (
-    <div className="bg-white rounded-2xl p-6 shadow-lg sticky top-24 border border-gray-200">
-      {/* Price Display */}
-      <div className="flex items-baseline mb-6">
-        <span className="text-2xl font-semibold">${calculateTotal()}</span>
-        <span className="text-lg text-gray-600 ml-2">starting price</span>
-      </div>
-
-      {/* Date and Time Selection Box */}
-      <div className="border border-gray-300 rounded-xl overflow-hidden mb-6">
-        {/* Date Selection */}
-        <div className="p-4 border-b border-gray-300">
-          <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-2">
-            Date
-          </label>
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            className="w-full text-lg border-none p-0 focus:ring-0"
-            min={new Date().toISOString().split('T')[0]}
-          />
-        </div>
-
-        {/* Time Selection */}
-        <div className="p-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-2">
-                Start Time
-              </label>
-              <input
-                type="time"
-                value={startTime}
-                onChange={(e) => setStartTime(e.target.value)}
-                className="w-full text-lg border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-2">
-                End Time
-              </label>
-              <input
-                type="time"
-                value={endTime}
-                onChange={(e) => setEndTime(e.target.value)}
-                className="w-full text-lg border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Package Selection */}
-      <div className="mb-6">
-        <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-2">
-          Select Package
-        </label>
-        <div className="space-y-3">
-          {service.packages?.map((pkg) => (
-            <label
-              key={pkg.id}
-              className={`block relative p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                selectedPackage === pkg.id
-                  ? 'border-purple-500 bg-purple-50'
-                  : 'border-gray-200 hover:border-gray-300'
-              }`}
-            >
-              <input
-                type="radio"
-                name="package"
-                value={pkg.id}
-                checked={selectedPackage === pkg.id}
-                onChange={(e) => setSelectedPackage(e.target.value)}
-                className="hidden"
-              />
-              <div className="space-y-2">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <span className="block font-medium text-gray-900">{pkg.name}</span>
-                    <span className="block text-sm text-gray-500">{pkg.description}</span>
-                  </div>
-                  <span className="font-semibold">${pkg.price}</span>
-                </div>
-                <div className="text-xs text-gray-500 space-y-1 pt-2 border-t border-gray-100">
-                  {pkg.includes.map((item, index) => (
-                    <div key={index} className="flex items-start">
-                      <CheckCircleIcon className="w-3.5 h-3.5 text-green-500 mr-1.5 mt-0.5" />
-                      <span>{item}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </label>
-          ))}
-        </div>
-      </div>
-
-      {/* Add-ons Selection */}
-      {selectedPackage && service.addons && (
-        <div className="mb-6">
-          <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-2">
-            Additional Services
-          </label>
-          <div className="space-y-3">
-            {service.addons.map((addon) => (
-              <label
-                key={addon.id}
-                className={`block relative p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                  selectedAddons.includes(addon.id)
-                    ? 'border-purple-500 bg-purple-50'
-                    : 'border-gray-200 hover:border-gray-300'
-                }`}
-              >
-                <input
-                  type="checkbox"
-                  checked={selectedAddons.includes(addon.id)}
-                  onChange={(e) => {
-                    if (e.target.checked) {
-                      setSelectedAddons([...selectedAddons, addon.id]);
-                    } else {
-                      setSelectedAddons(selectedAddons.filter(id => id !== addon.id));
-                    }
-                  }}
-                  className="hidden"
-                />
-                <div className="flex justify-between items-start">
-                  <div>
-                    <span className="block font-medium text-gray-900">{addon.name}</span>
-                    <span className="block text-sm text-gray-500">{addon.description}</span>
-                  </div>
-                  <span className="font-semibold">+${addon.price}</span>
-                </div>
-              </label>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Price Breakdown */}
-      {selectedPackage && (
-        <div className="border-t border-gray-200 pt-4 mb-6">
-          <div className="space-y-3">
-            <div className="flex justify-between">
-              <span className="text-gray-600">Base price</span>
-              <span>${service.packages?.find(p => p.id === selectedPackage)?.price}</span>
-            </div>
-            {selectedAddons.map(addonId => {
-              const addon = service.addons?.find(a => a.id === addonId);
-              return (
-                <div key={addonId} className="flex justify-between">
-                  <span className="text-gray-600">{addon?.name}</span>
-                  <span>+${addon?.price}</span>
-                </div>
-              );
-            })}
-            <div className="flex justify-between pt-3 border-t border-gray-200 font-semibold">
-              <span>Total</span>
-              <span>${calculateTotal()}</span>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Book Now Button */}
-      <button
-        onClick={handleBookNow}
-        disabled={!selectedPackage || !date || !startTime || !endTime}
-        className="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-4 px-4 rounded-xl font-semibold text-lg hover:from-purple-700 hover:to-purple-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        Book Now
-      </button>
-
-      {/* No charge disclaimer */}
-      <p className="text-center text-sm text-gray-500 mt-4">
-        You won't be charged yet
-      </p>
-    </div>
-  );
-
   const ClockIcon: React.FC<{ className?: string }> = ({ className }) => (
     <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -476,7 +261,10 @@ const ServiceDetailsPage: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Mobile Estimator */}
         <div className="lg:hidden mb-8">
-          <EstimateWidget />
+          <ServiceEstimator 
+            service={service}
+            onBookNow={handleBookNow}
+          />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
@@ -487,7 +275,10 @@ const ServiceDetailsPage: React.FC = () => {
 
           {/* Right Column - Desktop Estimator */}
           <div className="hidden lg:block lg:col-span-1">
-            <EstimateWidget />
+            <ServiceEstimator 
+              service={service}
+              onBookNow={handleBookNow}
+            />
           </div>
         </div>
       </div>
@@ -496,10 +287,6 @@ const ServiceDetailsPage: React.FC = () => {
       {showBookingFlow && (
         <ServiceBookingFlow
           service={service}
-          selectedPackage={selectedPackage}
-          selectedAddons={selectedAddons}
-          date={date}
-          time={selectedTime}
           onClose={() => setShowBookingFlow(false)}
         />
       )}

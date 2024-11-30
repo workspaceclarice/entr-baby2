@@ -1,109 +1,78 @@
 import React from 'react';
-import { Event } from '../../types/event';
-import { Service } from '../../types/service';
-import { Venue } from '../../types/venue';
-import EventCard from './cards/EventCard';
-import ServiceCard from './cards/ServiceCard';
-import VenueCard from './cards/VenueCard';
+import { ListingCategory } from '../../types';
+import VenueCard from '../venues/VenueCard';
+import ServiceCard from '../services/ServiceCard';
+import EventCard from '../events/EventCard';
 
-type Listing = Event | Service | Venue;
-
-export type ListingGridProps = {
-  category: 'events' | 'services' | 'venues';
-  listings: Listing[];
+interface ListingGridProps {
+  category: ListingCategory;
+  listings: any[];
   searchQuery: string;
   filters: {
     categoryId: string | null;
-    [key: string]: any;
+    priceRange: string;
+    sort: string;
+    location: string;
   };
-};
+}
 
-const isEvent = (listing: Listing): listing is Event => {
-  return 'type' in listing && (listing.type === 'ticketed' || listing.type === 'rsvp');
-};
-
-const isService = (listing: Listing): listing is Service => {
-  return 'serviceType' in listing;
-};
-
-const isVenue = (listing: Listing): listing is Venue => {
-  return 'venueType' in listing;
-};
-
-const ListingGrid: React.FC<ListingGridProps> = ({ 
-  category, 
+const ListingGrid: React.FC<ListingGridProps> = ({
+  category,
   listings,
-  searchQuery = '',
-  filters = { categoryId: null }
+  searchQuery,
+  filters
 }) => {
   const filteredListings = listings.filter(listing => {
-    // Search filter
-    if (searchQuery) {
-      const searchLower = searchQuery.toLowerCase();
-      const nameField = isEvent(listing) ? listing.title : listing.name;
-      const matchesSearch = nameField.toLowerCase().includes(searchLower) ||
-        listing.description.toLowerCase().includes(searchLower) ||
-        listing.category.toLowerCase().includes(searchLower);
-      
-      if (!matchesSearch) return false;
-    }
+    if (!listing) return false;
+    
+    const matchesSearch = searchQuery ? (
+      (listing.name?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
+      (listing.description?.toLowerCase() || '').includes(searchQuery.toLowerCase())
+    ) : true;
 
-    // Category filter
-    if (filters.categoryId) {
-      if (listing.category !== filters.categoryId) return false;
-    }
-
-    return true;
+    const matchesCategory = !filters.categoryId || listing.categoryId === filters.categoryId;
+    const matchesLocation = !filters.location || listing.location?.includes(filters.location);
+    
+    return matchesSearch && matchesCategory && matchesLocation;
   });
 
+  const sortedListings = [...filteredListings].sort((a, b) => {
+    if (!a || !b) return 0;
+    
+    switch (filters.sort) {
+      case 'price-low':
+        return (a.basePrice || 0) - (b.basePrice || 0);
+      case 'price-high':
+        return (b.basePrice || 0) - (a.basePrice || 0);
+      case 'rating':
+        return (b.rating || 0) - (a.rating || 0);
+      default:
+        return 0;
+    }
+  });
+
+  const renderCard = (listing: any) => {
+    switch (category) {
+      case 'venues':
+        return <VenueCard key={listing.id} venue={listing} />;
+      case 'services':
+        return <ServiceCard key={listing.id} service={listing} />;
+      case 'events':
+        return <EventCard key={listing.id} event={listing} />;
+      default:
+        return null;
+    }
+  };
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      {category === 'events' && filteredListings.map((listing) => {
-        if (isEvent(listing)) {
-          const eventData: Event = {
-            id: listing.id,
-            title: listing.title,
-            date: listing.date,
-            time: listing.time,
-            location: listing.location,
-            image: listing.image,
-            price: listing.price,
-            formattedPrice: listing.formattedPrice,
-            category: listing.category,
-            description: listing.description,
-            attendees: listing.attendees,
-            capacity: listing.capacity,
-            type: listing.type,
-            organizer: listing.organizer,
-            isRSVP: listing.type === 'rsvp',
-            hostId: listing.hostId || listing.organizer.name,
-            hostName: listing.hostName || listing.organizer.name,
-            hostImage: listing.hostImage || listing.organizer.image,
-            coverImage: listing.coverImage || listing.image,
-            startDate: listing.startDate || listing.date,
-            endDate: listing.endDate || listing.date,
-            status: listing.status || 'upcoming',
-            attendeeCount: listing.attendeeCount || listing.attendees,
-            interestedCount: listing.interestedCount || 0
-          };
-          return <EventCard key={listing.id} event={eventData} />;
-        }
-        return null;
-      })}
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {sortedListings.map((listing) => listing && renderCard(listing))}
       
-      {category === 'services' && filteredListings.map((listing) => {
-        if (isService(listing)) {
-          return <ServiceCard key={listing.id} service={listing} />;
-        }
-        return null;
-      })}
-      
-      {category === 'venues' && filteredListings.map((listing) => {
-        if (isVenue(listing)) {
-          return <VenueCard key={listing.id} venue={listing} />;
-        }
-        return null;
-      })}
+      {(!sortedListings.length || sortedListings.every(l => !l)) && (
+        <div className="col-span-full text-center py-12">
+          <p className="text-gray-500">No {category} found matching your criteria.</p>
+        </div>
+      )}
     </div>
   );
 };

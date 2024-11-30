@@ -1,41 +1,22 @@
+'use client';
+
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Service } from '../../types';
 
 interface BookingFlowProps {
   service: Service;
-  selectedPackage: string | null;
-  selectedAddons: string[];
-  date: string;
-  time: string;
   onClose: () => void;
 }
 
-// Mock available time slots - in real app, this would come from API
-const timeSlots = [
-  { start: '09:00', end: '13:00', available: true },
-  { start: '10:00', end: '14:00', available: true },
-  { start: '11:00', end: '15:00', available: false },
-  { start: '12:00', end: '16:00', available: true },
-  { start: '13:00', end: '17:00', available: true },
-  { start: '14:00', end: '18:00', available: false },
-  { start: '15:00', end: '19:00', available: true },
-  { start: '16:00', end: '20:00', available: true },
-  { start: '17:00', end: '21:00', available: true },
-  { start: '18:00', end: '22:00', available: true },
-  { start: '19:00', end: '23:00', available: false },
-  { start: '20:00', end: '00:00', available: true },
-];
-
 const ServiceBookingFlow: React.FC<BookingFlowProps> = ({
   service,
-  selectedPackage,
-  selectedAddons,
-  date,
   onClose
 }) => {
   const [step, setStep] = useState(1);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string | null>(null);
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [selectedPackageId, setSelectedPackageId] = useState<string | null>(null);
   const [bookingDetails, setBookingDetails] = useState({
     eventType: '',
     guestCount: '',
@@ -46,17 +27,26 @@ const ServiceBookingFlow: React.FC<BookingFlowProps> = ({
   });
 
   const calculateTotal = () => {
-    if (!selectedPackage || !service.packages) return 0;
-    const package_ = service.packages.find((p: any) => p.id === selectedPackage);
+    if (!selectedPackageId || !service.packages) return 0;
+    const package_ = service.packages.find(p => p.id === selectedPackageId);
     if (!package_) return 0;
-
-    const addonsTotal = selectedAddons.reduce((sum, addonId) => {
-      const addon = service.addons?.find((a: any) => a.id === addonId);
-      return sum + (addon?.price || 0);
-    }, 0);
-
-    return package_.price + addonsTotal;
+    return package_.price;
   };
+
+  const timeSlots = [
+    { start: '09:00', end: '13:00', available: true },
+    { start: '10:00', end: '14:00', available: true },
+    { start: '11:00', end: '15:00', available: false },
+    { start: '12:00', end: '16:00', available: true },
+    { start: '13:00', end: '17:00', available: true },
+    { start: '14:00', end: '18:00', available: false },
+    { start: '15:00', end: '19:00', available: true },
+    { start: '16:00', end: '20:00', available: true },
+    { start: '17:00', end: '21:00', available: true },
+    { start: '18:00', end: '22:00', available: true },
+    { start: '19:00', end: '23:00', available: false },
+    { start: '20:00', end: '00:00', available: true },
+  ];
 
   const handleSubmit = async () => {
     setStep(4);
@@ -98,7 +88,7 @@ const ServiceBookingFlow: React.FC<BookingFlowProps> = ({
             <h3 className="text-xl font-semibold">Select Time</h3>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Available Time Slots for {new Date(date).toLocaleDateString()}
+                Available Time Slots for {new Date(selectedDate).toLocaleDateString()}
               </label>
               {renderTimeSlots()}
             </div>
@@ -164,12 +154,12 @@ const ServiceBookingFlow: React.FC<BookingFlowProps> = ({
               <div className="flex justify-between">
                 <span className="text-gray-600">Package</span>
                 <span className="font-medium">
-                  {service.packages?.find((p: any) => p.id === selectedPackage)?.name}
+                  {service.packages?.find((p: any) => p.id === selectedPackageId)?.name}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Date</span>
-                <span className="font-medium">{new Date(date).toLocaleDateString()}</span>
+                <span className="font-medium">{new Date(selectedDate).toLocaleDateString()}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Time</span>

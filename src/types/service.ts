@@ -1,50 +1,26 @@
 export interface Service {
   id: string;
+  title: string;
   name: string;
-  serviceType: string;
+  vendorName: string;
   description: string;
-  price: number;
-  formattedPrice?: string;
-  image: string;
-  category: string;
   location: string;
+  category: string;
   rating: number;
   reviewCount: number;
-  provider: {
-    id: string;
-    name: string;
-    image: string;
-    rating: number;
-  };
-  availability: {
-    startDate: string;
-    endDate: string;
-    timeSlots: string[];
-  };
-  features: Array<{
+  basePrice: number;
+  profileImage: string;
+  type: string;
+  vendorId: string;
+  vendorImage: string;
+  vendorBio: string;
+  serviceType: string;
+  features?: Array<{
     title: string;
     description: string;
     icon: string;
   }>;
-  vendorId: string;
-  vendorName: string;
-  vendorImage: string;
-  vendorBio: string;
-  packages: Array<{
-    id: string;
-    name: string;
-    price: number;
-    description: string;
-    duration: string;
-    includes: string[];
-  }>;
-  addons: Array<{
-    id: string;
-    name: string;
-    price: number;
-    description: string;
-  }>;
-  profileImage: string;
+  gallery?: string[];
   priceRange: {
     min: number;
     max: number;

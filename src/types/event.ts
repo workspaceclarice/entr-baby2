@@ -1,31 +1,21 @@
 export interface Event {
   id: string;
   title: string;
+  description: string;
   date: string;
   time: string;
   location: string;
-  image: string;
   price: string;
-  formattedPrice?: string;
   category: string;
-  description: string;
-  attendees: number;
-  capacity: number;
-  type: 'ticketed' | 'rsvp';
+  image: string;
+  ticketsAvailable: number;
+  isRSVP?: boolean;
   organizer: {
     name: string;
     image: string;
   };
-  isRSVP: boolean;
-  hostId: string;
-  hostName: string;
-  hostImage: string;
-  coverImage: string;
-  startDate: string;
-  endDate: string;
-  status: 'upcoming' | 'ongoing' | 'past';
+  formattedPrice?: string;
   attendeeCount: number;
-  interestedCount: number;
 }
 
 export {}; 
