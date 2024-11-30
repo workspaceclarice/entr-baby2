@@ -1,18 +1,18 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "build"
-      }
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
-    }
-  ]
+  "framework": "create-react-app",
+  "buildCommand": "npm run build",
+  "devCommand": "npm start",
+  "outputDirectory": "build",
+  "env": {
+    "REACT_APP_FIREBASE_API_KEY": "AIzaSyAKdqYlC2SjZNyjEKyymGZd5va-OiiBwpU",
+    "REACT_APP_FIREBASE_AUTH_DOMAIN": "entr-baby2.firebaseapp.com",
+    "REACT_APP_FIREBASE_PROJECT_ID": "entr-baby2",
+    "REACT_APP_FIREBASE_STORAGE_BUCKET": "entr-baby2.firebasestorage.app",
+    "REACT_APP_FIREBASE_MESSAGING_SENDER_ID": "446412574463",
+    "REACT_APP_FIREBASE_APP_ID": "1:446412574463:web:8f757cc224f3be33e906ca",
+    "REACT_APP_FIREBASE_MEASUREMENT_ID": "G-FXDHK3Q7BZ",
+    "SKIP_PREFLIGHT_CHECK": "true",
+    "DISABLE_ESLINT_PLUGIN": "true"
+  }
 } 
