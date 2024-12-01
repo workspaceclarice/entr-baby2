@@ -3,16 +3,30 @@
   "framework": "create-react-app",
   "buildCommand": "npm run build",
   "devCommand": "npm start",
-  "outputDirectory": "build",
+  "installCommand": "npm install --legacy-peer-deps",
+  "routes": [
+    {
+      "src": "/static/(.*)",
+      "dest": "/static/$1"
+    },
+    {
+      "src": "/favicon.ico",
+      "dest": "/favicon.ico"
+    },
+    {
+      "src": "/manifest.json",
+      "dest": "/manifest.json"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ],
   "env": {
-    "REACT_APP_FIREBASE_API_KEY": "AIzaSyAKdqYlC2SjZNyjEKyymGZd5va-OiiBwpU",
-    "REACT_APP_FIREBASE_AUTH_DOMAIN": "entr-baby2.firebaseapp.com",
-    "REACT_APP_FIREBASE_PROJECT_ID": "entr-baby2",
-    "REACT_APP_FIREBASE_STORAGE_BUCKET": "entr-baby2.firebasestorage.app",
-    "REACT_APP_FIREBASE_MESSAGING_SENDER_ID": "446412574463",
-    "REACT_APP_FIREBASE_APP_ID": "1:446412574463:web:8f757cc224f3be33e906ca",
-    "REACT_APP_FIREBASE_MEASUREMENT_ID": "G-FXDHK3Q7BZ",
+    "CI": "false",
+    "DISABLE_ESLINT_PLUGIN": "true",
     "SKIP_PREFLIGHT_CHECK": "true",
-    "DISABLE_ESLINT_PLUGIN": "true"
+    "NODE_VERSION": "18",
+    "NODE_OPTIONS": "--openssl-legacy-provider"
   }
 } 
