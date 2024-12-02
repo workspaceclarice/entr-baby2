@@ -18,6 +18,7 @@ import VendorDashboard from './pages/vendors/dashboard/VendorDashboard';
 import VendorFeatures from './pages/vendors/features/VendorFeatures';
 import VendorPricing from './pages/vendors/pricing/VendorPricing';
 import EventDetailPage from './pages/events/EventDetailPage';
+import VendorSuccessStories from './pages/vendors/VendorSuccessStories';
 
 const AppRoutes = () => {
   const location = useLocation();
@@ -48,6 +49,7 @@ const AppRoutes = () => {
         <Route path="/vendors/dashboard/*" element={<VendorDashboard />} />
         <Route path="/vendors/features" element={<VendorFeatures />} />
         <Route path="/vendors/pricing" element={<VendorPricing />} />
+        <Route path="/vendors/success-stories" element={<VendorSuccessStories />} />
       </Routes>
     </>
   );

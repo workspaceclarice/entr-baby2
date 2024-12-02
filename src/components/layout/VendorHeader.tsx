@@ -17,9 +17,10 @@ const VendorHeader: React.FC = () => {
     { name: 'My Services', href: '/vendors/dashboard/services' },
     { name: 'Earnings', href: '/vendors/dashboard/earnings' },
   ] : [
+    { name: 'Home', href: '/vendors/landing' },
     { name: 'Features', href: '/vendors/features' },
-    { name: 'Pricing', href: '/vendors/pricing' },
     { name: 'Success Stories', href: '/vendors/success-stories' },
+    { name: 'Pricing', href: '/vendors/pricing' },
   ];
 
   return (
@@ -27,7 +28,7 @@ const VendorHeader: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link to="/vendors" className="flex items-center">
+          <Link to="/vendors/landing" className="flex items-center">
             <span className="text-2xl font-bold text-blue-600">entr</span>
             <span className="text-sm text-gray-500 ml-2">for Vendors</span>
           </Link>
