@@ -1,5 +1,5 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import VendorHeader from '../../components/layout/VendorHeader';
 import { 
   ArrowTrendingUpIcon,
@@ -7,33 +7,127 @@ import {
   CalendarIcon,
   UserGroupIcon,
 } from '@heroicons/react/24/outline';
+import { motion } from 'framer-motion';
+import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 
 const VendorLandingPage: React.FC = () => {
+  const navigate = useNavigate();
+
+  const marketStats = {
+    totalBookings: "50,000+",
+    totalRevenue: "$20M+",
+    averageIncrease: "200%",
+    activeVendors: "5,000+"
+  };
+
+  const vendorCategories = [
+    { name: "Venues", count: "500+", icon: "🏰" },
+    { name: "Photography", count: "450+", icon: "📸" },
+    { name: "Catering", count: "300+", icon: "🍽️" },
+    { name: "Entertainment", count: "400+", icon: "🎵" },
+    { name: "Decor", count: "250+", icon: "✨" },
+    { name: "Planning", count: "200+", icon: "📋" }
+  ];
+
+  const listingTypes = [
+    {
+      title: "Popular Event Service Listings",
+      subtitle: "List your professional event services on ENTR",
+      items: [
+        {
+          name: "Photography & Videography",
+          image: "https://images.unsplash.com/photo-1452587925148-ce544e77e70d",
+          description: "Capture special moments",
+          popular: ["Wedding Photography", "Event Photography", "Videography"],
+          other: ["Photo Booths", "Drone Photography", "Portrait Sessions"]
+        },
+        {
+          name: "Entertainment",
+          image: "https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec",
+          description: "Keep the party going",
+          popular: ["DJs", "Live Bands", "Musicians"],
+          other: ["MCs", "Dancers", "Performers"]
+        },
+        {
+          name: "Catering & Bar",
+          image: "https://images.unsplash.com/photo-1555244162-803834f70033",
+          description: "Serve amazing food & drinks",
+          popular: ["Full-Service Catering", "Bartending", "Food Trucks"],
+          other: ["Dessert Bars", "Coffee Carts", "Wine Service"]
+        },
+        {
+          name: "Event Planning",
+          image: "https://images.unsplash.com/photo-1505236858219-8359eb29e329",
+          description: "Coordinate flawless events",
+          popular: ["Wedding Planning", "Corporate Events", "Party Planning"],
+          other: ["Day-of Coordination", "Decor Services", "Vendor Management"]
+        }
+      ]
+    },
+    {
+      title: "Popular Venue Listings",
+      subtitle: "List your unique venue spaces on ENTR",
+      items: [
+        {
+          name: "Elegant Venues",
+          image: "https://images.unsplash.com/photo-1519167758481-83f550bb49b3",
+          description: "Host grand celebrations",
+          popular: ["Ballrooms", "Banquet Halls", "Historic Venues"],
+          other: ["Country Clubs", "Hotels", "Mansions"]
+        },
+        {
+          name: "Outdoor Spaces",
+          image: "https://images.unsplash.com/photo-1464366400600-7168b8af9bc3",
+          description: "Create natural experiences",
+          popular: ["Gardens", "Rooftops", "Beachfront"],
+          other: ["Vineyards", "Farms", "Parks"]
+        },
+        {
+          name: "Urban Venues",
+          image: "https://images.unsplash.com/photo-1519225421980-715cb0215aed",
+          description: "Modern city locations",
+          popular: ["Lofts", "Art Galleries", "Warehouses"],
+          other: ["Studios", "Co-working Spaces", "Penthouses"]
+        },
+        {
+          name: "Restaurant Venues",
+          image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4",
+          description: "Intimate dining spaces",
+          popular: ["Private Rooms", "Full Buyouts", "Patios"],
+          other: ["Wine Cellars", "Chef's Tables", "Bars"]
+        }
+      ]
+    }
+  ];
+
   return (
     <div className="min-h-screen bg-gray-50">
       <VendorHeader />
       
-      {/* Hero Section with Full-Screen Event Service Background Image */}
+      {/* Hero Section - Updated with multi-vendor event photo and stats */}
       <div className="relative min-h-screen">
         <div className="absolute inset-0">
           <img
-            src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&q=80"
-            alt="Event Service"
+            src="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3"
+            alt="Event Service Providers in Action"
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/40" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/70 to-transparent" />
+          <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1)_1px,transparent_1px)] [background-size:20px_20px]" />
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-48 pb-64">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-48">
           <div className="max-w-3xl">
-            <span className="inline-block px-4 py-2 bg-blue-600/20 text-blue-200 rounded-full text-sm mb-6">
+            <span className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600/30 to-purple-600/30 text-blue-200 rounded-full text-sm mb-6 backdrop-blur-sm">
+              <span className="mr-2">✨</span>
               For Event Professionals & Venues
             </span>
             <h1 className="text-5xl md:text-6xl font-light text-white mb-8 leading-tight">
-              Your events, our platform, endless possibilities
+              Turn inquiries into
+              <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent"> bookings with event planners</span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-200 font-light mb-12 max-w-2xl leading-relaxed">
-              Join the premier platform for event professionals. Manage bookings, grow your client base, and scale your business - all with zero lead fees.
+              List services or venues to get discovered by event planners. No upfront fees - only pay when you get booked.
             </p>
             <div className="space-x-6">
               <Link
@@ -52,165 +146,328 @@ const VendorLandingPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/70">
-          <div className="animate-bounce">
-            <svg 
-              className="w-6 h-6" 
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
-            >
-              <path 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                strokeWidth={2} 
-                d="M19 14l-7 7m0 0l-7-7m7 7V3" 
-              />
-            </svg>
+        {/* Stats Section - Updated with lighter style */}
+        <div className="absolute bottom-0 left-0 right-0 transform translate-y-1/2">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+              <div className="bg-gradient-to-br from-white/95 via-blue-50/95 to-purple-50/95 backdrop-blur-sm p-4 md:p-8 rounded-xl text-center transform hover:scale-105 transition-transform shadow-lg hover:shadow-xl border border-white/50">
+                <div className="text-2xl md:text-3xl font-light bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  {marketStats.totalBookings}
+                </div>
+                <div className="text-sm md:text-base text-gray-600 font-light mt-2">Bookings Processed</div>
+              </div>
+              <div className="bg-gradient-to-br from-white/95 via-blue-50/95 to-purple-50/95 backdrop-blur-sm p-4 md:p-8 rounded-xl text-center transform hover:scale-105 transition-transform shadow-lg hover:shadow-xl border border-white/50">
+                <div className="text-2xl md:text-3xl font-light bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  {marketStats.totalRevenue}
+                </div>
+                <div className="text-sm md:text-base text-gray-600 font-light mt-2">Revenue Generated</div>
+              </div>
+              <div className="bg-gradient-to-br from-white/95 via-blue-50/95 to-purple-50/95 backdrop-blur-sm p-4 md:p-8 rounded-xl text-center transform hover:scale-105 transition-transform shadow-lg hover:shadow-xl border border-white/50">
+                <div className="text-2xl md:text-3xl font-light bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  {marketStats.averageIncrease}
+                </div>
+                <div className="text-sm md:text-base text-gray-600 font-light mt-2">Avg. Revenue Growth</div>
+              </div>
+              <div className="bg-gradient-to-br from-white/95 via-blue-50/95 to-purple-50/95 backdrop-blur-sm p-4 md:p-8 rounded-xl text-center transform hover:scale-105 transition-transform shadow-lg hover:shadow-xl border border-white/50">
+                <div className="text-2xl md:text-3xl font-light bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  {marketStats.activeVendors}
+                </div>
+                <div className="text-sm md:text-base text-gray-600 font-light mt-2">Active Vendors</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Stats Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-24 relative z-10 mb-24">
-        <div className="grid md:grid-cols-4 gap-6">
-          <div className="bg-white p-6 rounded-xl shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium text-gray-900">Average Growth</h3>
-              <ArrowTrendingUpIcon className="w-6 h-6 text-green-500" />
+      {/* Listing Types Showcase - Condensed */}
+      <div className="bg-white pt-48 md:pt-44 pb-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Services Section */}
+          <div className="mb-24">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-light text-gray-900 mb-2">List Your Services</h2>
+              <p className="text-xl text-gray-600 font-light">Choose from our most popular categories</p>
             </div>
-            <p className="text-3xl font-light text-gray-900">150%</p>
-            <p className="text-sm text-gray-500">Year over year</p>
+            
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[
+                {
+                  name: "Photography",
+                  image: "https://images.unsplash.com/photo-1452587925148-ce544e77e70d",
+                  examples: ["Wedding", "Events", "Portrait", "Photo Booth"]
+                },
+                {
+                  name: "Entertainment",
+                  image: "https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec",
+                  examples: ["DJs", "Live Bands", "Musicians", "MCs"]
+                },
+                {
+                  name: "Catering",
+                  image: "https://images.unsplash.com/photo-1555244162-803834f70033",
+                  examples: ["Full-Service", "Bartending", "Food Trucks", "Desserts"]
+                },
+                {
+                  name: "Planning",
+                  image: "https://images.unsplash.com/photo-1505236858219-8359eb29e329",
+                  examples: ["Wedding", "Corporate", "Party", "Decor"]
+                }
+              ].map((service) => (
+                <div key={service.name} className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300">
+                  <div className="relative h-48">
+                    <img 
+                      src={service.image} 
+                      alt={service.name}
+                      className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
+                      <h3 className="text-xl font-medium mb-2">{service.name}</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {service.examples.map((example) => (
+                          <span key={example} className="text-sm bg-white/20 px-2 py-1 rounded-full backdrop-blur-sm">
+                            {example}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="bg-white p-6 rounded-xl shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium text-gray-900">Monthly Revenue</h3>
-              <CurrencyDollarIcon className="w-6 h-6 text-green-500" />
+
+          {/* Venues Section */}
+          <div>
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-light text-gray-900 mb-2">List Your Venue</h2>
+              <p className="text-xl text-gray-600 font-light">Perfect for any type of event space</p>
             </div>
-            <p className="text-3xl font-light text-gray-900">$15K+</p>
-            <p className="text-sm text-gray-500">Average per vendor</p>
-          </div>
-          <div className="bg-white p-6 rounded-xl shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium text-gray-900">Bookings</h3>
-              <CalendarIcon className="w-6 h-6 text-blue-500" />
+            
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[
+                {
+                  name: "Elegant",
+                  image: "https://images.unsplash.com/photo-1519167758481-83f550bb49b3",
+                  examples: ["Ballrooms", "Banquet Halls", "Historic", "Hotels"]
+                },
+                {
+                  name: "Outdoor",
+                  image: "https://images.unsplash.com/photo-1464366400600-7168b8af9bc3",
+                  examples: ["Gardens", "Rooftops", "Beach", "Vineyards"]
+                },
+                {
+                  name: "Urban",
+                  image: "https://images.unsplash.com/photo-1519225421980-715cb0215aed",
+                  examples: ["Lofts", "Galleries", "Studios", "Penthouses"]
+                },
+                {
+                  name: "Restaurant",
+                  image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4",
+                  examples: ["Private Rooms", "Full Buyout", "Patios", "Wine Cellars"]
+                }
+              ].map((venue) => (
+                <div key={venue.name} className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300">
+                  <div className="relative h-48">
+                    <img 
+                      src={venue.image} 
+                      alt={venue.name}
+                      className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
+                      <h3 className="text-xl font-medium mb-2">{venue.name}</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {venue.examples.map((example) => (
+                          <span key={example} className="text-sm bg-white/20 px-2 py-1 rounded-full backdrop-blur-sm">
+                            {example}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
-            <p className="text-3xl font-light text-gray-900">50+</p>
-            <p className="text-sm text-gray-500">Monthly average</p>
-          </div>
-          <div className="bg-white p-6 rounded-xl shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium text-gray-900">New Customers</h3>
-              <UserGroupIcon className="w-6 h-6 text-blue-500" />
-            </div>
-            <p className="text-3xl font-light text-gray-900">1000+</p>
-            <p className="text-sm text-gray-500">Reached monthly</p>
           </div>
         </div>
       </div>
 
-      {/* Key Benefits Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl font-light text-gray-900 mb-4">
-            Everything you need to succeed
-          </h2>
-          <p className="text-xl text-gray-600 font-light">
-            Simple tools to manage and grow your business
-          </p>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-8">
-          <div className="bg-white p-8 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-            <div className="text-4xl mb-4">💰</div>
-            <h3 className="text-xl font-medium text-gray-900 mb-2">
-              No Lead Fees
-            </h3>
-            <p className="text-gray-600">
-              Keep more of what you earn. We never charge for leads or take a cut of your bookings.
-            </p>
-          </div>
-          <div className="bg-white p-8 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-            <div className="text-4xl mb-4">📱</div>
-            <h3 className="text-xl font-medium text-gray-900 mb-2">
-              Easy Booking Management
-            </h3>
-            <p className="text-gray-600">
-              Accept bookings, manage your calendar, and communicate with clients all in one place.
-            </p>
-          </div>
-          <div className="bg-white p-8 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-            <div className="text-4xl mb-4">📈</div>
-            <h3 className="text-xl font-medium text-gray-900 mb-2">
-              Growth Tools
-            </h3>
-            <p className="text-gray-600">
-              Get insights and analytics to help you make data-driven decisions and grow your business.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Revenue Graph Section */}
+      {/* No Lead Fees Section - Moved after Listing Types */}
       <div className="bg-white py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-3xl font-light text-gray-900 mb-6">
-                Watch your revenue grow
-              </h2>
-              <p className="text-xl text-gray-600 font-light mb-8">
-                Our vendors see an average increase of 150% in bookings within their first year
-              </p>
-              <ul className="space-y-4">
-                <li className="flex items-center text-gray-600">
-                  <span className="w-2 h-2 bg-blue-600 rounded-full mr-3"></span>
-                  Direct bookings through your profile
-                </li>
-                <li className="flex items-center text-gray-600">
-                  <span className="w-2 h-2 bg-blue-600 rounded-full mr-3"></span>
-                  Automated payment processing
-                </li>
-                <li className="flex items-center text-gray-600">
-                  <span className="w-2 h-2 bg-blue-600 rounded-full mr-3"></span>
-                  Real-time analytics and insights
-                </li>
-              </ul>
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-light text-gray-900 mb-4">
+              No Lead Fees
+            </h2>
+            <p className="text-xl text-gray-600 font-light">
+              Only pay when you get paid - no upfront costs, no monthly fees
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Left side - Simple Benefits */}
+            <div className="bg-gradient-to-br from-blue-50 to-purple-50 p-8 rounded-xl">
+              <div className="grid grid-cols-2 gap-6">
+                <div className="text-center p-4">
+                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <span className="text-green-600 text-xl">✓</span>
+                  </div>
+                  <h4 className="font-medium text-gray-900 mb-1">No Monthly Fees</h4>
+                  <p className="text-sm text-gray-600 font-light">Start for free</p>
+                </div>
+                <div className="text-center p-4">
+                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <span className="text-green-600 text-xl">✓</span>
+                  </div>
+                  <h4 className="font-medium text-gray-900 mb-1">No Lead Fees</h4>
+                  <p className="text-sm text-gray-600 font-light">Only pay on bookings</p>
+                </div>
+                <div className="text-center p-4">
+                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <span className="text-green-600 text-xl">✓</span>
+                  </div>
+                  <h4 className="font-medium text-gray-900 mb-1">Unlimited Leads</h4>
+                  <p className="text-sm text-gray-600 font-light">No restrictions</p>
+                </div>
+                <div className="text-center p-4">
+                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <span className="text-green-600 text-xl">✓</span>
+                  </div>
+                  <h4 className="font-medium text-gray-900 mb-1">Simple Pricing</h4>
+                  <p className="text-sm text-gray-600 font-light">20% or less</p>
+                </div>
+              </div>
             </div>
+
+            {/* Right side - Quick Comparison */}
             <div className="bg-gray-50 p-8 rounded-xl">
-              {/* Add your revenue graph component here */}
-              <img 
-                src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80"
-                alt="Revenue Growth"
-                className="w-full rounded-lg"
-              />
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg font-medium text-gray-900">Cost Comparison</h3>
+                <Link
+                  to="/vendors/pricing"
+                  className="text-blue-600 hover:text-blue-700 text-sm"
+                >
+                  View detailed pricing →
+                </Link>
+              </div>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center p-4 bg-white rounded-lg border border-red-100">
+                  <div>
+                    <span className="text-red-600 font-medium">Other Platforms</span>
+                    <p className="text-sm text-gray-500 mt-1">Pay per lead + monthly fees</p>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-red-600 font-medium">$99-299/mo</div>
+                    <div className="text-sm text-gray-500">+ $15-45 per lead</div>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center p-4 bg-white rounded-lg border border-green-100">
+                  <div>
+                    <span className="text-green-600 font-medium">ENTR Platform</span>
+                    <p className="text-sm text-gray-500 mt-1">Commission on bookings only</p>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-green-600 font-medium">$0 upfront</div>
+                    <div className="text-sm text-gray-500">20% per booking</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* How ENTR Works Section - Static Interactive Version */}
+      <div className="bg-gradient-to-b from-white to-gray-50 py-24 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-light text-gray-900 mb-4">
+              How ENTR Works
+            </h2>
+            <p className="text-xl text-gray-600 font-light">
+              Get started in minutes and start receiving bookings
+            </p>
+          </div>
+
+          <div className="relative">
+            {/* Connection Line */}
+            <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-100 via-purple-100 to-blue-100 -translate-y-1/2 hidden md:block" />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+              {[
+                {
+                  step: 1,
+                  title: "Create Your Profile",
+                  description: "List your services and showcase your work",
+                  icon: "📝",
+                  color: "from-blue-500/10 to-blue-600/10"
+                },
+                {
+                  step: 2,
+                  title: "Receive Bookings",
+                  description: "Get booking requests from qualified customers",
+                  icon: "📅",
+                  color: "from-purple-500/10 to-purple-600/10"
+                },
+                {
+                  step: 3,
+                  title: "Deliver Service",
+                  description: "Provide your amazing service to customers",
+                  icon: "⭐",
+                  color: "from-indigo-500/10 to-indigo-600/10"
+                },
+                {
+                  step: 4,
+                  title: "Get Paid",
+                  description: "Receive secure payments directly to your account",
+                  icon: "💰",
+                  color: "from-blue-500/10 to-blue-600/10"
+                }
+              ].map((step) => (
+                <motion.div 
+                  key={step.step}
+                  whileHover={{ scale: 1.02 }}
+                  className="w-full"
+                >
+                  <div className={`bg-gradient-to-br ${step.color} backdrop-blur-sm rounded-xl p-6 h-full border border-white/50 relative`}>
+                    <div className="absolute -top-3 -right-3 w-8 h-8 bg-white shadow-lg rounded-full flex items-center justify-center text-sm font-medium text-blue-600">
+                      {step.step}
+                    </div>
+                    
+                    <div className="flex flex-col items-center text-center">
+                      <span className="text-4xl mb-4">{step.icon}</span>
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">{step.title}</h3>
+                      <p className="text-sm text-gray-600 font-light">{step.description}</p>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
             </div>
           </div>
         </div>
       </div>
 
       {/* CTA Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center">
-        <h2 className="text-3xl font-light text-gray-900 mb-4">
-          Start growing your business today
-        </h2>
-        <p className="text-xl text-gray-600 font-light mb-8">
-          Join thousands of successful vendors on our platform
-        </p>
-        <div className="space-x-4">
-          <Link
-            to="/vendors/list-business"
-            className="inline-block px-6 py-3 bg-blue-600 text-white text-sm font-light rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            List Your Business
-          </Link>
-          <Link
-            to="/vendors/features"
-            className="inline-block px-6 py-3 text-blue-600 text-sm font-light hover:text-blue-700"
-          >
-            Learn More
-          </Link>
+      <div className="bg-blue-600 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+          <h2 className="text-3xl font-light">Ready to Grow Your Business?</h2>
+          <p className="mt-4 text-xl text-blue-100 font-light">
+            Join {marketStats.activeVendors} successful venues and service providers on ENTR
+          </p>
+          <div className="mt-8 flex justify-center gap-4">
+            <Link
+              to="/vendors/list-business"
+              className="px-8 py-3 bg-white text-blue-600 rounded-lg font-light hover:bg-blue-50 transition-colors"
+            >
+              List Your Business
+            </Link>
+            <Link
+              to="/vendors/pricing"
+              className="px-8 py-3 bg-blue-700 text-white rounded-lg font-light hover:bg-blue-800 transition-colors"
+            >
+              View Pricing
+            </Link>
+          </div>
         </div>
       </div>
     </div>
