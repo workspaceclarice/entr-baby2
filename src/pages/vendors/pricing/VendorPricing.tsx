@@ -6,78 +6,84 @@ import { CheckIcon, XMarkIcon } from '@heroicons/react/24/outline';
 const VendorPricing: React.FC = () => {
   const navigate = useNavigate();
 
-  // Simple plans for the cards at the top
+  // Updated simple plans with new pricing model
   const simplePlans = [
     {
       name: 'Basic',
-      price: '49',
-      description: 'Perfect for getting started',
+      price: '0',
+      commission: '20%',
+      description: 'Perfect for getting started with no upfront costs',
       features: [
-        'Single Venue/Service Listing',
-        'Basic Calendar Management',
-        'Email Support',
+        'No monthly fees',
+        '20% commission per booking',
+        'Unlimited bookings',
         'Basic Analytics',
+        'Standard Support'
       ],
       popular: false,
-      ctaText: 'Start Basic'
+      ctaText: 'Start Free'
     },
     {
       name: 'Professional',
-      price: '99',
-      description: 'Ideal for growing businesses',
+      price: '500',
+      commission: '15%',
+      description: 'Reduced commission for growing businesses',
       features: [
-        'Up to 3 Venue/Service Listings',
-        'Advanced Calendar Management',
-        '24/7 Priority Support',
-        'Marketing Tools',
+        'Lower 15% commission rate',
+        'Unlimited bookings',
+        'Priority Support',
+        'Advanced Analytics',
+        'Marketing Tools'
       ],
       popular: true,
       ctaText: 'Go Professional'
     },
     {
       name: 'Enterprise',
-      price: '199',
-      description: 'For established businesses',
+      price: '2,000',
+      commission: '10%',
+      description: 'Lowest commission for high-volume businesses',
       features: [
-        'Unlimited Listings',
-        'Premium Features',
+        'Lowest 10% commission rate',
+        'Unlimited bookings',
         'Dedicated Support',
-        'Advanced Analytics',
+        'Premium Analytics',
+        'Advanced Marketing Tools'
       ],
       popular: false,
-      ctaText: 'Contact Sales'
+      ctaText: 'Go Enterprise'
     }
   ];
 
-  // Detailed feature comparison
+  // Updated feature comparison
   const featureComparison = {
-    'Listing Features': {
-      'Number of Listings': ['1', 'Up to 3', 'Unlimited'],
-      'Photo Gallery': ['10 photos', '30 photos', 'Unlimited'],
-      'Calendar Management': ['Basic', 'Advanced', 'Premium'],
-      'Business Hours': ['✓', '✓', '✓'],
-      'Analytics': ['Basic', 'Advanced', 'Enterprise'],
+    'Commission & Fees': {
+      'Monthly Fee': ['$0', '$500', '$2,000'],
+      'Commission Rate': ['20%', '15%', '10%'],
+      'Booking Limit': ['Unlimited', 'Unlimited', 'Unlimited'],
+      'Payment Processing': ['✓', '✓', '✓'],
+      'Instant Payouts': ['✕', '✓', '✓'],
     },
     'Booking Management': {
       'Online Booking': ['✓', '✓', '✓'],
-      'Availability Calendar': ['Basic', 'Advanced', 'Premium'],
-      'Notifications': ['Email', 'Email & SMS', 'Priority Email & SMS'],
-      'Payment Processing': ['✓', '✓', '✓'],
+      'Calendar Management': ['Basic', 'Advanced', 'Premium'],
+      'Automated Notifications': ['Email Only', 'Email & SMS', 'Priority Email & SMS'],
       'Custom Booking Rules': ['✕', '✓', 'Advanced'],
+      'Multi-Calendar Sync': ['✕', '✓', '✓'],
     },
-    'Customer Engagement': {
-      'Customer Reviews': ['✓', '✓', '✓'],
-      'Messaging System': ['Basic', 'Advanced', 'Premium'],
+    'Marketing & Growth': {
+      'Listing Visibility': ['Standard', 'Enhanced', 'Premium'],
+      'Featured Placement': ['✕', '2x Monthly', 'Unlimited'],
+      'Promotional Tools': ['Basic', 'Advanced', 'Premium'],
+      'SEO Optimization': ['Basic', 'Advanced', 'Premium'],
+      'Marketing Analytics': ['Basic', 'Advanced', 'Premium'],
+    },
+    'Support & Services': {
       'Customer Support': ['Email Only', '24/7 Priority', '24/7 Dedicated'],
-      'Response Time Metrics': ['✕', '✓', '✓'],
-      'Customer Database': ['✕', '✓', 'Advanced'],
-    },
-    'Marketing Tools': {
-      'SEO Tools': ['Basic', 'Advanced', 'Premium'],
-      'Social Media Integration': ['✕', '✓', 'Advanced'],
-      'Promotional Tools': ['✕', '✓', 'Premium'],
-      'Featured Listing': ['✕', '1 per month', 'Unlimited'],
-      'Marketing Analytics': ['✕', '✓', 'Advanced'],
+      'Account Manager': ['✕', '✕', '✓'],
+      'Business Advisory': ['✕', 'Quarterly', 'Monthly'],
+      'Training Sessions': ['Self-serve', 'Group', 'One-on-One'],
+      'API Access': ['✕', '✓', '✓'],
     }
   };
 
@@ -90,16 +96,16 @@ const VendorPricing: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 pt-32">
           <div className="text-center">
             <h1 className="text-4xl font-light tracking-tight sm:text-5xl">
-              Simple, Transparent Pricing
+              Simple, Commission-Based Pricing
             </h1>
             <p className="mt-6 text-xl font-light text-blue-600 max-w-2xl mx-auto">
-              Choose the perfect plan for your business. No hidden fees.
+              Start for free and upgrade as you grow. No booking limits, just lower commission rates.
             </p>
           </div>
         </div>
       </div>
 
-      {/* Simple Pricing Cards */}
+      {/* Pricing Cards */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-16 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {simplePlans.map((plan) => (
@@ -117,15 +123,29 @@ const VendorPricing: React.FC = () => {
               
               <div className="p-8">
                 <h3 className="text-xl font-light text-gray-900">{plan.name}</h3>
-                <div className="mt-4 flex items-baseline">
-                  <span className="text-4xl font-light">${plan.price}</span>
-                  <span className="ml-2 text-gray-500">/month</span>
+                <div className="mt-4">
+                  <div className="flex items-baseline">
+                    <span className="text-4xl font-light">${plan.price}</span>
+                    <span className="ml-2 text-gray-500">/month</span>
+                  </div>
+                  <div className="mt-2 text-lg text-blue-600 font-medium">
+                    {plan.commission} commission
+                  </div>
                 </div>
                 <p className="mt-4 text-gray-500 font-light">{plan.description}</p>
 
+                <ul className="mt-6 space-y-4">
+                  {plan.features.map((feature, index) => (
+                    <li key={index} className="flex items-center text-gray-600">
+                      <CheckIcon className="h-5 w-5 text-green-500 mr-3" />
+                      <span className="font-light">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+
                 <button
                   onClick={() => navigate('/vendors/list-business')}
-                  className={`mt-6 w-full py-3 px-4 rounded-lg font-light ${
+                  className={`mt-8 w-full py-3 px-4 rounded-lg font-light ${
                     plan.popular
                       ? 'bg-blue-600 text-white hover:bg-blue-700'
                       : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
@@ -133,18 +153,6 @@ const VendorPricing: React.FC = () => {
                 >
                   {plan.ctaText}
                 </button>
-              </div>
-
-              {/* Feature Categories */}
-              <div className="border-t">
-                {plan.features.map((feature) => (
-                  <div key={feature} className="p-8 border-b last:border-b-0">
-                    <h4 className="text-lg font-light text-gray-900 mb-4">{feature}</h4>
-                    <ul className="space-y-4">
-                      {/* Add feature details here */}
-                    </ul>
-                  </div>
-                ))}
               </div>
             </div>
           ))}
