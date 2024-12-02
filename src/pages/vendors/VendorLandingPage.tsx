@@ -116,7 +116,7 @@ const VendorLandingPage: React.FC = () => {
           <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1)_1px,transparent_1px)] [background-size:20px_20px]" />
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-48">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-48 pb-32 md:pb-64">
           <div className="max-w-3xl">
             <span className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600/30 to-purple-600/30 text-blue-200 rounded-full text-sm mb-6 backdrop-blur-sm">
               <span className="mr-2">✨</span>
@@ -146,33 +146,33 @@ const VendorLandingPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Stats Section - Updated with lighter style */}
-        <div className="absolute bottom-0 left-0 right-0 transform translate-y-1/2">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-              <div className="bg-gradient-to-br from-white/95 via-blue-50/95 to-purple-50/95 backdrop-blur-sm p-4 md:p-8 rounded-xl text-center transform hover:scale-105 transition-transform shadow-lg hover:shadow-xl border border-white/50">
-                <div className="text-2xl md:text-3xl font-light bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+        {/* Stats Section - Updated with better mobile spacing */}
+        <div className="absolute bottom-0 left-0 right-0 transform translate-y-1/2 px-4 sm:px-6 lg:px-8 mt-16 md:mt-0">
+          <div className="max-w-7xl mx-auto">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
+              <div className="bg-gradient-to-br from-white/95 via-blue-50/95 to-purple-50/95 backdrop-blur-sm p-3 md:p-8 rounded-xl text-center transform hover:scale-105 transition-transform shadow-lg hover:shadow-xl border border-white/50">
+                <div className="text-xl md:text-3xl font-light bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                   {marketStats.totalBookings}
                 </div>
-                <div className="text-sm md:text-base text-gray-600 font-light mt-2">Bookings Processed</div>
+                <div className="text-xs md:text-base text-gray-600 font-light mt-1 md:mt-2">Bookings Processed</div>
               </div>
-              <div className="bg-gradient-to-br from-white/95 via-blue-50/95 to-purple-50/95 backdrop-blur-sm p-4 md:p-8 rounded-xl text-center transform hover:scale-105 transition-transform shadow-lg hover:shadow-xl border border-white/50">
-                <div className="text-2xl md:text-3xl font-light bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <div className="bg-gradient-to-br from-white/95 via-blue-50/95 to-purple-50/95 backdrop-blur-sm p-3 md:p-8 rounded-xl text-center transform hover:scale-105 transition-transform shadow-lg hover:shadow-xl border border-white/50">
+                <div className="text-xl md:text-3xl font-light bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                   {marketStats.totalRevenue}
                 </div>
-                <div className="text-sm md:text-base text-gray-600 font-light mt-2">Revenue Generated</div>
+                <div className="text-xs md:text-base text-gray-600 font-light mt-1 md:mt-2">Revenue Generated</div>
               </div>
-              <div className="bg-gradient-to-br from-white/95 via-blue-50/95 to-purple-50/95 backdrop-blur-sm p-4 md:p-8 rounded-xl text-center transform hover:scale-105 transition-transform shadow-lg hover:shadow-xl border border-white/50">
-                <div className="text-2xl md:text-3xl font-light bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <div className="bg-gradient-to-br from-white/95 via-blue-50/95 to-purple-50/95 backdrop-blur-sm p-3 md:p-8 rounded-xl text-center transform hover:scale-105 transition-transform shadow-lg hover:shadow-xl border border-white/50">
+                <div className="text-xl md:text-3xl font-light bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                   {marketStats.averageIncrease}
                 </div>
-                <div className="text-sm md:text-base text-gray-600 font-light mt-2">Avg. Revenue Growth</div>
+                <div className="text-xs md:text-base text-gray-600 font-light mt-1 md:mt-2">Avg. Revenue Growth</div>
               </div>
-              <div className="bg-gradient-to-br from-white/95 via-blue-50/95 to-purple-50/95 backdrop-blur-sm p-4 md:p-8 rounded-xl text-center transform hover:scale-105 transition-transform shadow-lg hover:shadow-xl border border-white/50">
-                <div className="text-2xl md:text-3xl font-light bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <div className="bg-gradient-to-br from-white/95 via-blue-50/95 to-purple-50/95 backdrop-blur-sm p-3 md:p-8 rounded-xl text-center transform hover:scale-105 transition-transform shadow-lg hover:shadow-xl border border-white/50">
+                <div className="text-xl md:text-3xl font-light bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                   {marketStats.activeVendors}
                 </div>
-                <div className="text-sm md:text-base text-gray-600 font-light mt-2">Active Vendors</div>
+                <div className="text-xs md:text-base text-gray-600 font-light mt-1 md:mt-2">Active Vendors</div>
               </div>
             </div>
           </div>
@@ -180,7 +180,7 @@ const VendorLandingPage: React.FC = () => {
       </div>
 
       {/* Listing Types Showcase - Condensed */}
-      <div className="bg-white pt-48 md:pt-44 pb-24">
+      <div className="bg-white pt-32 md:pt-44 pb-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Services Section */}
           <div className="mb-24">

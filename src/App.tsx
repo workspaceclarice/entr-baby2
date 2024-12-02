@@ -22,10 +22,11 @@ import EventDetailPage from './pages/events/EventDetailPage';
 const AppRoutes = () => {
   const location = useLocation();
   const isVendorDashboard = location.pathname.startsWith('/vendors/dashboard');
+  const isVendorLanding = location.pathname === '/vendors/landing';
 
   return (
     <>
-      {!isVendorDashboard && <Header />}
+      {!isVendorDashboard && !isVendorLanding && <Header />}
       <Routes>
         {/* Main Routes */}
         <Route path="/" element={<HomePage />} />
