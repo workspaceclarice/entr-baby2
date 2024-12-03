@@ -54,7 +54,6 @@ const VendorSettings: React.FC = () => {
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [smsNotifications, setSmsNotifications] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [showSaveSuccess, setShowSaveSuccess] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [profileForm, setProfileForm] = useState({
     firstName: userProfile?.firstName || '',
@@ -70,7 +69,6 @@ const VendorSettings: React.FC = () => {
     taxId: isVendorProfile(userProfile) ? userProfile.taxId || '' : ''
   });
   const [isSavingBusiness, setIsSavingBusiness] = useState(false);
-  const [showBusinessSaveSuccess, setShowBusinessSaveSuccess] = useState(false);
   const [notification, setNotification] = useState<{
     show: boolean;
     message: string;
@@ -430,12 +428,6 @@ const VendorSettings: React.FC = () => {
             <div className="bg-white rounded-lg shadow-sm p-6">
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-lg font-light text-gray-900">Business Information</h3>
-                {showBusinessSaveSuccess && (
-                  <div className="flex items-center text-green-600 text-sm">
-                    <CheckCircleIcon className="h-5 w-5 mr-1" />
-                    Changes saved successfully
-                  </div>
-                )}
               </div>
 
               <div className="mb-6 p-4 rounded-lg bg-gray-50 border border-gray-200">
@@ -723,12 +715,6 @@ const VendorSettings: React.FC = () => {
       <div className="bg-white rounded-lg shadow-sm p-6">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-lg font-light text-gray-900">Profile Information</h3>
-          {showSaveSuccess && (
-            <div className="flex items-center text-green-600 text-sm">
-              <CheckCircleIcon className="h-5 w-5 mr-1" />
-              Changes saved successfully
-            </div>
-          )}
         </div>
         <div className="space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center">

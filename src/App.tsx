@@ -29,6 +29,7 @@ import ConfirmedBooking from './pages/vendors/dashboard/ConfirmedBooking';
 import VendorMessengerHub from './pages/vendors/dashboard/VendorMessengerHub';
 import VendorNotificationsHub from './pages/vendors/dashboard/VendorNotificationsHub';
 import VendorSettings from './pages/vendors/dashboard/VendorSettings';
+import VendorCalendar from './pages/vendors/dashboard/VendorCalendar';
 
 const AppRoutes = () => {
   const location = useLocation();
@@ -69,6 +70,7 @@ const AppRoutes = () => {
           <Route path="messenger" element={<VendorMessengerHub />} />
           <Route path="notifications" element={<VendorNotificationsHub />} />
           <Route path="settings" element={<VendorSettings />} />
+          <Route path="calendar" element={<VendorCalendar />} />
         </Route>
         <Route path="/vendors/features" element={<VendorFeatures />} />
         <Route path="/vendors/pricing" element={<VendorPricing />} />

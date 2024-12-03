@@ -7,7 +7,8 @@ import {
   BellIcon,
   ChatBubbleLeftIcon,
   Bars3Icon,
-  UserCircleIcon
+  UserCircleIcon,
+  CalendarIcon
 } from '@heroicons/react/24/outline';
 
 const VendorDashboardHeader: React.FC = () => {
@@ -58,6 +59,12 @@ const VendorDashboardHeader: React.FC = () => {
 
           {/* Desktop Right Section */}
           <div className="hidden sm:ml-6 sm:flex sm:items-center space-x-4">
+            <Link 
+              to="/vendors/dashboard/calendar"
+              className="p-1 rounded-full text-gray-400 hover:text-gray-500"
+            >
+              <CalendarIcon className="h-6 w-6" />
+            </Link>
             <Link 
               to="/vendors/dashboard/messenger"
               className="p-1 rounded-full text-gray-400 hover:text-gray-500"
@@ -137,6 +144,12 @@ const VendorDashboardHeader: React.FC = () => {
 
           {/* Mobile Right Section */}
           <div className="flex items-center sm:hidden space-x-2">
+            <Link 
+              to="/vendors/dashboard/calendar"
+              className="p-1 rounded-full text-gray-400 hover:text-gray-500"
+            >
+              <CalendarIcon className="h-6 w-6" />
+            </Link>
             <Link 
               to="/vendors/dashboard/messenger"
               className="p-1 rounded-full text-gray-400 hover:text-gray-500"
