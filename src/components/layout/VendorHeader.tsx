@@ -7,6 +7,7 @@ import {
   Cog6ToothIcon,
   Bars3Icon,
   XMarkIcon,
+  ArrowLeftCircleIcon,
 } from '@heroicons/react/24/outline';
 
 const VendorHeader: React.FC = () => {
@@ -29,11 +30,16 @@ const VendorHeader: React.FC = () => {
     <header className="bg-white shadow-sm fixed w-full top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <Link to="/vendors/landing" className="flex items-center">
-            <span className="text-2xl font-bold text-blue-600">entr</span>
-            <span className="text-sm text-gray-500 ml-2">for Vendors</span>
-          </Link>
+          {/* Logo with Back Arrow */}
+          <div className="flex items-center space-x-2">
+            <Link to="/" className="text-blue-600 hover:text-blue-700">
+              <ArrowLeftCircleIcon className="h-6 w-6" />
+            </Link>
+            <Link to="/vendors/landing" className="flex items-center">
+              <span className="text-2xl font-bold text-blue-600">entr</span>
+              <span className="text-sm text-gray-500 ml-2">for Vendors</span>
+            </Link>
+          </div>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
@@ -52,7 +58,29 @@ const VendorHeader: React.FC = () => {
             ))}
           </nav>
 
-          {/* Right side - Auth or Profile */}
+          {/* Mobile Actions */}
+          <div className="flex items-center space-x-2 md:hidden">
+            <Link
+              to="/vendors/list-business"
+              className="text-sm font-light text-white bg-blue-600 hover:bg-blue-700 px-3 py-1.5 rounded-md whitespace-nowrap"
+            >
+              List business
+            </Link>
+            
+            {/* Mobile menu button */}
+            <button
+              className="p-2 rounded-md text-gray-500 hover:text-blue-600"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              {isMobileMenuOpen ? (
+                <XMarkIcon className="h-6 w-6" />
+              ) : (
+                <Bars3Icon className="h-6 w-6" />
+              )}
+            </button>
+          </div>
+
+          {/* Desktop Right Side */}
           <div className="hidden md:flex items-center space-x-6">
             {currentUser ? (
               <>
@@ -83,18 +111,6 @@ const VendorHeader: React.FC = () => {
               </>
             )}
           </div>
-
-          {/* Mobile menu button */}
-          <button
-            className="md:hidden p-2 rounded-md text-gray-500 hover:text-gray-900"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          >
-            {isMobileMenuOpen ? (
-              <XMarkIcon className="h-6 w-6" />
-            ) : (
-              <Bars3Icon className="h-6 w-6" />
-            )}
-          </button>
         </div>
       </div>
 
