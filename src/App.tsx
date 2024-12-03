@@ -25,6 +25,7 @@ import VendorEarnings from './pages/vendors/dashboard/VendorEarnings';
 import CreateServiceListing from './pages/vendors/dashboard/CreateServiceListing';
 import CreateVenueListing from './pages/vendors/dashboard/CreateVenueListing';
 import BookingRequestDetail from './pages/vendors/dashboard/BookingRequestDetail';
+import ConfirmedBooking from './pages/vendors/dashboard/ConfirmedBooking';
 
 const AppRoutes = () => {
   const location = useLocation();
@@ -57,6 +58,7 @@ const AppRoutes = () => {
           <Route index element={<VendorDashboardHome />} />
           <Route path="bookings" element={<VendorBookings />} />
           <Route path="bookings/:requestId" element={<BookingRequestDetail />} />
+          <Route path="bookings/:bookingId/details" element={<ConfirmedBooking />} />
           <Route path="listings" element={<VendorListings />} />
           <Route path="listings/create-service" element={<CreateServiceListing />} />
           <Route path="listings/create-venue" element={<CreateVenueListing />} />

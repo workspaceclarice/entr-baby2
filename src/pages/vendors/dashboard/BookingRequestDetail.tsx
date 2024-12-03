@@ -70,7 +70,7 @@ const BookingRequestDetail: React.FC = () => {
       previousBookings: 0,
     },
     selectedPackage: {
-      name: 'Premium Coverage Package',
+      name: 'Premium Photography Package',
       basePrice: 2500,
       duration: '5 hours',
       includes: [
@@ -115,7 +115,7 @@ const BookingRequestDetail: React.FC = () => {
       type: 'service', // or 'venue'
       title: 'Premium Photography Package',
       category: 'Photography',
-      coverImage: 'https://images.unsplash.com/photo-1496337589254-7e19d01cec44?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+      coverImage: 'https://images.unsplash.com/photo-1604017011826-d3b4c23f8914?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
       rating: 4.9,
       reviewCount: 124,
       price: {
@@ -123,17 +123,18 @@ const BookingRequestDetail: React.FC = () => {
         unit: 'per event'
       },
       features: [
-        'Professional photographer',
+        'Professional photographers',
+        'Complete event coverage',
         'High-resolution photos',
         'Digital delivery',
-        'Event coverage'
+        'Online gallery'
       ],
       location: 'San Francisco, CA'
     }
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-32 lg:pb-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-48 lg:pb-8">
       {/* Header - Mobile Friendly */}
       <div className="space-y-4 sm:space-y-0 sm:flex sm:items-center sm:justify-between mb-8">
         <div>
@@ -262,29 +263,21 @@ const BookingRequestDetail: React.FC = () => {
             </div>
           </div>
 
-          {/* Add-ons & Requirements */}
+          {/* Requirements - New separate section */}
           <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-xl font-light text-gray-900 mb-4">Add-ons & Requirements</h2>
-            <div className="grid grid-cols-2 gap-6">
+            <h2 className="text-xl font-light text-gray-900 mb-4">Event Requirements</h2>
+            <div className="space-y-4">
               <div>
-                <h3 className="text-sm font-medium text-gray-900 mb-3">Selected Add-ons</h3>
-                <ul className="space-y-3">
-                  {requestDetails.addons.map((addon, index) => (
-                    <li key={index} className="flex justify-between text-sm">
-                      <span className="text-gray-600">
-                        {addon.name} × {addon.quantity}
-                      </span>
-                      <span className="text-gray-900">${addon.price}</span>
-                    </li>
-                  ))}
-                </ul>
+                <h3 className="text-sm font-medium text-gray-900 mb-2">Setup Time</h3>
+                <p className="text-sm text-gray-600">{requestDetails.requirements.setup}</p>
               </div>
               <div>
-                <h3 className="text-sm font-medium text-gray-900 mb-3">Specific Requirements</h3>
+                <h3 className="text-sm font-medium text-gray-900 mb-2">Specific Requirements</h3>
                 <ul className="space-y-2">
                   {requestDetails.requirements.specific.map((req, index) => (
-                    <li key={index} className="text-sm text-gray-600">
-                      • {req}
+                    <li key={index} className="flex items-start">
+                      <span className="flex-shrink-0 h-5 w-5 text-blue-500 mr-2">•</span>
+                      <span className="text-sm text-gray-600">{req}</span>
                     </li>
                   ))}
                 </ul>
@@ -322,34 +315,56 @@ const BookingRequestDetail: React.FC = () => {
           <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg shadow-sm p-6 border border-blue-100">
             <h2 className="text-xl font-light text-gray-900 mb-4">Pricing Breakdown</h2>
             <div className="space-y-3">
+              {/* Base Package */}
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">Package Price</span>
                 <span className="text-gray-900">${requestDetails.pricing.packagePrice}</span>
               </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Add-ons Total</span>
-                <span className="text-gray-900">${requestDetails.pricing.addonsTotal}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Service Fee</span>
-                <span className="text-gray-900">${requestDetails.pricing.serviceFee}</span>
-              </div>
+
+              {/* Add-ons Section */}
+              {requestDetails.addons.length > 0 && (
+                <div className="py-3 border-t border-blue-100">
+                  <p className="text-sm font-medium text-gray-900 mb-2">Add-ons</p>
+                  {requestDetails.addons.map((addon, index) => (
+                    <div key={index} className="flex justify-between text-sm mb-1">
+                      <span className="text-gray-600">
+                        {addon.name} × {addon.quantity}
+                      </span>
+                      <span className="text-gray-900">${addon.price}</span>
+                    </div>
+                  ))}
+                  <div className="flex justify-between text-sm mt-2 pt-2 border-t border-blue-100">
+                    <span className="text-gray-600">Add-ons Total</span>
+                    <span className="text-gray-900">${requestDetails.pricing.addonsTotal}</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Total */}
               <div className="pt-3 border-t border-blue-200">
                 <div className="flex justify-between text-sm font-medium">
                   <span className="text-gray-900">Total Amount</span>
                   <span className="text-gray-900">${requestDetails.pricing.total}</span>
                 </div>
-                <div className="flex justify-between mt-1">
-                  <span className="text-sm text-gray-600">Your Estimated Income</span>
-                  <span className="text-lg font-semibold text-green-600">
-                    ${requestDetails.pricing.estimatedIncome}
-                  </span>
-                </div>
+                <p className="text-xs text-gray-500 mt-1 text-center">
+                  Platform fees included
+                </p>
               </div>
             </div>
           </div>
 
-          {/* Action Buttons - Full Width on Mobile */}
+          {/* Estimated Income Card - Now shows same as total amount */}
+          <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg shadow-sm p-6 border border-green-100">
+            <div className="text-center">
+              <h3 className="text-sm font-medium text-gray-900 mb-1">Your Estimated Income</h3>
+              <p className="text-3xl font-semibold text-green-600">
+                ${requestDetails.pricing.total}
+              </p>
+              <p className="text-xs text-gray-500 mt-1">All fees included</p>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
           <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 space-y-3 lg:relative lg:bg-transparent lg:border-0 lg:p-0">
             <button 
               className="w-full px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"

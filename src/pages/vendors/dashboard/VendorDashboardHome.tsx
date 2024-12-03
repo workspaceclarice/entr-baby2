@@ -159,6 +159,8 @@ const VendorDashboardHome: React.FC = () => {
     );
   };
 
+  const navigate = useNavigate();
+
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Title Section */}
@@ -225,7 +227,8 @@ const VendorDashboardHome: React.FC = () => {
             {upcomingEvents.map((event) => (
               <div 
                 key={event.id} 
-                className="flex justify-between items-center px-4 py-3 hover:bg-gray-50 transition-colors"
+                onClick={() => navigate(`/vendors/dashboard/bookings/${event.id}/details`)}
+                className="flex justify-between items-center px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer"
               >
                 <div className="flex items-center space-x-3">
                   <div className={`w-2 h-2 rounded-full ${
