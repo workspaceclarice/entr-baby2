@@ -11,6 +11,7 @@ export interface BaseProfile {
   profileImage: string;
   displayName?: string;
   userType: 'user' | 'vendor';
+  phone?: string;
 }
 
 export interface VendorProfile extends BaseProfile {
@@ -18,11 +19,21 @@ export interface VendorProfile extends BaseProfile {
   businessName?: string;
   serviceType?: string;
   vendorStatus?: 'active' | 'pending' | 'inactive';
+  businessAddress?: string;
+  businessDescription?: string;
+  taxId?: string;
+  documents?: Array<{
+    name: string;
+    url: string;
+    type: string;
+  }>;
+  phone: string;
 }
 
 export interface CustomerProfile extends BaseProfile {
   userType: 'user';
   preferences?: string[];
+  phone?: string;
 }
 
 interface AuthContextType {
@@ -35,6 +46,7 @@ interface AuthContextType {
   logout: () => Promise<void>;
   loginWithGoogle: () => Promise<UserCredential>;
   googleSignIn: () => Promise<void>;
+  updateUserProfile: (profile: VendorProfile | CustomerProfile) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -86,6 +98,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     navigate('/');
   };
 
+  const updateUserProfile = async (profile: VendorProfile | CustomerProfile) => {
+    setUserProfile(profile);
+  };
+
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       setCurrentUser(user);
@@ -98,7 +114,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           lastName: nameParts[1] || '',
           profileImage: user.photoURL || `https://ui-avatars.com/api/?name=${nameParts[0]}+${nameParts[1]}`,
           userType: 'user',
-          displayName: user.displayName || undefined
+          displayName: user.displayName || undefined,
+          phone: user.phoneNumber || ''
         } as CustomerProfile);
       }
       setLoading(false);
@@ -116,7 +133,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     signup,
     logout,
     loginWithGoogle,
-    googleSignIn
+    googleSignIn,
+    updateUserProfile
   };
 
   return (

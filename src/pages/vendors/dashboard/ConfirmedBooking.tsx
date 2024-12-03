@@ -306,7 +306,7 @@ const ConfirmedBooking: React.FC = () => {
               </Tab>
             </Tab.List>
 
-            <Tab.Panels>
+            <Tab.Panels className="mt-6">
               {/* Event Details Panel */}
               <Tab.Panel>
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -537,7 +537,7 @@ const ConfirmedBooking: React.FC = () => {
 
         {/* Sidebar */}
         <div className="space-y-6">
-          {/* Updated Client Information Card */}
+          {/* Client Information Card */}
           <div className="bg-white rounded-lg shadow-sm p-6">
             <h2 className="text-xl font-light text-gray-900 mb-4">Client Information</h2>
             <div className="flex items-start space-x-4">

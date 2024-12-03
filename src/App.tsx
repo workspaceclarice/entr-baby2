@@ -26,6 +26,9 @@ import CreateServiceListing from './pages/vendors/dashboard/CreateServiceListing
 import CreateVenueListing from './pages/vendors/dashboard/CreateVenueListing';
 import BookingRequestDetail from './pages/vendors/dashboard/BookingRequestDetail';
 import ConfirmedBooking from './pages/vendors/dashboard/ConfirmedBooking';
+import VendorMessengerHub from './pages/vendors/dashboard/VendorMessengerHub';
+import VendorNotificationsHub from './pages/vendors/dashboard/VendorNotificationsHub';
+import VendorSettings from './pages/vendors/dashboard/VendorSettings';
 
 const AppRoutes = () => {
   const location = useLocation();
@@ -63,6 +66,9 @@ const AppRoutes = () => {
           <Route path="listings/create-service" element={<CreateServiceListing />} />
           <Route path="listings/create-venue" element={<CreateVenueListing />} />
           <Route path="earnings" element={<VendorEarnings />} />
+          <Route path="messenger" element={<VendorMessengerHub />} />
+          <Route path="notifications" element={<VendorNotificationsHub />} />
+          <Route path="settings" element={<VendorSettings />} />
         </Route>
         <Route path="/vendors/features" element={<VendorFeatures />} />
         <Route path="/vendors/pricing" element={<VendorPricing />} />
