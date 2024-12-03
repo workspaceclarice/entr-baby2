@@ -18,6 +18,13 @@ import VendorDashboard from './pages/vendors/dashboard/VendorDashboard';
 import VendorFeatures from './pages/vendors/features/VendorFeatures';
 import VendorPricing from './pages/vendors/pricing/VendorPricing';
 import EventDetailPage from './pages/events/EventDetailPage';
+import VendorDashboardHome from './pages/vendors/dashboard/VendorDashboardHome';
+import VendorBookings from './pages/vendors/dashboard/VendorBookings';
+import VendorListings from './pages/vendors/dashboard/VendorListings';
+import VendorEarnings from './pages/vendors/dashboard/VendorEarnings';
+import CreateServiceListing from './pages/vendors/dashboard/CreateServiceListing';
+import CreateVenueListing from './pages/vendors/dashboard/CreateVenueListing';
+import BookingRequestDetail from './pages/vendors/dashboard/BookingRequestDetail';
 
 const AppRoutes = () => {
   const location = useLocation();
@@ -46,7 +53,15 @@ const AppRoutes = () => {
         <Route path="/vendors/signup" element={<VendorSignUp />} />
         <Route path="/vendors/list-business" element={<ListYourBusiness />} />
         <Route path="/vendors/onboarding/*" element={<VendorOnboarding />} />
-        <Route path="/vendors/dashboard/*" element={<VendorDashboard />} />
+        <Route path="/vendors/dashboard/*" element={<VendorDashboard />}>
+          <Route index element={<VendorDashboardHome />} />
+          <Route path="bookings" element={<VendorBookings />} />
+          <Route path="bookings/:requestId" element={<BookingRequestDetail />} />
+          <Route path="listings" element={<VendorListings />} />
+          <Route path="listings/create-service" element={<CreateServiceListing />} />
+          <Route path="listings/create-venue" element={<CreateVenueListing />} />
+          <Route path="earnings" element={<VendorEarnings />} />
+        </Route>
         <Route path="/vendors/features" element={<VendorFeatures />} />
         <Route path="/vendors/pricing" element={<VendorPricing />} />
       </Routes>

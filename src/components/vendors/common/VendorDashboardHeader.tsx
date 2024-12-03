@@ -22,10 +22,10 @@ const VendorDashboardHeader: React.FC = () => {
     }
   };
 
-  const dashboardNavigation = [
+  const navigation = [
     { name: 'Dashboard', href: '/vendors/dashboard' },
     { name: 'Bookings', href: '/vendors/dashboard/bookings' },
-    { name: 'My Services', href: '/vendors/dashboard/services' },
+    { name: 'My Listings', href: '/vendors/dashboard/listings' },
     { name: 'Earnings', href: '/vendors/dashboard/earnings' },
   ];
 
@@ -41,7 +41,7 @@ const VendorDashboardHeader: React.FC = () => {
 
             {/* Dashboard Navigation */}
             <nav className="hidden md:flex ml-8 space-x-8">
-              {dashboardNavigation.map((item) => (
+              {navigation.map((item) => (
                 <Link
                   key={item.name}
                   to={item.href}

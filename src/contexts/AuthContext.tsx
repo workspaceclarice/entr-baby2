@@ -1,27 +1,39 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth, googleProvider } from '../config/firebase';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, signOut, User, UserCredential } from 'firebase/auth';
 
-interface UserProfile {
+export interface BaseProfile {
   id: string;
   email: string;
   firstName: string;
   lastName: string;
   profileImage: string;
-  role: string;
-  name?: string;  // Optional for backward compatibility
+  displayName?: string;
+  userType: 'user' | 'vendor';
+}
+
+export interface VendorProfile extends BaseProfile {
+  userType: 'vendor';
+  businessName?: string;
+  serviceType?: string;
+  vendorStatus?: 'active' | 'pending' | 'inactive';
+}
+
+export interface CustomerProfile extends BaseProfile {
+  userType: 'user';
+  preferences?: string[];
 }
 
 interface AuthContextType {
   currentUser: User | null;
-  userProfile: UserProfile | null;
-  userType: string | null;
+  userProfile: VendorProfile | CustomerProfile | null;
   loading: boolean;
-  signup: (email: string, password: string) => Promise<void>;
+  isVendor: boolean;
   login: (email: string, password: string) => Promise<void>;
-  loginWithGoogle: () => Promise<UserCredential>;  // Changed return type
+  signup: (email: string, password: string, userType: 'user' | 'vendor') => Promise<void>;
   logout: () => Promise<void>;
+  loginWithGoogle: () => Promise<UserCredential>;
   googleSignIn: () => Promise<void>;
 }
 
@@ -37,12 +49,13 @@ export const useAuth = () => {
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const [userType, setUserType] = useState<string | null>(null);
+  const [userProfile, setUserProfile] = useState<VendorProfile | CustomerProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  const signup = async (email: string, password: string) => {
+  const isVendor = useMemo(() => userProfile?.userType === 'vendor', [userProfile]);
+
+  const signup = async (email: string, password: string, userType: 'user' | 'vendor') => {
     await createUserWithEmailAndPassword(auth, email, password);
   };
 
@@ -70,7 +83,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = async () => {
     await signOut(auth);
     setUserProfile(null);
-    setUserType(null);
     navigate('/');
   };
 
@@ -78,7 +90,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       setCurrentUser(user);
       if (user) {
-        // Here you would typically fetch the user's profile from your database
         const nameParts = user.displayName?.split(' ') || ['', ''];
         setUserProfile({
           id: user.uid,
@@ -86,10 +97,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           firstName: nameParts[0],
           lastName: nameParts[1] || '',
           profileImage: user.photoURL || `https://ui-avatars.com/api/?name=${nameParts[0]}+${nameParts[1]}`,
-          role: 'user', // You might want to fetch this from your database
-          name: user.displayName || 'User'
-        });
-        setUserType('user'); // Or fetch from database
+          userType: 'user',
+          displayName: user.displayName || undefined
+        } as CustomerProfile);
       }
       setLoading(false);
     });
@@ -100,12 +110,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const value = {
     currentUser,
     userProfile,
-    userType,
     loading,
-    signup,
+    isVendor,
     login,
-    loginWithGoogle,
+    signup,
     logout,
+    loginWithGoogle,
     googleSignIn
   };
 

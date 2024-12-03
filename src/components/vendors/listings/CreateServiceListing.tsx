@@ -22,7 +22,13 @@ const STEPS = [
   { id: 'availability', name: 'Availability' },
 ];
 
-const CreateServiceListing: React.FC = () => {
+// Export the interface
+export interface CreateServiceListingProps {
+  onClose: () => void;
+  onSuccess: () => void;
+}
+
+const CreateServiceListing: React.FC<CreateServiceListingProps> = ({ onClose, onSuccess }) => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState('photos');
   const [formData, setFormData] = useState({

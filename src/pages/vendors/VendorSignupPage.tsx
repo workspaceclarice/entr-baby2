@@ -5,6 +5,7 @@ import { useAuth } from '../../contexts/AuthContext';
 interface FormData {
   email: string;
   password: string;
+  passwordConfirm: string;
   businessName: string;
   phoneNumber: string;
 }
@@ -13,6 +14,7 @@ const VendorSignupPage: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({
     email: '',
     password: '',
+    passwordConfirm: '',
     businessName: '',
     phoneNumber: ''
   });
@@ -23,10 +25,15 @@ const VendorSignupPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (formData.password !== formData.passwordConfirm) {
+      return setError('Passwords do not match');
+    }
+
     try {
       setError('');
       setLoading(true);
-      await signup(formData.email, formData.password);
+      await signup(formData.email, formData.password, 'vendor');
       navigate('/vendor/dashboard');
     } catch (err) {
       setError('Failed to create an account');

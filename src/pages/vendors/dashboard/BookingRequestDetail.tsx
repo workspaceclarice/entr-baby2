@@ -1,255 +1,399 @@
 import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { BookingRequest } from '../../../types/vendor';
-import {
-  CalendarIcon,
-  ClockIcon,
-  UserGroupIcon,
+import { useParams, useNavigate } from 'react-router-dom';
+import { 
+  CalendarIcon, 
+  ClockIcon, 
   MapPinIcon,
+  UserGroupIcon,
   CurrencyDollarIcon,
-  ChatBubbleLeftIcon,
+  CheckCircleIcon,
+  ArrowLeftIcon,
+  StarIcon
 } from '@heroicons/react/24/outline';
+import AcceptBookingModal from '../../../components/vendors/bookings/AcceptBookingModal';
+import CounterOfferModal from '../../../components/vendors/bookings/CounterOfferModal';
+import DeclineRequestModal from '../../../components/vendors/bookings/DeclineRequestModal';
 
 const BookingRequestDetail: React.FC = () => {
   const { requestId } = useParams();
-  const [isCounterOfferOpen, setIsCounterOfferOpen] = useState(false);
-  const [counterOfferPrice, setCounterOfferPrice] = useState('');
-  const [vendorNotes, setVendorNotes] = useState('');
+  const navigate = useNavigate();
 
-  // Mock data - replace with actual API call
-  const request: BookingRequest = {
-    id: requestId || '',
-    listingId: 'listing123',
-    listingType: 'service',
-    userId: 'user123',
-    userDetails: {
-      name: 'John Doe',
-      email: 'john@example.com',
-      phone: '123-456-7890',
-    },
-    eventDetails: {
-      date: new Date('2024-03-15'),
-      startTime: '14:00',
-      endTime: '18:00',
-      guestCount: 50,
-      eventType: 'Wedding Reception',
-      specialRequests: 'Need vegetarian food options',
-    },
-    status: 'pending',
-    price: {
-      amount: 1500,
-      currency: 'USD',
-    },
-    createdAt: new Date(),
-    updatedAt: new Date(),
+  // Add state for modals
+  const [showAcceptModal, setShowAcceptModal] = useState(false);
+  const [showCounterModal, setShowCounterModal] = useState(false);
+  const [showDeclineModal, setShowDeclineModal] = useState(false);
+
+  // Add handlers for actions
+  const handleAcceptBooking = () => {
+    // Handle accept booking logic
+    console.log('Booking accepted');
+    setShowAcceptModal(false);
+    // You might want to redirect or show a success message
+    navigate('/vendors/dashboard/bookings');
   };
 
-  const getStatusColor = (status: BookingRequest['status']) => {
-    switch (status) {
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'accepted':
-        return 'bg-green-100 text-green-800';
-      case 'countered':
-        return 'bg-blue-100 text-blue-800';
-      case 'declined':
-        return 'bg-red-100 text-red-800';
-      case 'cancelled':
-        return 'bg-gray-100 text-gray-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
+  const handleCounterOffer = (counterOffer: any) => {
+    // Handle counter offer logic
+    console.log('Counter offer sent:', counterOffer);
+    setShowCounterModal(false);
+    // You might want to redirect or show a success message
+    navigate('/vendors/dashboard/bookings');
+  };
+
+  const handleDeclineRequest = (reason: string) => {
+    // Handle decline request logic
+    console.log('Request declined:', reason);
+    setShowDeclineModal(false);
+    // You might want to redirect or show a success message
+    navigate('/vendors/dashboard/bookings');
+  };
+
+  // Mock data - In real app, fetch based on requestId
+  const requestDetails = {
+    id: '123',
+    status: 'Pending',
+    createdAt: '2024-03-20 14:30',
+    event: {
+      name: 'Corporate Annual Gala',
+      date: '2024-04-15',
+      time: '6:00 PM - 11:00 PM',
+      location: 'Grand Ballroom, Hilton Hotel',
+      expectedGuests: 200,
+      type: 'Corporate Event',
+      description: 'Annual corporate gathering with awards ceremony and dinner.',
+    },
+    client: {
+      name: 'Jessica Chen',
+      company: 'TechCorp Inc.',
+      email: 'jessica.chen@techcorp.com',
+      phone: '+1 (555) 123-4567',
+      previousBookings: 0,
+    },
+    selectedPackage: {
+      name: 'Premium Coverage Package',
+      basePrice: 2500,
+      duration: '5 hours',
+      includes: [
+        'Two professional photographers',
+        'Complete event coverage',
+        'Executive headshots',
+        'Digital delivery within 48 hours',
+        'High-resolution edited photos',
+        'Online gallery'
+      ]
+    },
+    addons: [
+      {
+        name: 'Extra Hour Coverage',
+        price: 300,
+        quantity: 1
+      },
+      {
+        name: 'Printed Photo Album',
+        price: 200,
+        quantity: 1
+      }
+    ],
+    requirements: {
+      setup: '30 minutes before event',
+      specific: [
+        'Black-tie dress code required',
+        'Need candid shots of networking',
+        'Group photos of department teams',
+        'Coverage of awards ceremony'
+      ]
+    },
+    pricing: {
+      packagePrice: 2500,
+      addonsTotal: 500,
+      subtotal: 3000,
+      serviceFee: 500,
+      total: 3500,
+      estimatedIncome: 2800 // After platform fees
+    },
+    bookedItem: {
+      type: 'service', // or 'venue'
+      title: 'Premium Photography Package',
+      category: 'Photography',
+      coverImage: 'https://images.unsplash.com/photo-1496337589254-7e19d01cec44?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+      rating: 4.9,
+      reviewCount: 124,
+      price: {
+        startingAt: 2500,
+        unit: 'per event'
+      },
+      features: [
+        'Professional photographer',
+        'High-resolution photos',
+        'Digital delivery',
+        'Event coverage'
+      ],
+      location: 'San Francisco, CA'
     }
   };
 
-  const handleAccept = async () => {
-    // Implement accept logic
-  };
-
-  const handleDecline = async () => {
-    // Implement decline logic
-  };
-
-  const handleCounterOffer = async () => {
-    // Implement counter offer logic
-  };
-
   return (
-    <div className="max-w-4xl mx-auto py-8">
-      {/* Header */}
-      <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-        <div className="flex justify-between items-start mb-6">
-          <div>
-            <h1 className="text-2xl font-semibold text-gray-900">
-              Booking Request
-            </h1>
-            <p className="text-sm text-gray-500">ID: {request.id.slice(0, 8)}</p>
-          </div>
-          <span
-            className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
-              request.status
-            )}`}
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-32 lg:pb-8">
+      {/* Header - Mobile Friendly */}
+      <div className="space-y-4 sm:space-y-0 sm:flex sm:items-center sm:justify-between mb-8">
+        <div>
+          <button 
+            onClick={() => navigate(-1)}
+            className="text-sm text-gray-500 hover:text-gray-700 mb-2 flex items-center"
           >
-            {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+            <ArrowLeftIcon className="h-4 w-4 mr-1" />
+            Back to requests
+          </button>
+          <h1 className="text-2xl sm:text-3xl font-extralight text-gray-900">Booking Request</h1>
+        </div>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center sm:space-x-4">
+          <span className="px-3 py-1 text-sm font-light rounded-full bg-yellow-100 text-yellow-800 mb-2 sm:mb-0">
+            {requestDetails.status}
+          </span>
+          <span className="text-sm text-gray-500">
+            Received {requestDetails.createdAt}
           </span>
         </div>
+      </div>
 
-        {/* Customer Details */}
-        <div className="border-t border-gray-200 pt-6">
-          <h2 className="text-lg font-medium text-gray-900 mb-4">
-            Customer Details
-          </h2>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <p className="text-sm font-medium text-gray-500">Name</p>
-              <p className="mt-1">{request.userDetails.name}</p>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-500">Email</p>
-              <p className="mt-1">{request.userDetails.email}</p>
-            </div>
-            {request.userDetails.phone && (
-              <div>
-                <p className="text-sm font-medium text-gray-500">Phone</p>
-                <p className="mt-1">{request.userDetails.phone}</p>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Main Content - Now Mobile Friendly */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Booked Service/Venue Card */}
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <h2 className="text-xl font-light text-gray-900 mb-4">Booked {requestDetails.bookedItem.type}</h2>
+            <div className="flex flex-col sm:flex-row gap-6">
+              <div className="w-full sm:w-48">
+                <img 
+                  src={requestDetails.bookedItem.coverImage} 
+                  alt={requestDetails.bookedItem.title}
+                  className="w-full h-32 sm:h-48 object-cover rounded-lg"
+                />
               </div>
-            )}
+              <div className="flex-1">
+                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  {requestDetails.bookedItem.title}
+                </h3>
+                <p className="text-sm text-gray-500 mb-2">{requestDetails.bookedItem.category}</p>
+                <div className="flex items-center mb-4">
+                  <StarIcon className="h-5 w-5 text-yellow-400" />
+                  <span className="text-sm font-medium text-gray-900 ml-1">
+                    {requestDetails.bookedItem.rating}
+                  </span>
+                  <span className="text-sm text-gray-500 ml-1">
+                    ({requestDetails.bookedItem.reviewCount} reviews)
+                  </span>
+                </div>
+                <div className="space-y-2">
+                  {requestDetails.bookedItem.features.map((feature, index) => (
+                    <div key={index} className="flex items-center text-sm text-gray-600">
+                      <CheckCircleIcon className="h-4 w-4 text-green-500 mr-2" />
+                      {feature}
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-4 pt-4 border-t border-gray-100">
+                  <div className="flex items-baseline">
+                    <span className="text-2xl font-semibold text-gray-900">
+                      ${requestDetails.bookedItem.price.startingAt}
+                    </span>
+                    <span className="text-sm text-gray-500 ml-1">
+                      {requestDetails.bookedItem.price.unit}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Event Details - Mobile Optimized */}
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <h2 className="text-xl font-light text-gray-900 mb-4">Event Details</h2>
+            <div className="grid grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <div className="flex items-start">
+                  <CalendarIcon className="h-5 w-5 text-gray-400 mr-2 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">{requestDetails.event.date}</p>
+                    <p className="text-sm text-gray-500">{requestDetails.event.time}</p>
+                  </div>
+                </div>
+                <div className="flex items-start">
+                  <MapPinIcon className="h-5 w-5 text-gray-400 mr-2 mt-0.5" />
+                  <div>
+                    <p className="text-sm text-gray-900">{requestDetails.event.location}</p>
+                  </div>
+                </div>
+                <div className="flex items-start">
+                  <UserGroupIcon className="h-5 w-5 text-gray-400 mr-2 mt-0.5" />
+                  <div>
+                    <p className="text-sm text-gray-900">{requestDetails.event.expectedGuests} expected guests</p>
+                    <p className="text-sm text-gray-500">{requestDetails.event.type}</p>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-gray-900 mb-2">Event Description</h3>
+                <p className="text-sm text-gray-600">{requestDetails.event.description}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Selected Package */}
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <h2 className="text-xl font-light text-gray-900 mb-4">Selected Package</h2>
+            <div className="mb-4">
+              <div className="flex justify-between items-start mb-2">
+                <h3 className="text-base font-medium text-gray-900">{requestDetails.selectedPackage.name}</h3>
+                <p className="text-lg font-medium text-gray-900">${requestDetails.selectedPackage.basePrice}</p>
+              </div>
+              <p className="text-sm text-gray-500 mb-4">Duration: {requestDetails.selectedPackage.duration}</p>
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h4 className="text-sm font-medium text-gray-900 mb-2">Package Includes:</h4>
+                <ul className="grid grid-cols-2 gap-2">
+                  {requestDetails.selectedPackage.includes.map((item, index) => (
+                    <li key={index} className="flex items-center text-sm text-gray-600">
+                      <CheckCircleIcon className="h-4 w-4 text-green-500 mr-2" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* Add-ons & Requirements */}
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <h2 className="text-xl font-light text-gray-900 mb-4">Add-ons & Requirements</h2>
+            <div className="grid grid-cols-2 gap-6">
+              <div>
+                <h3 className="text-sm font-medium text-gray-900 mb-3">Selected Add-ons</h3>
+                <ul className="space-y-3">
+                  {requestDetails.addons.map((addon, index) => (
+                    <li key={index} className="flex justify-between text-sm">
+                      <span className="text-gray-600">
+                        {addon.name} × {addon.quantity}
+                      </span>
+                      <span className="text-gray-900">${addon.price}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-gray-900 mb-3">Specific Requirements</h3>
+                <ul className="space-y-2">
+                  {requestDetails.requirements.specific.map((req, index) => (
+                    <li key={index} className="text-sm text-gray-600">
+                      • {req}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Event Details */}
-        <div className="border-t border-gray-200 pt-6 mt-6">
-          <h2 className="text-lg font-medium text-gray-900 mb-4">
-            Event Details
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex items-center">
-              <CalendarIcon className="h-5 w-5 text-gray-400 mr-2" />
-              <div>
-                <p className="text-sm font-medium text-gray-500">Date</p>
-                <p className="mt-1">
-                  {request.eventDetails.date.toLocaleDateString()}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center">
-              <ClockIcon className="h-5 w-5 text-gray-400 mr-2" />
-              <div>
-                <p className="text-sm font-medium text-gray-500">Time</p>
-                <p className="mt-1">
-                  {request.eventDetails.startTime} - {request.eventDetails.endTime}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center">
-              <UserGroupIcon className="h-5 w-5 text-gray-400 mr-2" />
-              <div>
-                <p className="text-sm font-medium text-gray-500">Guests</p>
-                <p className="mt-1">{request.eventDetails.guestCount}</p>
-              </div>
-            </div>
-            <div className="flex items-center">
-              <CurrencyDollarIcon className="h-5 w-5 text-gray-400 mr-2" />
-              <div>
-                <p className="text-sm font-medium text-gray-500">Price</p>
-                <p className="mt-1">${request.price.amount}</p>
-              </div>
-            </div>
-          </div>
-
-          {request.eventDetails.specialRequests && (
-            <div className="mt-4">
-              <p className="text-sm font-medium text-gray-500">
-                Special Requests
-              </p>
-              <p className="mt-1 text-gray-700">
-                {request.eventDetails.specialRequests}
-              </p>
-            </div>
-          )}
-        </div>
-
-        {/* Action Buttons */}
-        {request.status === 'pending' && (
-          <div className="border-t border-gray-200 pt-6 mt-6">
-            <div className="flex space-x-4">
-              <button
-                onClick={handleAccept}
-                className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                Accept
-              </button>
-              <button
-                onClick={() => setIsCounterOfferOpen(true)}
-                className="flex-1 bg-white text-blue-600 px-4 py-2 rounded-md border border-blue-600 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                Counter Offer
-              </button>
-              <button
-                onClick={handleDecline}
-                className="flex-1 bg-white text-red-600 px-4 py-2 rounded-md border border-red-600 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500"
-              >
-                Decline
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Counter Offer Dialog */}
-        {isCounterOfferOpen && (
-          <div className="border-t border-gray-200 pt-6 mt-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
-              Make Counter Offer
-            </h3>
+        {/* Sidebar - Sticky on Desktop */}
+        <div className="space-y-6 lg:sticky lg:top-8">
+          {/* Client Information */}
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <h2 className="text-xl font-light text-gray-900 mb-4">Client Information</h2>
             <div className="space-y-4">
               <div>
-                <label
-                  htmlFor="price"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  New Price ($)
-                </label>
-                <input
-                  type="number"
-                  id="price"
-                  value={counterOfferPrice}
-                  onChange={(e) => setCounterOfferPrice(e.target.value)}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                />
+                <p className="text-sm font-medium text-gray-900">{requestDetails.client.name}</p>
+                <p className="text-sm text-gray-500">{requestDetails.client.company}</p>
               </div>
               <div>
-                <label
-                  htmlFor="notes"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Notes
-                </label>
-                <textarea
-                  id="notes"
-                  rows={3}
-                  value={vendorNotes}
-                  onChange={(e) => setVendorNotes(e.target.value)}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                  placeholder="Explain your counter offer..."
-                />
+                <p className="text-sm text-gray-600">{requestDetails.client.email}</p>
+                <p className="text-sm text-gray-600">{requestDetails.client.phone}</p>
               </div>
-              <div className="flex space-x-4">
-                <button
-                  onClick={handleCounterOffer}
-                  className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  Send Counter Offer
-                </button>
-                <button
-                  onClick={() => setIsCounterOfferOpen(false)}
-                  className="flex-1 bg-white text-gray-700 px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500"
-                >
-                  Cancel
-                </button>
+              <div className="pt-4 border-t border-gray-200">
+                <p className="text-sm text-gray-500">
+                  {requestDetails.client.previousBookings === 0 
+                    ? 'First-time client'
+                    : `Previous bookings: ${requestDetails.client.previousBookings}`
+                  }
+                </p>
               </div>
             </div>
           </div>
-        )}
+
+          {/* Pricing Breakdown */}
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg shadow-sm p-6 border border-blue-100">
+            <h2 className="text-xl font-light text-gray-900 mb-4">Pricing Breakdown</h2>
+            <div className="space-y-3">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Package Price</span>
+                <span className="text-gray-900">${requestDetails.pricing.packagePrice}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Add-ons Total</span>
+                <span className="text-gray-900">${requestDetails.pricing.addonsTotal}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Service Fee</span>
+                <span className="text-gray-900">${requestDetails.pricing.serviceFee}</span>
+              </div>
+              <div className="pt-3 border-t border-blue-200">
+                <div className="flex justify-between text-sm font-medium">
+                  <span className="text-gray-900">Total Amount</span>
+                  <span className="text-gray-900">${requestDetails.pricing.total}</span>
+                </div>
+                <div className="flex justify-between mt-1">
+                  <span className="text-sm text-gray-600">Your Estimated Income</span>
+                  <span className="text-lg font-semibold text-green-600">
+                    ${requestDetails.pricing.estimatedIncome}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Action Buttons - Full Width on Mobile */}
+          <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 space-y-3 lg:relative lg:bg-transparent lg:border-0 lg:p-0">
+            <button 
+              className="w-full px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+              onClick={() => setShowAcceptModal(true)}
+            >
+              Accept Booking
+            </button>
+            <button 
+              className="w-full px-4 py-2 border border-blue-600 text-blue-600 text-sm font-medium rounded-lg hover:bg-blue-50 transition-colors"
+              onClick={() => setShowCounterModal(true)}
+            >
+              Send Counter Offer
+            </button>
+            <button 
+              className="w-full px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors"
+              onClick={() => setShowDeclineModal(true)}
+            >
+              Decline Request
+            </button>
+          </div>
+        </div>
       </div>
+
+      {/* Add Modals */}
+      <AcceptBookingModal
+        isOpen={showAcceptModal}
+        onClose={() => setShowAcceptModal(false)}
+        onConfirm={handleAcceptBooking}
+        bookingDetails={requestDetails}
+      />
+
+      <CounterOfferModal
+        isOpen={showCounterModal}
+        onClose={() => setShowCounterModal(false)}
+        onSubmit={handleCounterOffer}
+        bookingDetails={requestDetails}
+      />
+
+      <DeclineRequestModal
+        isOpen={showDeclineModal}
+        onClose={() => setShowDeclineModal(false)}
+        onConfirm={handleDeclineRequest}
+        bookingDetails={requestDetails}
+      />
     </div>
   );
 };
