@@ -134,25 +134,25 @@ const BookingRequestDetail: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-48 lg:pb-8">
-      {/* Header - Mobile Friendly */}
-      <div className="space-y-4 sm:space-y-0 sm:flex sm:items-center sm:justify-between mb-8">
-        <div>
-          <button 
-            onClick={() => navigate(-1)}
-            className="text-sm text-gray-500 hover:text-gray-700 mb-2 flex items-center"
-          >
-            <ArrowLeftIcon className="h-4 w-4 mr-1" />
-            Back to requests
-          </button>
-          <h1 className="text-2xl sm:text-3xl font-extralight text-gray-900">Booking Request</h1>
-        </div>
-        <div className="flex flex-col sm:flex-row items-start sm:items-center sm:space-x-4">
-          <span className="px-3 py-1 text-sm font-light rounded-full bg-yellow-100 text-yellow-800 mb-2 sm:mb-0">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Back button and header */}
+      <div className="mb-8">
+        <button 
+          onClick={() => navigate(-1)}
+          className="text-sm text-gray-500 hover:text-gray-700 mb-4 flex items-center"
+        >
+          <ArrowLeftIcon className="h-4 w-4 mr-1" />
+          Back to requests
+        </button>
+        
+        {/* Add event title and status */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-light text-gray-900">{requestDetails.event.name}</h1>
+            <p className="mt-2 text-sm text-gray-600">{requestDetails.event.date} • {requestDetails.event.time}</p>
+          </div>
+          <span className="px-3 py-1 text-sm font-light rounded-full bg-yellow-100 text-yellow-800">
             {requestDetails.status}
-          </span>
-          <span className="text-sm text-gray-500">
-            Received {requestDetails.createdAt}
           </span>
         </div>
       </div>

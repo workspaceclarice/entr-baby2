@@ -200,17 +200,22 @@ const ConfirmedBooking: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Header */}
+      {/* Back button and header */}
       <div className="mb-8">
         <button 
           onClick={() => navigate(-1)}
-          className="text-sm text-gray-500 hover:text-gray-700 mb-2 flex items-center"
+          className="text-sm text-gray-500 hover:text-gray-700 mb-4 flex items-center"
         >
           <ArrowLeftIcon className="h-4 w-4 mr-1" />
           Back to bookings
         </button>
-        <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-extralight text-gray-900">Booking Details</h1>
+        
+        {/* Add event title and status */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-light text-gray-900">{bookingDetails.event.name}</h1>
+            <p className="mt-2 text-sm text-gray-600">{bookingDetails.event.date} • {bookingDetails.event.time}</p>
+          </div>
           <span className="px-3 py-1 text-sm font-light rounded-full bg-green-100 text-green-800">
             {bookingDetails.status}
           </span>
@@ -346,53 +351,6 @@ const ConfirmedBooking: React.FC = () => {
                             </div>
                           </div>
                         ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Sidebar */}
-                  <div className="space-y-6">
-                    {/* Updated Client Information Card */}
-                    <div className="bg-white rounded-lg shadow-sm p-6">
-                      <h2 className="text-xl font-light text-gray-900 mb-4">Client Information</h2>
-                      <div className="flex items-start space-x-4">
-                        <img
-                          src={bookingDetails.client.profileImage || `https://ui-avatars.com/api/?name=${encodeURIComponent(bookingDetails.client.name)}&background=random`}
-                          alt={bookingDetails.client.name}
-                          className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm"
-                        />
-                        <div className="flex-1">
-                          <div className="flex items-center space-x-2">
-                            <h3 className="text-base font-medium text-gray-900">{bookingDetails.client.name}</h3>
-                            {bookingDetails.client.verified && (
-                              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
-                                Verified
-                              </span>
-                            )}
-                          </div>
-                          {bookingDetails.client.company && (
-                            <p className="text-sm text-gray-500">{bookingDetails.client.company}</p>
-                          )}
-                          <div className="mt-2 space-y-1">
-                            <p className="text-sm text-gray-600 flex items-center">
-                              <span className="w-4 h-4 inline-flex items-center justify-center rounded-full bg-gray-100 mr-2">
-                                📧
-                              </span>
-                              {bookingDetails.client.email}
-                            </p>
-                            <p className="text-sm text-gray-600 flex items-center">
-                              <span className="w-4 h-4 inline-flex items-center justify-center rounded-full bg-gray-100 mr-2">
-                                📱
-                              </span>
-                              {bookingDetails.client.phone}
-                            </p>
-                          </div>
-                          {bookingDetails.client.previousBookings && bookingDetails.client.previousBookings > 0 && (
-                            <p className="mt-2 text-sm text-green-600">
-                              {bookingDetails.client.previousBookings} previous bookings
-                            </p>
-                          )}
-                        </div>
                       </div>
                     </div>
                   </div>
