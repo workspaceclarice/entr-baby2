@@ -53,6 +53,16 @@ interface Invoice {
   paymentDate?: string;
 }
 
+interface Client {
+  name: string;
+  company: string;
+  email: string;
+  phone: string;
+  profileImage?: string;
+  verified?: boolean;
+  previousBookings?: number;
+}
+
 const ConfirmedBooking: React.FC = () => {
   const { bookingId } = useParams();
   const navigate = useNavigate();
@@ -75,7 +85,10 @@ const ConfirmedBooking: React.FC = () => {
       company: 'TechCorp Inc.',
       email: 'jessica.chen@techcorp.com',
       phone: '+1 (555) 123-4567',
-    },
+      profileImage: 'https://example.com/path/to/profile.jpg',
+      verified: true,
+      previousBookings: 3
+    } as Client,
     timeline: [
       {
         time: '5:30 PM',
@@ -335,36 +348,50 @@ const ConfirmedBooking: React.FC = () => {
                         ))}
                       </div>
                     </div>
-
-                    {/* Client Information */}
-                    <div className="bg-white rounded-lg shadow-sm p-6">
-                      <h2 className="text-xl font-light text-gray-900 mb-4">Client Information</h2>
-                      <div className="space-y-4">
-                        <div>
-                          <p className="text-sm font-medium text-gray-900">{bookingDetails.client.name}</p>
-                          <p className="text-sm text-gray-500">{bookingDetails.client.company}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-gray-600">{bookingDetails.client.email}</p>
-                          <p className="text-sm text-gray-600">{bookingDetails.client.phone}</p>
-                        </div>
-                      </div>
-                    </div>
                   </div>
 
                   {/* Sidebar */}
                   <div className="space-y-6">
-                    {/* Client Information */}
+                    {/* Updated Client Information Card */}
                     <div className="bg-white rounded-lg shadow-sm p-6">
                       <h2 className="text-xl font-light text-gray-900 mb-4">Client Information</h2>
-                      <div className="space-y-4">
-                        <div>
-                          <p className="text-sm font-medium text-gray-900">{bookingDetails.client.name}</p>
-                          <p className="text-sm text-gray-500">{bookingDetails.client.company}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-gray-600">{bookingDetails.client.email}</p>
-                          <p className="text-sm text-gray-600">{bookingDetails.client.phone}</p>
+                      <div className="flex items-start space-x-4">
+                        <img
+                          src={bookingDetails.client.profileImage || `https://ui-avatars.com/api/?name=${encodeURIComponent(bookingDetails.client.name)}&background=random`}
+                          alt={bookingDetails.client.name}
+                          className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm"
+                        />
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-2">
+                            <h3 className="text-base font-medium text-gray-900">{bookingDetails.client.name}</h3>
+                            {bookingDetails.client.verified && (
+                              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                                Verified
+                              </span>
+                            )}
+                          </div>
+                          {bookingDetails.client.company && (
+                            <p className="text-sm text-gray-500">{bookingDetails.client.company}</p>
+                          )}
+                          <div className="mt-2 space-y-1">
+                            <p className="text-sm text-gray-600 flex items-center">
+                              <span className="w-4 h-4 inline-flex items-center justify-center rounded-full bg-gray-100 mr-2">
+                                📧
+                              </span>
+                              {bookingDetails.client.email}
+                            </p>
+                            <p className="text-sm text-gray-600 flex items-center">
+                              <span className="w-4 h-4 inline-flex items-center justify-center rounded-full bg-gray-100 mr-2">
+                                📱
+                              </span>
+                              {bookingDetails.client.phone}
+                            </p>
+                          </div>
+                          {bookingDetails.client.previousBookings && bookingDetails.client.previousBookings > 0 && (
+                            <p className="mt-2 text-sm text-green-600">
+                              {bookingDetails.client.previousBookings} previous bookings
+                            </p>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -552,17 +579,46 @@ const ConfirmedBooking: React.FC = () => {
 
         {/* Sidebar */}
         <div className="space-y-6">
-          {/* Client Information */}
+          {/* Updated Client Information Card */}
           <div className="bg-white rounded-lg shadow-sm p-6">
             <h2 className="text-xl font-light text-gray-900 mb-4">Client Information</h2>
-            <div className="space-y-4">
-              <div>
-                <p className="text-sm font-medium text-gray-900">{bookingDetails.client.name}</p>
-                <p className="text-sm text-gray-500">{bookingDetails.client.company}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">{bookingDetails.client.email}</p>
-                <p className="text-sm text-gray-600">{bookingDetails.client.phone}</p>
+            <div className="flex items-start space-x-4">
+              <img
+                src={bookingDetails.client.profileImage || `https://ui-avatars.com/api/?name=${encodeURIComponent(bookingDetails.client.name)}&background=random`}
+                alt={bookingDetails.client.name}
+                className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm"
+              />
+              <div className="flex-1">
+                <div className="flex items-center space-x-2">
+                  <h3 className="text-base font-medium text-gray-900">{bookingDetails.client.name}</h3>
+                  {bookingDetails.client.verified && (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                      Verified
+                    </span>
+                  )}
+                </div>
+                {bookingDetails.client.company && (
+                  <p className="text-sm text-gray-500">{bookingDetails.client.company}</p>
+                )}
+                <div className="mt-2 space-y-1">
+                  <p className="text-sm text-gray-600 flex items-center">
+                    <span className="w-4 h-4 inline-flex items-center justify-center rounded-full bg-gray-100 mr-2">
+                      📧
+                    </span>
+                    {bookingDetails.client.email}
+                  </p>
+                  <p className="text-sm text-gray-600 flex items-center">
+                    <span className="w-4 h-4 inline-flex items-center justify-center rounded-full bg-gray-100 mr-2">
+                      📱
+                    </span>
+                    {bookingDetails.client.phone}
+                  </p>
+                </div>
+                {bookingDetails.client.previousBookings && bookingDetails.client.previousBookings > 0 && (
+                  <p className="mt-2 text-sm text-green-600">
+                    {bookingDetails.client.previousBookings} previous bookings
+                  </p>
+                )}
               </div>
             </div>
           </div>
