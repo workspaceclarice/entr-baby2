@@ -8,6 +8,14 @@ import BookingHistoryCard from '../../../components/vendors/bookings/BookingHist
 const VendorBookings: React.FC = () => {
   const navigate = useNavigate();
 
+  const handleRequestClick = (requestId: number) => {
+    navigate(`/vendors/dashboard/bookings/${requestId}`);
+  };
+
+  const handleBookingClick = (bookingId: number) => {
+    navigate(`/vendors/dashboard/bookings/${bookingId}/details`);
+  };
+
   const bookingRequests = [
     {
       id: 1,
@@ -102,11 +110,16 @@ const VendorBookings: React.FC = () => {
         </div>
         <div className="space-y-6">
           {activeBookings.map((booking) => (
-            <ActiveBookingCard
+            <div 
               key={booking.id}
-              booking={booking}
-              onClick={(id) => navigate(`/vendors/dashboard/bookings/${id}/details`)}
-            />
+              onClick={() => handleBookingClick(booking.id)}
+              className="cursor-pointer"
+            >
+              <ActiveBookingCard
+                booking={booking}
+                onClick={handleBookingClick}
+              />
+            </div>
           ))}
         </div>
       </div>
@@ -124,7 +137,7 @@ const VendorBookings: React.FC = () => {
             <ActiveRequestCard
               key={request.id}
               request={request}
-              onClick={(id) => navigate(`/vendors/dashboard/bookings/${id}`)}
+              onClick={handleRequestClick}
             />
           ))}
         </div>

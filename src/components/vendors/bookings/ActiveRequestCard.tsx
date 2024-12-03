@@ -17,8 +17,8 @@ interface ActiveRequestProps {
 
 const ActiveRequestCard: React.FC<ActiveRequestProps> = ({ request, onClick }) => (
   <div 
-    className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-lg p-6 border border-yellow-100 hover:shadow-md transition-shadow cursor-pointer"
     onClick={() => onClick(request.id)}
+    className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-lg p-6 border border-yellow-100 hover:shadow-md transition-shadow cursor-pointer"
   >
     <div className="flex justify-between items-start mb-4">
       <div>
