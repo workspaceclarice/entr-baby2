@@ -37,8 +37,9 @@ const VendorDashboardHeader: React.FC = () => {
           {/* Logo and Navigation */}
           <div className="flex">
             <div className="flex flex-shrink-0 items-center">
-              <Link to="/vendors/dashboard" className="text-2xl font-bold text-blue-600">
-                entr
+              <Link to="/vendors/dashboard" className="flex items-center space-x-2">
+                <span className="text-2xl font-bold text-blue-600">entr</span>
+                <span className="text-sm font-light text-gray-600">for Vendors</span>
               </Link>
             </div>
 

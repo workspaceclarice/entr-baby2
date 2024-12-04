@@ -32,6 +32,7 @@ import VendorSettings from './pages/vendors/dashboard/VendorSettings';
 import VendorCalendar from './pages/vendors/dashboard/VendorCalendar';
 import VendorProfileEditor from './pages/vendors/dashboard/VendorProfileEditor';
 import VendorProfilePreview from './pages/vendors/dashboard/VendorProfilePreview';
+import CompletedBooking from './pages/vendors/dashboard/CompletedBooking';
 
 const AppRoutes = () => {
   const location = useLocation();
@@ -75,6 +76,7 @@ const AppRoutes = () => {
           <Route path="calendar" element={<VendorCalendar />} />
           <Route path="profile" element={<VendorProfileEditor />} />
           <Route path="profile/preview" element={<VendorProfilePreview />} />
+          <Route path="bookings/:bookingId/completed" element={<CompletedBooking />} />
         </Route>
         <Route path="/vendors/features" element={<VendorFeatures />} />
         <Route path="/vendors/pricing" element={<VendorPricing />} />
