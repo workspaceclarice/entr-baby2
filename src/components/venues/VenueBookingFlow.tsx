@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Dialog } from '@headlessui/react';
-import { XMarkIcon, CheckIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { Venue } from '../../types/venue';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
@@ -11,10 +11,27 @@ interface VenueBookingFlowProps {
   onClose: () => void;
 }
 
-type BookingStep = 'details' | 'review' | 'confirmation';
+type Step = 'availability' | 'details' | 'review';
+
+// Helper functions
+const formatTime = (time: string) => {
+  const [hours, minutes] = time.split(':').map(Number);
+  const hour = parseInt(hours.toString());
+  const ampm = hour >= 12 ? 'PM' : 'AM';
+  const standardHour = hour % 12 || 12;
+  return `${standardHour}:${minutes.toString().padStart(2, '0')} ${ampm}`;
+};
+
+const formatDate = (date: Date) => {
+  return date.toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric'
+  });
+};
 
 export default function VenueBookingFlow({ venue, isOpen, onClose }: VenueBookingFlowProps) {
-  const [step, setStep] = useState<BookingStep>('details');
+  const [currentStep, setCurrentStep] = useState<Step>('availability');
   const [bookingDetails, setBookingDetails] = useState({
     date: null as Date | null,
     startTime: '',
@@ -24,13 +41,22 @@ export default function VenueBookingFlow({ venue, isOpen, onClose }: VenueBookin
     notes: ''
   });
 
-  const basePrice = venue.pricePerHour * bookingDetails.duration;
-  const guestFee = venue.pricePerGuest * bookingDetails.guests;
-  const totalPrice = basePrice + guestFee;
+  const steps = [
+    { id: 'availability', name: 'Select Date & Time' },
+    { id: 'details', name: 'Event Details' },
+    { id: 'review', name: 'Review & Pay' }
+  ];
 
-  const handleSubmit = async () => {
-    // TODO: Implement booking submission
-    setStep('confirmation');
+  const handleStepClick = (step: Step) => {
+    if (step === 'details' && !bookingDetails.date) return;
+    if (step === 'review' && !bookingDetails.eventType) return;
+    setCurrentStep(step);
+  };
+
+  const calculateTotal = () => {
+    const basePrice = venue.pricePerHour * bookingDetails.duration;
+    const guestFee = venue.pricePerGuest * bookingDetails.guests;
+    return basePrice + guestFee;
   };
 
   return (
@@ -40,32 +66,61 @@ export default function VenueBookingFlow({ venue, isOpen, onClose }: VenueBookin
       className="fixed inset-0 z-50 overflow-y-auto"
     >
       <div className="flex items-center justify-center min-h-screen">
-        <Dialog.Overlay className="fixed inset-0 bg-black opacity-30" />
+        <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-50" />
 
-        <div className="relative bg-white rounded-lg max-w-2xl w-full mx-4 shadow-xl">
+        <div className="relative bg-white rounded-xl max-w-2xl w-full mx-4 my-8">
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b">
-            <Dialog.Title className="text-lg font-medium text-gray-900">
-              {step === 'details' && 'Book Venue'}
-              {step === 'review' && 'Review Booking'}
-              {step === 'confirmation' && 'Booking Confirmed'}
-            </Dialog.Title>
+          <div className="border-b px-6 py-4 sticky top-0 bg-white rounded-t-xl z-10">
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-500"
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-500"
             >
               <XMarkIcon className="h-6 w-6" />
             </button>
+            <h2 className="text-xl font-semibold">Book Venue</h2>
+          </div>
+
+          {/* Steps */}
+          <div className="border-b sticky top-[73px] bg-white z-10">
+            <div className="px-6 py-4">
+              <nav className="flex items-center justify-between">
+                {steps.map((step, index) => (
+                  <button
+                    key={step.id}
+                    onClick={() => handleStepClick(step.id as Step)}
+                    className={`flex items-center ${
+                      index < steps.findIndex(s => s.id === currentStep)
+                        ? 'text-purple-600'
+                        : index === steps.findIndex(s => s.id === currentStep)
+                          ? 'text-purple-600'
+                          : 'text-gray-400'
+                    }`}
+                  >
+                    <span className={`w-8 h-8 rounded-full flex items-center justify-center text-sm border-2 
+                      ${index <= steps.findIndex(s => s.id === currentStep)
+                        ? 'border-purple-600 bg-purple-50'
+                        : 'border-gray-300'
+                      }`}
+                    >
+                      {index + 1}
+                    </span>
+                    <span className="ml-2 text-sm font-medium">{step.name}</span>
+                    {index < steps.length - 1 && (
+                      <ChevronRightIcon className="w-5 h-5 mx-3 text-gray-300" />
+                    )}
+                  </button>
+                ))}
+              </nav>
+            </div>
           </div>
 
           {/* Content */}
-          <div className="px-6 py-4">
-            {step === 'details' && (
+          <div className="p-6 overflow-y-auto max-h-[calc(100vh-250px)]">
+            {currentStep === 'availability' && (
               <div className="space-y-6">
-                {/* Date Selection */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Event Date
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Select Date
                   </label>
                   <DatePicker
                     selected={bookingDetails.date}
@@ -76,9 +131,8 @@ export default function VenueBookingFlow({ venue, isOpen, onClose }: VenueBookin
                   />
                 </div>
 
-                {/* Time Selection */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Start Time
                   </label>
                   <select
@@ -87,174 +141,197 @@ export default function VenueBookingFlow({ venue, isOpen, onClose }: VenueBookin
                     className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   >
                     <option value="">Select time</option>
-                    {venue.availability[bookingDetails.date?.getDay() === 0 ? 'sunday' : 
-                      bookingDetails.date?.getDay() === 1 ? 'monday' :
-                      bookingDetails.date?.getDay() === 2 ? 'tuesday' :
-                      bookingDetails.date?.getDay() === 3 ? 'wednesday' :
-                      bookingDetails.date?.getDay() === 4 ? 'thursday' :
-                      bookingDetails.date?.getDay() === 5 ? 'friday' : 'saturday']
-                      ?.map(time => (
-                        <option key={time} value={time}>{time}</option>
-                      ))
-                    }
-                  </select>
-                </div>
-
-                {/* Duration Selection */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Duration (hours)
-                  </label>
-                  <select
-                    value={bookingDetails.duration}
-                    onChange={(e) => setBookingDetails(prev => ({ ...prev, duration: Number(e.target.value) }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                  >
-                    {[2, 3, 4, 5, 6, 8].map(hours => (
-                      <option key={hours} value={hours}>{hours} hours</option>
+                    {['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00'].map((time) => (
+                      <option key={time} value={time}>{formatTime(time)}</option>
                     ))}
                   </select>
                 </div>
 
-                {/* Guest Count */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Duration (hours)
+                  </label>
+                  <select
+                    value={bookingDetails.duration}
+                    onChange={(e) => setBookingDetails(prev => ({ ...prev, duration: parseInt(e.target.value) }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  >
+                    {[4, 5, 6, 7, 8].map((hours) => (
+                      <option key={hours} value={hours}>{hours} hours</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            )}
+
+            {currentStep === 'details' && (
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Event Type
+                  </label>
+                  <select
+                    value={bookingDetails.eventType}
+                    onChange={(e) => setBookingDetails(prev => ({ ...prev, eventType: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  >
+                    <option value="">Select event type</option>
+                    <option value="wedding">Wedding</option>
+                    <option value="corporate">Corporate Event</option>
+                    <option value="birthday">Birthday Party</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Number of Guests
                   </label>
                   <input
                     type="number"
                     value={bookingDetails.guests}
-                    onChange={(e) => setBookingDetails(prev => ({ ...prev, guests: Number(e.target.value) }))}
-                    min={1}
+                    onChange={(e) => setBookingDetails(prev => ({ ...prev, guests: parseInt(e.target.value) }))}
+                    min="1"
                     max={venue.maxCapacity}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   />
                 </div>
 
-                {/* Event Type */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Event Type
-                  </label>
-                  <input
-                    type="text"
-                    value={bookingDetails.eventType}
-                    onChange={(e) => setBookingDetails(prev => ({ ...prev, eventType: e.target.value }))}
-                    placeholder="e.g., Wedding, Corporate Event, Birthday"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                  />
-                </div>
-
-                {/* Notes */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Additional Notes
                   </label>
                   <textarea
                     value={bookingDetails.notes}
                     onChange={(e) => setBookingDetails(prev => ({ ...prev, notes: e.target.value }))}
-                    rows={3}
+                    rows={4}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    placeholder="Any special requirements or requests?"
                   />
                 </div>
               </div>
             )}
 
-            {step === 'review' && (
+            {currentStep === 'review' && (
               <div className="space-y-6">
-                <div className="border-b pb-4">
+                <div className="bg-gray-50 rounded-lg p-6">
                   <h3 className="text-lg font-medium text-gray-900 mb-4">Booking Summary</h3>
-                  <dl className="space-y-3">
-                    <div className="flex justify-between">
-                      <dt className="text-sm text-gray-500">Date</dt>
-                      <dd className="text-sm text-gray-900">
-                        {bookingDetails.date?.toLocaleDateString()}
-                      </dd>
+                  
+                  {/* Venue Details */}
+                  <div className="space-y-4">
+                    <div className="bg-white rounded-lg p-4 border border-gray-200">
+                      <div className="flex items-start space-x-4">
+                        <img
+                          src={venue.images[0]}
+                          alt={venue.name}
+                          className="w-16 h-16 rounded-lg object-cover"
+                        />
+                        <div>
+                          <h5 className="font-medium">{venue.name}</h5>
+                          <p className="text-sm text-gray-600">{venue.location.city}, {venue.location.state}</p>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex justify-between">
-                      <dt className="text-sm text-gray-500">Time</dt>
-                      <dd className="text-sm text-gray-900">{bookingDetails.startTime}</dd>
-                    </div>
-                    <div className="flex justify-between">
-                      <dt className="text-sm text-gray-500">Duration</dt>
-                      <dd className="text-sm text-gray-900">{bookingDetails.duration} hours</dd>
-                    </div>
-                    <div className="flex justify-between">
-                      <dt className="text-sm text-gray-500">Guests</dt>
-                      <dd className="text-sm text-gray-900">{bookingDetails.guests}</dd>
-                    </div>
-                  </dl>
-                </div>
 
-                <div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Price Breakdown</h3>
-                  <dl className="space-y-3">
-                    <div className="flex justify-between">
-                      <dt className="text-sm text-gray-500">Venue Fee ({bookingDetails.duration} hours)</dt>
-                      <dd className="text-sm text-gray-900">${basePrice}</dd>
+                    {/* Date and Time */}
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-700 mb-2">Date & Time</h4>
+                      <div className="bg-white rounded-lg p-4 border border-gray-200">
+                        <div className="space-y-2">
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Date</span>
+                            <span className="font-medium">
+                              {bookingDetails.date && formatDate(bookingDetails.date)}
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Time</span>
+                            <span className="font-medium">
+                              {formatTime(bookingDetails.startTime)}
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Duration</span>
+                            <span className="font-medium">{bookingDetails.duration} hours</span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex justify-between">
-                      <dt className="text-sm text-gray-500">Guest Fee ({bookingDetails.guests} guests)</dt>
-                      <dd className="text-sm text-gray-900">${guestFee}</dd>
-                    </div>
-                    <div className="flex justify-between font-medium pt-3 border-t">
-                      <dt className="text-gray-900">Total</dt>
-                      <dd className="text-gray-900">${totalPrice}</dd>
-                    </div>
-                  </dl>
-                </div>
-              </div>
-            )}
 
-            {step === 'confirmation' && (
-              <div className="text-center py-8">
-                <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
-                  <CheckIcon className="h-6 w-6 text-green-600" />
+                    {/* Event Details */}
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-700 mb-2">Event Details</h4>
+                      <div className="bg-white rounded-lg p-4 border border-gray-200">
+                        <div className="space-y-2">
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Event Type</span>
+                            <span className="font-medium capitalize">{bookingDetails.eventType}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Guests</span>
+                            <span className="font-medium">{bookingDetails.guests}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Price Breakdown */}
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-700 mb-2">Price Breakdown</h4>
+                      <div className="bg-white rounded-lg p-4 border border-gray-200">
+                        <div className="space-y-2">
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Venue Fee ({bookingDetails.duration} hours)</span>
+                            <span className="font-medium">${venue.pricePerHour * bookingDetails.duration}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Guest Fee ({bookingDetails.guests} guests)</span>
+                            <span className="font-medium">${venue.pricePerGuest * bookingDetails.guests}</span>
+                          </div>
+                          <div className="flex justify-between pt-2 border-t">
+                            <span className="font-medium">Total</span>
+                            <span className="font-medium">${calculateTotal()}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Booking Confirmed!</h3>
-                <p className="text-sm text-gray-500">
-                  We've sent a confirmation email with all the details.
-                </p>
               </div>
             )}
           </div>
 
           {/* Footer */}
-          <div className="px-6 py-4 bg-gray-50 border-t rounded-b-lg">
-            {step === 'details' && (
-              <button
-                onClick={() => setStep('review')}
-                className="w-full bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700"
-              >
-                Continue to Review
-              </button>
-            )}
-
-            {step === 'review' && (
-              <div className="flex space-x-3">
+          <div className="border-t px-6 py-4 sticky bottom-0 bg-white rounded-b-xl">
+            <div className="flex justify-between items-center">
+              {currentStep !== 'availability' && (
                 <button
-                  onClick={() => setStep('details')}
-                  className="flex-1 bg-white text-gray-700 border border-gray-300 py-2 px-4 rounded-md hover:bg-gray-50"
+                  onClick={() => setCurrentStep(steps[steps.findIndex(s => s.id === currentStep) - 1].id as Step)}
+                  className="flex items-center text-gray-600 hover:text-gray-700"
                 >
+                  <ChevronLeftIcon className="w-5 h-5 mr-1" />
                   Back
                 </button>
+              )}
+              {currentStep === 'review' ? (
                 <button
-                  onClick={handleSubmit}
-                  className="flex-1 bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700"
+                  className="ml-auto px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
                 >
-                  Confirm Booking
+                  Pay Now
                 </button>
-              </div>
-            )}
-
-            {step === 'confirmation' && (
-              <button
-                onClick={onClose}
-                className="w-full bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700"
-              >
-                Done
-              </button>
-            )}
+              ) : (
+                <button
+                  onClick={() => setCurrentStep(steps[steps.findIndex(s => s.id === currentStep) + 1].id as Step)}
+                  disabled={
+                    (currentStep === 'availability' && (!bookingDetails.date || !bookingDetails.startTime)) ||
+                    (currentStep === 'details' && !bookingDetails.eventType)
+                  }
+                  className="ml-auto px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+                >
+                  Continue
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>
