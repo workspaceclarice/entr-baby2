@@ -21,7 +21,7 @@ const Header: React.FC = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="text-xl font-bold text-purple-600">
-            ENTR
+            Entr
           </Link>
 
           {/* Center Navigation */}
