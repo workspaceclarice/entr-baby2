@@ -30,6 +30,15 @@ const VendorDashboardHeader: React.FC = () => {
     return location.pathname.startsWith(path);
   };
 
+  const handleSignOut = async () => {
+    try {
+      await logout();
+      navigate('/vendors/landing'); // Redirect to vendor landing page
+    } catch (error) {
+      console.error('Failed to sign out:', error);
+    }
+  };
+
   return (
     <header className="bg-white shadow">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -136,12 +145,12 @@ const VendorDashboardHeader: React.FC = () => {
                   <Menu.Item>
                     {({ active }) => (
                       <button
-                        onClick={logout}
+                        onClick={handleSignOut}
                         className={`${
                           active ? 'bg-gray-100' : ''
                         } block w-full text-left px-4 py-2 text-sm text-gray-700`}
                       >
-                        Sign out
+                        Sign Out
                       </button>
                     )}
                   </Menu.Item>
@@ -227,12 +236,12 @@ const VendorDashboardHeader: React.FC = () => {
                   <Menu.Item>
                     {({ active }) => (
                       <button
-                        onClick={logout}
+                        onClick={handleSignOut}
                         className={`${
                           active ? 'bg-gray-100' : ''
                         } block w-full text-left px-4 py-2 text-sm text-gray-700`}
                       >
-                        Sign out
+                        Sign Out
                       </button>
                     )}
                   </Menu.Item>

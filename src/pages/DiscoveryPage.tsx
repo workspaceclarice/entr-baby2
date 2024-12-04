@@ -8,6 +8,7 @@ import { events } from '../data/events';
 import { services } from '../data/services';
 import { venues } from '../data/venues';
 import { eventCategories, serviceCategories, venueCategories } from '../data/categories';
+import { FilterPopover } from '../components/discovery/FilterPopover';
 
 interface DiscoveryPageProps {
   category: ListingCategory;
@@ -20,6 +21,7 @@ export const DiscoveryPage: React.FC<DiscoveryPageProps> = ({ category }) => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedPrice, setSelectedPrice] = useState('all');
   const [selectedSort, setSelectedSort] = useState('recommended');
+  const [filters, setFilters] = useState<Record<string, string[]>>({});
 
   // Get category data based on type
   const getCategoryData = () => {
@@ -53,59 +55,66 @@ export const DiscoveryPage: React.FC<DiscoveryPageProps> = ({ category }) => {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header Section */}
-        <div className="pt-32 pb-12">
+        <div className="pt-32 pb-8">
           <div className="max-w-4xl">
-            <h1 className="text-4xl sm:text-5xl font-extralight tracking-tight text-gray-900 mb-3">
+            <h1 className={`text-4xl sm:text-5xl font-extralight tracking-tight mb-3 ${
+              'text-gray-900'
+            }`}>
               {category === 'events' && 'Discover Events'}
               {category === 'services' && 'Browse Services'}
               {category === 'venues' && 'Find Venues'}
             </h1>
-            <p className="text-lg font-light text-gray-600 leading-relaxed mb-8">
+            <p className={`text-lg font-light leading-relaxed mb-8 ${
+              'text-gray-600'
+            }`}>
               {category === 'events' && 'Discover and book tickets to the most exciting events happening in your area'}
               {category === 'services' && 'Find and connect with top-rated vendors to make your event unforgettable'}
               {category === 'venues' && 'Explore unique spaces that perfectly match your event vision'}
             </p>
+          </div>
+        </div>
 
-            {/* Location Selector */}
-            <div className="mb-8">
-              <div 
-                className="inline-flex items-center border-b border-gray-300 hover:border-purple-600 transition-colors pb-1 cursor-pointer"
-                onClick={() => setIsEditingLocation(true)}
-              >
-                <MapPinIcon className="h-5 w-5 text-gray-400 mr-2" />
-                {isEditingLocation ? (
-                  <select
-                    value={location}
-                    onChange={(e) => {
-                      setLocation(e.target.value);
-                      setIsEditingLocation(false);
-                    }}
-                    onBlur={() => setIsEditingLocation(false)}
-                    className="bg-transparent border-none focus:ring-0 text-gray-600 pr-8 py-0"
-                    autoFocus
-                  >
-                    <option value="San Francisco, CA">San Francisco, CA</option>
-                    <option value="Los Angeles, CA">Los Angeles, CA</option>
-                    <option value="New York, NY">New York, NY</option>
-                    <option value="Chicago, IL">Chicago, IL</option>
-                    <option value="Miami, FL">Miami, FL</option>
-                  </select>
-                ) : (
-                  <span className="text-gray-600">{location}</span>
-                )}
-              </div>
+        {/* Location and Search Section */}
+        <div className="space-y-6 mb-8">
+          {/* Location Selector */}
+          <div>
+            <div 
+              className="inline-flex items-center border-b border-gray-300 hover:border-purple-600 transition-colors pb-1 cursor-pointer"
+              onClick={() => setIsEditingLocation(true)}
+            >
+              <MapPinIcon className="h-5 w-5 text-gray-400 mr-2" />
+              {isEditingLocation ? (
+                <select
+                  value={location}
+                  onChange={(e) => {
+                    setLocation(e.target.value);
+                    setIsEditingLocation(false);
+                  }}
+                  onBlur={() => setIsEditingLocation(false)}
+                  className="bg-transparent border-none focus:ring-0 text-gray-600 pr-8 py-0"
+                  autoFocus
+                >
+                  <option value="San Francisco, CA">San Francisco, CA</option>
+                  <option value="Los Angeles, CA">Los Angeles, CA</option>
+                  <option value="New York, NY">New York, NY</option>
+                  <option value="Chicago, IL">Chicago, IL</option>
+                  <option value="Miami, FL">Miami, FL</option>
+                </select>
+              ) : (
+                <span className="text-gray-600">{location}</span>
+              )}
             </div>
+          </div>
 
-            {/* Updated Search Bar - Aligned Left */}
-            <div className="relative w-full max-w-2xl">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={`Search ${category.toLowerCase()}...`}
-                className="w-full px-6 py-3 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              />
-            </div>
+          {/* Search Bar */}
+          <div className="relative w-full max-w-2xl mb-2">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={`Search ${category.toLowerCase()}...`}
+              className="w-full px-6 py-3 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            />
           </div>
         </div>
 
@@ -115,6 +124,7 @@ export const DiscoveryPage: React.FC<DiscoveryPageProps> = ({ category }) => {
             categories={getCategoryData()}
             selectedCategory={selectedCategory}
             onSelectCategory={setSelectedCategory}
+            category={category}
           />
         </div>
 
@@ -124,6 +134,15 @@ export const DiscoveryPage: React.FC<DiscoveryPageProps> = ({ category }) => {
           selectedSort={selectedSort}
           onPriceChange={setSelectedPrice}
           onSortChange={setSelectedSort}
+          category={category}
+          selectedFilters={filters}
+          onFilterChange={(filterId, values) => {
+            setFilters(prev => ({
+              ...prev,
+              [filterId]: values
+            }));
+          }}
+          totalResults={getListings().length}
         />
 
         {/* Listing Grid */}

@@ -1,87 +1,171 @@
-import React from 'react';
-import { FunnelIcon, ArrowsUpDownIcon } from '@heroicons/react/24/outline';
+import { Fragment } from 'react';
+import { Menu, Transition } from '@headlessui/react';
+import { 
+  ArrowsUpDownIcon, 
+  AdjustmentsHorizontalIcon,
+  FunnelIcon 
+} from '@heroicons/react/24/outline';
+import { FilterPopover } from './FilterPopover';
 
 interface FilterSectionProps {
-  onPriceChange: (range: string) => void;
-  onSortChange: (sort: string) => void;
   selectedPrice: string;
   selectedSort: string;
+  onPriceChange: (value: string) => void;
+  onSortChange: (value: string) => void;
+  category: 'events' | 'services' | 'venues';
+  selectedFilters: Record<string, string[]>;
+  onFilterChange: (filterId: string, values: string[]) => void;
+  totalResults: number;
 }
 
-const FilterSection: React.FC<FilterSectionProps> = ({
+const SORT_OPTIONS = {
+  events: [
+    { value: 'recommended', label: 'Recommended' },
+    { value: 'date-asc', label: 'Date: Soonest' },
+    { value: 'date-desc', label: 'Date: Latest' },
+    { value: 'price-asc', label: 'Price: Low to High' },
+    { value: 'price-desc', label: 'Price: High to Low' }
+  ],
+  services: [
+    { value: 'recommended', label: 'Recommended' },
+    { value: 'rating-desc', label: 'Highest Rated' },
+    { value: 'reviews-desc', label: 'Most Reviews' },
+    { value: 'price-asc', label: 'Price: Low to High' },
+    { value: 'price-desc', label: 'Price: High to Low' }
+  ],
+  venues: [
+    { value: 'recommended', label: 'Recommended' },
+    { value: 'capacity-asc', label: 'Capacity: Smallest' },
+    { value: 'capacity-desc', label: 'Capacity: Largest' },
+    { value: 'price-asc', label: 'Price: Low to High' },
+    { value: 'price-desc', label: 'Price: High to Low' }
+  ]
+};
+
+export default function FilterSection({
+  selectedPrice,
+  selectedSort,
   onPriceChange,
   onSortChange,
-  selectedPrice,
-  selectedSort
-}) => {
-  const priceRanges = [
-    { value: 'all', label: 'All Prices' },
-    { value: 'free', label: 'Free' },
-    { value: '0-50', label: '$0 - $50' },
-    { value: '50-100', label: '$50 - $100' },
-    { value: '100-200', label: '$100 - $200' },
-    { value: '200+', label: '$200+' }
-  ];
-
-  const sortOptions = [
-    { value: 'recommended', label: 'Recommended' },
-    { value: 'price-low', label: 'Price: Low to High' },
-    { value: 'price-high', label: 'Price: High to Low' },
-    { value: 'date-newest', label: 'Date: Newest First' },
-    { value: 'popularity', label: 'Most Popular' }
-  ];
+  category,
+  selectedFilters,
+  onFilterChange,
+  totalResults
+}: FilterSectionProps) {
+  const sortOptions = SORT_OPTIONS[category];
 
   return (
-    <div className="py-4 border-b border-gray-200">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          {/* Price Filter */}
-          <div className="relative">
-            <div className="flex items-center space-x-2">
-              <FunnelIcon className="h-5 w-5 text-gray-400" />
-              <select
-                value={selectedPrice}
-                onChange={(e) => onPriceChange(e.target.value)}
-                className="appearance-none bg-transparent pl-2 pr-8 py-1 text-sm font-light text-gray-700 focus:outline-none focus:text-gray-900"
-              >
-                {priceRanges.map((range) => (
-                  <option key={range.value} value={range.value}>
-                    {range.label}
-                  </option>
-                ))}
-              </select>
+    <div className="sticky top-0 z-10 border-b border-gray-200">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-14">
+          {/* Mobile Filter Button */}
+          <div className="sm:hidden">
+            <FilterPopover
+              category={category}
+              selectedFilters={selectedFilters}
+              onFilterChange={onFilterChange}
+            />
+          </div>
+
+          {/* Desktop Controls */}
+          <div className="hidden sm:flex items-center justify-between w-full">
+            <div className="flex items-center space-x-6">
+              {/* Sort Dropdown */}
+              <Menu as="div" className="relative">
+                <Menu.Button className="flex items-center space-x-1.5 text-sm text-gray-700 hover:text-gray-900">
+                  <ArrowsUpDownIcon className="h-4 w-4" />
+                  <span className="font-light">
+                    {sortOptions.find(opt => opt.value === selectedSort)?.label || 'Sort'}
+                  </span>
+                </Menu.Button>
+
+                <Transition
+                  as={Fragment}
+                  enter="transition ease-out duration-100"
+                  enterFrom="opacity-0 scale-95"
+                  enterTo="opacity-100 scale-100"
+                  leave="transition ease-in duration-75"
+                  leaveFrom="opacity-100 scale-100"
+                  leaveTo="opacity-0 scale-95"
+                >
+                  <Menu.Items className="absolute left-0 z-50 mt-2 w-56 origin-top-left rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                    <div className="py-1">
+                      {sortOptions.map((option) => (
+                        <Menu.Item key={option.value}>
+                          {({ active }) => (
+                            <button
+                              onClick={() => onSortChange(option.value)}
+                              className={`
+                                ${active ? 'bg-gray-50' : ''}
+                                ${selectedSort === option.value ? 'text-gray-900' : 'text-gray-600'}
+                                block px-4 py-2 text-sm w-full text-left font-light hover:text-gray-900
+                              `}
+                            >
+                              {option.label}
+                            </button>
+                          )}
+                        </Menu.Item>
+                      ))}
+                    </div>
+                  </Menu.Items>
+                </Transition>
+              </Menu>
+
+              {/* Filter Button */}
+              <FilterPopover
+                category={category}
+                selectedFilters={selectedFilters}
+                onFilterChange={onFilterChange}
+              />
             </div>
           </div>
 
-          {/* Divider */}
-          <div className="h-5 w-px bg-gray-200" />
+          {/* Results Count */}
+          <div className="flex items-center space-x-4">
+            <p className="text-sm text-gray-500 font-light">
+              {totalResults} results
+            </p>
+            
+            {/* Mobile Sort Button */}
+            <Menu as="div" className="sm:hidden relative">
+              <Menu.Button className="flex items-center text-sm text-gray-700 hover:text-gray-900">
+                <AdjustmentsHorizontalIcon className="h-4 w-4" />
+              </Menu.Button>
 
-          {/* Sort Options */}
-          <div className="relative">
-            <div className="flex items-center space-x-2">
-              <ArrowsUpDownIcon className="h-5 w-5 text-gray-400" />
-              <select
-                value={selectedSort}
-                onChange={(e) => onSortChange(e.target.value)}
-                className="appearance-none bg-transparent pl-2 pr-8 py-1 text-sm font-light text-gray-700 focus:outline-none focus:text-gray-900"
+              <Transition
+                as={Fragment}
+                enter="transition ease-out duration-100"
+                enterFrom="opacity-0 scale-95"
+                enterTo="opacity-100 scale-100"
+                leave="transition ease-in duration-75"
+                leaveFrom="opacity-100 scale-100"
+                leaveTo="opacity-0 scale-95"
               >
-                {sortOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </div>
+                <Menu.Items className="absolute right-0 z-20 mt-2 w-56 origin-top-right rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                  <div className="py-1">
+                    {sortOptions.map((option) => (
+                      <Menu.Item key={option.value}>
+                        {({ active }) => (
+                          <button
+                            onClick={() => onSortChange(option.value)}
+                            className={`
+                              ${active ? 'bg-gray-50' : ''}
+                              ${selectedSort === option.value ? 'text-gray-900' : 'text-gray-600'}
+                              block px-4 py-2 text-sm w-full text-left font-light hover:text-gray-900
+                            `}
+                          >
+                            {option.label}
+                          </button>
+                        )}
+                      </Menu.Item>
+                    ))}
+                  </div>
+                </Menu.Items>
+              </Transition>
+            </Menu>
           </div>
-        </div>
-
-        {/* Results Count */}
-        <div className="text-sm text-gray-500 font-light">
-          Showing 1-20 of 156 results
         </div>
       </div>
     </div>
   );
-};
-
-export default FilterSection; 
+} 

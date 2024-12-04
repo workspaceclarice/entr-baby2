@@ -6,12 +6,14 @@ interface CategorySliderProps {
   categories: Category[];
   selectedCategory: string | null;
   onSelectCategory: (categoryId: string) => void;
+  category: string;
 }
 
 const CategorySlider: React.FC<CategorySliderProps> = ({
   categories,
   selectedCategory,
   onSelectCategory,
+  category,
 }) => {
   const sliderRef = React.useRef<HTMLDivElement>(null);
 
@@ -22,6 +24,32 @@ const CategorySlider: React.FC<CategorySliderProps> = ({
         left: direction === 'left' ? -scrollAmount : scrollAmount,
         behavior: 'smooth',
       });
+    }
+  };
+
+  const getRingColor = () => {
+    switch (category) {
+      case 'events':
+        return 'ring-purple-600 hover:ring-purple-600';
+      case 'services':
+        return 'ring-blue-600 hover:ring-blue-600';
+      case 'venues':
+        return 'ring-green-600 hover:ring-green-600';
+      default:
+        return 'ring-purple-600 hover:ring-purple-600';
+    }
+  };
+
+  const getOverlayColor = () => {
+    switch (category) {
+      case 'events':
+        return 'bg-purple-900/50';
+      case 'services':
+        return 'bg-blue-900/50';
+      case 'venues':
+        return 'bg-green-900/50';
+      default:
+        return 'bg-purple-900/50';
     }
   };
 
@@ -45,8 +73,8 @@ const CategorySlider: React.FC<CategorySliderProps> = ({
           onClick={() => onSelectCategory('')}
           className={`flex-none w-48 h-64 rounded-xl overflow-hidden relative group ${
             !selectedCategory 
-              ? 'ring-2 ring-purple-500 ring-opacity-50' 
-              : 'hover:ring-2 hover:ring-purple-500 hover:ring-opacity-30'
+              ? `ring-2 ${getRingColor()} ring-opacity-50` 
+              : `hover:ring-2 ${getRingColor()} ring-opacity-30`
           }`}
         >
           <img
@@ -54,6 +82,7 @@ const CategorySlider: React.FC<CategorySliderProps> = ({
             alt="All Categories"
             className="w-full h-full object-cover transform transition-transform duration-300 group-hover:scale-105"
           />
+          <div className={`absolute inset-0 ${getOverlayColor()}`} />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
           <div className="absolute bottom-0 left-0 right-0 p-4">
             <h3 className="text-white text-lg font-light tracking-wide">All Categories</h3>
@@ -67,8 +96,8 @@ const CategorySlider: React.FC<CategorySliderProps> = ({
             onClick={() => onSelectCategory(category.id)}
             className={`flex-none w-48 h-64 rounded-xl overflow-hidden relative group ${
               selectedCategory === category.id 
-                ? 'ring-2 ring-purple-500 ring-opacity-50' 
-                : 'hover:ring-2 hover:ring-purple-500 hover:ring-opacity-30'
+                ? `ring-2 ${getRingColor()} ring-opacity-50` 
+                : `hover:ring-2 ${getRingColor()} ring-opacity-30`
             }`}
           >
             <img
@@ -76,6 +105,7 @@ const CategorySlider: React.FC<CategorySliderProps> = ({
               alt={category.name}
               className="w-full h-full object-cover transform transition-transform duration-300 group-hover:scale-105"
             />
+            <div className={`absolute inset-0 ${getOverlayColor()}`} />
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
             <div className="absolute bottom-0 left-0 right-0 p-4">
               <h3 className="text-white text-lg font-light tracking-wide">
