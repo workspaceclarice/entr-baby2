@@ -17,13 +17,16 @@ const VendorDashboardHeader: React.FC = () => {
   const { userProfile, logout } = useAuth();
 
   const navigation = [
-    { name: 'Dashboard', href: '/vendors/dashboard' },
-    { name: 'Bookings', href: '/vendors/dashboard/bookings' },
-    { name: 'My Listings', href: '/vendors/dashboard/listings' },
-    { name: 'Earnings', href: '/vendors/dashboard/earnings' },
+    { name: 'Dashboard', href: '/vendors/dashboard', exact: true },
+    { name: 'Bookings', href: '/vendors/dashboard/bookings', exact: false },
+    { name: 'My Listings', href: '/vendors/dashboard/listings', exact: false },
+    { name: 'Earnings', href: '/vendors/dashboard/earnings', exact: false },
   ];
 
   const isActive = (path: string) => {
+    if (path === '/vendors/dashboard') {
+      return location.pathname === '/vendors/dashboard';
+    }
     return location.pathname.startsWith(path);
   };
 
@@ -46,9 +49,13 @@ const VendorDashboardHeader: React.FC = () => {
                   key={item.name}
                   to={item.href}
                   className={`inline-flex items-center border-b-2 px-1 pt-1 text-sm font-light ${
-                    isActive(item.href)
-                      ? 'border-blue-500 text-gray-900'
-                      : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                    item.exact 
+                      ? location.pathname === item.href
+                        ? 'border-blue-500 text-gray-900'
+                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                      : isActive(item.href)
+                        ? 'border-blue-500 text-gray-900'
+                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
                   }`}
                 >
                   {item.name}

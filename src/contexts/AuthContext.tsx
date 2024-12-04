@@ -28,6 +28,23 @@ export interface VendorProfile extends BaseProfile {
     type: string;
   }>;
   phone: string;
+  introduction?: string;
+  website?: string;
+  yearFounded?: string;
+  teamSize?: string;
+  isBackgroundChecked?: boolean;
+  location?: string;
+  featuredProjects?: Array<{
+    id: string;
+    title: string;
+    imageUrl: string;
+    description?: string;
+  }>;
+  socialMedia?: {
+    facebook?: string;
+    instagram?: string;
+    twitter?: string;
+  };
 }
 
 export interface CustomerProfile extends BaseProfile {
