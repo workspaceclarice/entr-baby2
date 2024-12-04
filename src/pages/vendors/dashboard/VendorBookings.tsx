@@ -1,9 +1,26 @@
 import React from 'react';
-import { Tab } from '@headlessui/react';
 import { useNavigate } from 'react-router-dom';
 import ActiveRequestCard from '../../../components/vendors/bookings/ActiveRequestCard';
 import ActiveBookingCard from '../../../components/vendors/bookings/ActiveBookingCard';
 import BookingHistoryCard from '../../../components/vendors/bookings/BookingHistoryCard';
+
+interface BookingHistoryItem {
+  id: string;
+  bookingId: string;
+  eventName: string;
+  client: {
+    name: string;
+    photo: string;
+  };
+  date: string;
+  amount: string;
+  status: 'completed';
+  rating: number;
+  review: {
+    comment: string;
+    date: string;
+  };
+}
 
 const VendorBookings: React.FC = () => {
   const navigate = useNavigate();
@@ -66,28 +83,40 @@ const VendorBookings: React.FC = () => {
     }
   ];
 
-  const bookingHistory = [
+  const bookingHistory: BookingHistoryItem[] = [
     {
-      id: 1,
+      id: '1',
+      bookingId: 'BK-001',
       eventName: 'Birthday Celebration',
-      client: 'Michael Brown',
+      client: {
+        name: 'Michael Brown',
+        photo: 'https://randomuser.me/api/portraits/men/1.jpg'
+      },
       date: '2024-02-15',
-      package: 'Standard Package',
       amount: '$2,200',
-      status: 'Completed',
+      status: 'completed' as const,
       rating: 5,
-      review: 'Amazing service! Very professional and accommodating.'
+      review: {
+        comment: 'Amazing service! Very professional and accommodating.',
+        date: '2024-02-16'
+      }
     },
     {
-      id: 2,
+      id: '2',
+      bookingId: 'BK-002',
       eventName: 'Product Launch',
-      client: 'InnovateX',
+      client: {
+        name: 'Sarah Johnson',
+        photo: 'https://randomuser.me/api/portraits/women/1.jpg'
+      },
       date: '2024-02-10',
-      package: 'Premium Package',
-      amount: '$3,800',
-      status: 'Completed',
+      amount: '$3,500',
+      status: 'completed' as const,
       rating: 4,
-      review: 'Great work, would book again.'
+      review: {
+        comment: 'Great photos and timely delivery. Would book again.',
+        date: '2024-02-11'
+      }
     }
   ];
 
@@ -143,33 +172,26 @@ const VendorBookings: React.FC = () => {
         </div>
       </div>
 
-      {/* Booking History Tab */}
-      <Tab.Group>
-        <Tab.List className="flex space-x-4 border-b border-gray-200">
-          <Tab className={({ selected }) =>
-            `py-2 px-4 text-sm font-light border-b-2 ${
-              selected 
-                ? 'text-blue-600 border-blue-600'
-                : 'text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300'
-            }`
-          }>
-            Booking History
-          </Tab>
-        </Tab.List>
-
-        <Tab.Panels className="mt-6">
-          <Tab.Panel>
-            <div className="space-y-6">
-              {bookingHistory.map((booking) => (
-                <BookingHistoryCard
-                  key={booking.id}
-                  booking={booking}
-                />
-              ))}
-            </div>
-          </Tab.Panel>
-        </Tab.Panels>
-      </Tab.Group>
+      {/* Booking History Section */}
+      <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-xl font-light text-gray-900">Booking History</h2>
+          <span className="px-3 py-1 text-sm bg-green-100 text-green-800 rounded-full">
+            {bookingHistory.length} completed
+          </span>
+        </div>
+        <div className="space-y-4">
+          {bookingHistory.map((booking) => (
+            <BookingHistoryCard
+              key={booking.id}
+              booking={booking}
+            />
+          ))}
+          {bookingHistory.length === 0 && (
+            <p className="text-center text-gray-500 font-light">No completed bookings</p>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

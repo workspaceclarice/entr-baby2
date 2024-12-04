@@ -3,28 +3,165 @@ import { Dialog, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+interface ServiceListing {
+  id: string;
+  type: 'service';
+  name: string;
+  category: string;
+  basePrice: number;
+  status: 'active' | 'inactive' | 'draft';
+  bookings: number;
+  description: string;
+  photos: string[];
+  packages: Array<{
+    name: string;
+    price: number;
+    duration: number;
+    description: string;
+    includedItems: string[];
+  }>;
+  availability: {
+    monday: { isAvailable: boolean; startTime: string; endTime: string; };
+    tuesday: { isAvailable: boolean; startTime: string; endTime: string; };
+    wednesday: { isAvailable: boolean; startTime: string; endTime: string; };
+    thursday: { isAvailable: boolean; startTime: string; endTime: string; };
+    friday: { isAvailable: boolean; startTime: string; endTime: string; };
+    saturday: { isAvailable: boolean; startTime: string; endTime: string; };
+    sunday: { isAvailable: boolean; startTime: string; endTime: string; };
+  };
+}
+
+interface VenueListing {
+  id: string;
+  type: 'venue';
+  name: string;
+  category: string;
+  pricePerHour: number;
+  status: 'active' | 'inactive' | 'draft';
+  bookings: number;
+  description: string;
+  photos: string[];
+  capacity: {
+    standing: number;
+    seated: number;
+    minGuests: number;
+    maxGuests: number;
+  };
+  amenities: string[];
+  rules: {
+    music: boolean;
+    catering: 'inHouse' | 'preferred' | 'external' | 'any';
+    alcohol: boolean;
+    decorations: string;
+    endTime: string;
+  };
+}
+
+type Listing = ServiceListing | VenueListing;
+
+const mockListings: Listing[] = [
+  {
+    id: 's1',
+    type: 'service',
+    name: 'Wedding Photography Package',
+    category: 'Photography',
+    basePrice: 2500,
+    status: 'active',
+    bookings: 12,
+    description: 'Professional wedding photography services with a creative and modern approach.',
+    photos: [
+      'https://images.unsplash.com/photo-1554048612-b6a482bc67e5',
+      'https://images.unsplash.com/photo-1537633552985-df8429e8048b'
+    ],
+    packages: [
+      {
+        name: 'Basic Package',
+        price: 2500,
+        duration: 4,
+        description: '4 hours of photography coverage',
+        includedItems: ['100 edited photos', 'Online gallery', 'Print release']
+      },
+      {
+        name: 'Premium Package',
+        price: 3500,
+        duration: 8,
+        description: '8 hours of photography coverage',
+        includedItems: ['300 edited photos', 'Online gallery', 'Print release', 'Engagement session']
+      }
+    ],
+    availability: {
+      monday: { isAvailable: true, startTime: '09:00', endTime: '17:00' },
+      tuesday: { isAvailable: true, startTime: '09:00', endTime: '17:00' },
+      wednesday: { isAvailable: true, startTime: '09:00', endTime: '17:00' },
+      thursday: { isAvailable: true, startTime: '09:00', endTime: '17:00' },
+      friday: { isAvailable: true, startTime: '09:00', endTime: '17:00' },
+      saturday: { isAvailable: true, startTime: '10:00', endTime: '15:00' },
+      sunday: { isAvailable: false, startTime: '09:00', endTime: '17:00' }
+    }
+  },
+  {
+    id: 'v1',
+    type: 'venue',
+    name: 'The Grand Ballroom',
+    category: 'Wedding Venue',
+    pricePerHour: 500,
+    status: 'active',
+    bookings: 8,
+    description: 'Elegant ballroom venue perfect for weddings and corporate events',
+    photos: [
+      'https://images.unsplash.com/photo-1519167758481-83f550bb49b3',
+      'https://images.unsplash.com/photo-1522413452208-996ff3f3e740'
+    ],
+    capacity: {
+      standing: 300,
+      seated: 200,
+      minGuests: 50,
+      maxGuests: 300
+    },
+    amenities: [
+      'Catering Kitchen',
+      'Sound System',
+      'Stage',
+      'Dance Floor',
+      'Private Entrance',
+      'Bridal Suite',
+      'Parking',
+      'WiFi'
+    ],
+    rules: {
+      music: true,
+      catering: 'preferred',
+      alcohol: true,
+      decorations: 'Approved vendors only',
+      endTime: '23:00'
+    }
+  }
+];
+
 const VendorListings: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
-  const listings = [
-    {
-      id: 1,
-      name: 'Wedding Photography Package',
-      type: 'Photography',
-      price: '$2,500',
-      status: 'Active',
-      bookings: 12
-    },
-    {
-      id: 2,
-      name: 'Corporate Event Coverage',
-      type: 'Photography',
-      price: '$1,800',
-      status: 'Active',
-      bookings: 8
+  const handleEdit = (listing: Listing) => {
+    // Store the listing data in localStorage or state management
+    localStorage.setItem('editListing', JSON.stringify(listing));
+    
+    // Navigate to the appropriate edit page
+    if (listing.type === 'service') {
+      navigate('/vendors/dashboard/listings/create-service', { state: { isEditing: true, listingId: listing.id } });
+    } else {
+      navigate('/vendors/dashboard/listings/create-venue', { state: { isEditing: true, listingId: listing.id } });
     }
-  ];
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'active': return 'bg-green-100 text-green-800';
+      case 'inactive': return 'bg-gray-100 text-gray-800';
+      case 'draft': return 'bg-yellow-100 text-yellow-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
 
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -32,14 +169,13 @@ const VendorListings: React.FC = () => {
         <div>
           <h1 className="text-3xl font-extralight text-gray-900">My Listings</h1>
           <p className="mt-2 text-sm font-light text-gray-600">
-            Manage and update your service listings
+            Manage and update your service and venue listings
           </p>
         </div>
-        <div className="mt-4 flex md:mt-0">
+        <div className="mt-4 sm:mt-0">
           <button
-            type="button"
             onClick={() => setIsModalOpen(true)}
-            className="ml-3 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-light text-white bg-blue-600 hover:bg-blue-700 focus:outline-none"
+            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-light text-white bg-blue-600 hover:bg-blue-700 focus:outline-none"
           >
             Add New Listing
           </button>
@@ -60,28 +196,35 @@ const VendorListings: React.FC = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {listings.map((listing) => (
+              {mockListings.map((listing) => (
                 <tr key={listing.id}>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-light text-gray-900">
                     {listing.name}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-light text-gray-500">
-                    {listing.type}
+                    {listing.category}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-light text-gray-900">
-                    {listing.price}
+                    ${listing.type === 'service' ? listing.basePrice : `${listing.pricePerHour}/hr`}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="px-2 inline-flex text-xs leading-5 font-light rounded-full bg-green-100 text-green-800">
+                    <span className={`px-2 inline-flex text-xs leading-5 font-light rounded-full ${getStatusColor(listing.status)}`}>
                       {listing.status}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-light text-gray-900">
                     {listing.bookings}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-light text-gray-500">
-                    <button className="text-blue-600 hover:text-blue-900 mr-4">Edit</button>
-                    <button className="text-red-600 hover:text-red-900">Delete</button>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-light">
+                    <button
+                      onClick={() => handleEdit(listing)}
+                      className="text-blue-600 hover:text-blue-900 mr-4"
+                    >
+                      Edit
+                    </button>
+                    <button className="text-red-600 hover:text-red-900">
+                      Delete
+                    </button>
                   </td>
                 </tr>
               ))}

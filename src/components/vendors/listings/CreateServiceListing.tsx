@@ -1,11 +1,37 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   PhotoIcon,
   PlusIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline';
 import PreviewButton from '../dashboard/PreviewButton';
+
+// Add ServiceListing interface
+interface ServiceListing {
+  id: string;
+  type: 'service';
+  name: string;
+  category: string;
+  basePrice: number;
+  status: 'active' | 'inactive' | 'draft';
+  description: string;
+  photos: string[];
+  packages: Array<{
+    name: string;
+    price: number;
+    duration: number;
+    description: string;
+    includedItems: string[];
+  }>;
+  availability: {
+    [key: string]: {
+      isAvailable: boolean;
+      startTime: string;
+      endTime: string;
+    };
+  };
+}
 
 const SERVICE_CATEGORIES = {
   'Photography': ['Wedding', 'Events', 'Portrait', 'Commercial'],
@@ -20,16 +46,20 @@ const STEPS = [
   { id: 'basic', name: 'Basic Info' },
   { id: 'packages', name: 'Packages' },
   { id: 'availability', name: 'Availability' },
+  { id: 'faq', name: 'FAQ' }
 ];
 
 // Export the interface
 export interface CreateServiceListingProps {
   onClose: () => void;
   onSuccess: () => void;
+  existingListing?: ServiceListing | null;
+  isEditing?: boolean;
 }
 
-const CreateServiceListing: React.FC<CreateServiceListingProps> = ({ onClose, onSuccess }) => {
+const CreateServiceListing: React.FC<CreateServiceListingProps> = ({ onClose, onSuccess, existingListing, isEditing }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [currentStep, setCurrentStep] = useState('photos');
   const [formData, setFormData] = useState({
     photos: [] as File[],
@@ -53,7 +83,35 @@ const CreateServiceListing: React.FC<CreateServiceListingProps> = ({ onClose, on
       advanceBooking: 30,
       minimumNotice: 24,
     },
+    faqs: [] as Array<{
+      question: string;
+      answer: string;
+    }>,
   });
+
+  // Load existing data when editing
+  useEffect(() => {
+    if (existingListing && isEditing) {
+      setFormData({
+        photos: [], // We'll need to handle photos differently since they're Files
+        title: existingListing.name,
+        category: existingListing.category,
+        subCategory: '', // Add default value for required field
+        description: existingListing.description,
+        packages: existingListing.packages,
+        availability: {
+          timeSlots: Object.entries(existingListing.availability).map(([day, slot]) => ({
+            day,
+            startTime: (slot as { startTime: string }).startTime,
+            endTime: (slot as { endTime: string }).endTime
+          })),
+          advanceBooking: 30,
+          minimumNotice: 24,
+        },
+        faqs: [],
+      });
+    }
+  }, [existingListing, isEditing]);
 
   // Step Indicator
   const renderStepIndicator = () => {
@@ -255,28 +313,366 @@ const CreateServiceListing: React.FC<CreateServiceListingProps> = ({ onClose, on
   };
 
   // Packages Section
-  const renderPackages = () => {
-    return (
+  const renderPackages = () => (
       <div className="bg-white px-6 py-8 border-b">
-        {/* ... your packages section code */}
+      <div className="flex justify-between items-center mb-6">
+        <h3 className="text-lg font-medium text-gray-900">Service Packages</h3>
+        <button
+          onClick={() => {
+            setFormData({
+              ...formData,
+              packages: [
+                ...formData.packages,
+                {
+                  name: '',
+                  price: 0,
+                  duration: 1,
+                  description: '',
+                  includedItems: [],
+                },
+              ],
+            });
+          }}
+          className="inline-flex items-center px-4 py-2 border border-blue-600 rounded-md shadow-sm text-sm font-medium text-blue-600 bg-white hover:bg-blue-50"
+        >
+          <PlusIcon className="h-5 w-5 mr-2" />
+          Add Package
+        </button>
+      </div>
+
+      <div className="space-y-6">
+        {formData.packages.map((pkg, index) => (
+          <div key={index} className="bg-gray-50 rounded-lg p-6 relative">
+            <button
+              onClick={() => {
+                const newPackages = [...formData.packages];
+                newPackages.splice(index, 1);
+                setFormData({ ...formData, packages: newPackages });
+              }}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-500"
+            >
+              <XMarkIcon className="h-5 w-5" />
+            </button>
+
+            {/* Package Name */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">Package Name</label>
+              <input
+                type="text"
+                value={pkg.name}
+                onChange={(e) => {
+                  const newPackages = [...formData.packages];
+                  newPackages[index].name = e.target.value;
+                  setFormData({ ...formData, packages: newPackages });
+                }}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                placeholder="e.g., Basic Package"
+              />
+            </div>
+
+            {/* Price */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">Price</label>
+              <div className="mt-1 relative rounded-md shadow-sm">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <span className="text-gray-500 sm:text-sm">$</span>
+                </div>
+                <input
+                  type="number"
+                  value={pkg.price}
+                  onChange={(e) => {
+                    const newPackages = [...formData.packages];
+                    newPackages[index].price = Number(e.target.value);
+                    setFormData({ ...formData, packages: newPackages });
+                  }}
+                  className="block w-full pl-7 rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+
+            {/* Duration */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">Duration (hours)</label>
+              <input
+                type="number"
+                value={pkg.duration}
+                onChange={(e) => {
+                  const newPackages = [...formData.packages];
+                  newPackages[index].duration = Number(e.target.value);
+                  setFormData({ ...formData, packages: newPackages });
+                }}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              />
+            </div>
+
+            {/* Description */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">Description</label>
+              <textarea
+                rows={3}
+                value={pkg.description}
+                onChange={(e) => {
+                  const newPackages = [...formData.packages];
+                  newPackages[index].description = e.target.value;
+                  setFormData({ ...formData, packages: newPackages });
+                }}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              />
+            </div>
+
+            {/* Included Items */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Included Items
+              </label>
+              <div className="flex flex-wrap gap-2 mb-2">
+                {pkg.includedItems.map((item, itemIndex) => (
+                  <span
+                    key={itemIndex}
+                    className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800"
+                  >
+                    {item}
+                    <button
+                      onClick={() => {
+                        const newPackages = [...formData.packages];
+                        newPackages[index].includedItems.splice(itemIndex, 1);
+                        setFormData({ ...formData, packages: newPackages });
+                      }}
+                      className="ml-2 text-blue-600 hover:text-blue-500"
+                    >
+                      <XMarkIcon className="h-4 w-4" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+              <input
+                type="text"
+                placeholder="Type and press Enter to add items"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && e.currentTarget.value.trim()) {
+                    const newPackages = [...formData.packages];
+                    newPackages[index].includedItems.push(e.currentTarget.value.trim());
+                    setFormData({ ...formData, packages: newPackages });
+                    e.currentTarget.value = '';
+                  }
+                }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
       </div>
     );
-  };
 
   // Availability Section
-  const renderAvailability = () => {
-    return (
-      <div className="bg-white px-6 py-8 border-b">
-        {/* ... your availability section code */}
+  const renderAvailability = () => (
+    <div className="bg-white px-6 py-8 border-b">
+      <h3 className="text-lg font-medium text-gray-900 mb-6">Service Availability</h3>
+
+      {/* Weekly Schedule */}
+      <div className="space-y-6">
+        {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map((day) => {
+          const timeSlot = formData.availability.timeSlots.find(slot => slot.day === day);
+          return (
+            <div key={day} className="flex items-center space-x-4">
+              <div className="w-32">
+                <span className="text-sm font-medium text-gray-700">{day}</span>
+              </div>
+              <div className="flex-1 grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-light text-gray-500">Start Time</label>
+                  <input
+                    type="time"
+                    value={timeSlot?.startTime || '09:00'}
+                    onChange={(e) => {
+                      const newTimeSlots = [...formData.availability.timeSlots];
+                      const index = newTimeSlots.findIndex(slot => slot.day === day);
+                      if (index >= 0) {
+                        newTimeSlots[index].startTime = e.target.value;
+                      } else {
+                        newTimeSlots.push({
+                          day,
+                          startTime: e.target.value,
+                          endTime: '17:00'
+                        });
+                      }
+                      setFormData({
+                        ...formData,
+                        availability: {
+                          ...formData.availability,
+                          timeSlots: newTimeSlots
+                        }
+                      });
+                    }}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-light text-gray-500">End Time</label>
+                  <input
+                    type="time"
+                    value={timeSlot?.endTime || '17:00'}
+                    onChange={(e) => {
+                      const newTimeSlots = [...formData.availability.timeSlots];
+                      const index = newTimeSlots.findIndex(slot => slot.day === day);
+                      if (index >= 0) {
+                        newTimeSlots[index].endTime = e.target.value;
+                      } else {
+                        newTimeSlots.push({
+                          day,
+                          startTime: '09:00',
+                          endTime: e.target.value
+                        });
+                      }
+                      setFormData({
+                        ...formData,
+                        availability: {
+                          ...formData.availability,
+                          timeSlots: newTimeSlots
+                        }
+                      });
+                    }}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
-    );
-  };
+
+      {/* Booking Settings */}
+      <div className="mt-8 space-y-6">
+        <h4 className="text-sm font-medium text-gray-900">Booking Settings</h4>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Advance Booking Required
+            </label>
+            <div className="mt-1 flex items-center space-x-2">
+              <input
+                type="number"
+                value={formData.availability.advanceBooking}
+                onChange={(e) => setFormData({
+                  ...formData,
+                  availability: {
+                    ...formData.availability,
+                    advanceBooking: Number(e.target.value)
+                  }
+                })}
+                className="block w-20 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              />
+              <span className="text-sm text-gray-500">days in advance</span>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Minimum Notice Required
+            </label>
+            <div className="mt-1 flex items-center space-x-2">
+              <input
+                type="number"
+                value={formData.availability.minimumNotice}
+                onChange={(e) => setFormData({
+                  ...formData,
+                  availability: {
+                    ...formData.availability,
+                    minimumNotice: Number(e.target.value)
+                  }
+                })}
+                className="block w-20 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              />
+              <span className="text-sm text-gray-500">hours notice</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  // Add FAQ Section
+  const renderFAQ = () => (
+    <div className="bg-white px-6 py-8 border-b">
+      <div className="flex justify-between items-center mb-6">
+        <h3 className="text-lg font-medium text-gray-900">Frequently Asked Questions</h3>
+        <button
+          onClick={() => {
+            setFormData({
+              ...formData,
+              faqs: [
+                ...formData.faqs,
+                { question: '', answer: '' }
+              ]
+            });
+          }}
+          className="inline-flex items-center px-4 py-2 border border-blue-600 rounded-md shadow-sm text-sm font-medium text-blue-600 bg-white hover:bg-blue-50"
+        >
+          <PlusIcon className="h-5 w-5 mr-2" />
+          Add FAQ
+        </button>
+      </div>
+
+      <div className="space-y-6">
+        {formData.faqs.map((faq, index) => (
+          <div key={index} className="bg-gray-50 rounded-lg p-6 relative">
+            <button
+              onClick={() => {
+                const newFaqs = [...formData.faqs];
+                newFaqs.splice(index, 1);
+                setFormData({ ...formData, faqs: newFaqs });
+              }}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-500"
+            >
+              <XMarkIcon className="h-5 w-5" />
+            </button>
+
+            {/* Question */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">Question</label>
+              <input
+                type="text"
+                value={faq.question}
+                onChange={(e) => {
+                  const newFaqs = [...formData.faqs];
+                  newFaqs[index].question = e.target.value;
+                  setFormData({ ...formData, faqs: newFaqs });
+                }}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                placeholder="e.g., What is your cancellation policy?"
+              />
+            </div>
+
+            {/* Answer */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Answer</label>
+              <textarea
+                rows={3}
+                value={faq.answer}
+                onChange={(e) => {
+                  const newFaqs = [...formData.faqs];
+                  newFaqs[index].answer = e.target.value;
+                  setFormData({ ...formData, faqs: newFaqs });
+                }}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                placeholder="Provide a clear and detailed answer..."
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 
   return (
     <div className="max-w-4xl mx-auto">
       {/* Header */}
       <div className="bg-white rounded-t-xl shadow-sm px-6 py-4 border-b flex justify-between items-center">
-        <h1 className="text-2xl font-semibold text-gray-900">Add Service</h1>
+        <h1 className="text-2xl font-semibold text-gray-900">
+          {isEditing ? 'Edit Service' : 'Add Service'}
+        </h1>
         <PreviewButton listingData={formData} listingType="service" />
       </div>
 
@@ -289,6 +685,7 @@ const CreateServiceListing: React.FC<CreateServiceListingProps> = ({ onClose, on
         {currentStep === 'basic' && renderBasicInfo()}
         {currentStep === 'packages' && renderPackages()}
         {currentStep === 'availability' && renderAvailability()}
+        {currentStep === 'faq' && renderFAQ()}
       </div>
 
       {/* Navigation Buttons */}

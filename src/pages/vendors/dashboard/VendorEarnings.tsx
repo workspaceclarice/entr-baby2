@@ -9,7 +9,8 @@ import {
   BanknotesIcon,
   BoltIcon,
   ClockIcon,
-  ExclamationCircleIcon
+  ExclamationCircleIcon,
+  StarIcon
 } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
 import { Dialog, Transition } from '@headlessui/react';
@@ -24,6 +25,7 @@ import {
   ResponsiveContainer 
 } from 'recharts';
 import styles from './VendorEarnings.module.css';
+import { Link } from 'react-router-dom';
 
 interface EarningsSummary {
   totalEarnings: number;
@@ -38,10 +40,18 @@ interface EarningsSummary {
   }[];
   recentTransactions: {
     id: string;
+    bookingId: string;
     date: string;
     description: string;
     amount: number;
-    status: 'completed' | 'pending' | 'processing';
+    status: 'completed';
+    clientName: string;
+    clientPhoto?: string;
+    review?: {
+      rating: number;
+      comment: string;
+      date: string;
+    };
   }[];
 }
 
@@ -67,19 +77,34 @@ const mockData: EarningsSummary = {
   recentTransactions: [
     {
       id: 'TX123',
+      bookingId: 'BK-001',
       date: '2024-03-15',
       description: 'Wedding Photography Session',
       amount: 1200.00,
-      status: 'completed'
+      status: 'completed',
+      clientName: 'Jessica Chen',
+      clientPhoto: 'https://randomuser.me/api/portraits/women/1.jpg',
+      review: {
+        rating: 5,
+        comment: 'Amazing service! The photos turned out beautifully. Would definitely recommend!',
+        date: '2024-03-16'
+      }
     },
     {
       id: 'TX122',
+      bookingId: 'BK-002',
       date: '2024-03-12',
       description: 'Corporate Event Coverage',
       amount: 800.00,
-      status: 'pending'
-    },
-    // Add more transactions...
+      status: 'completed',
+      clientName: 'Michael Brown',
+      clientPhoto: 'https://randomuser.me/api/portraits/men/1.jpg',
+      review: {
+        rating: 4,
+        comment: 'Professional service and great photos. Would recommend!',
+        date: '2024-03-13'
+      }
+    }
   ]
 };
 
@@ -657,30 +682,61 @@ const VendorEarnings: React.FC = () => {
 
       {/* Recent Transactions */}
       <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
-        <h2 className="text-lg font-light text-gray-900 mb-4 sm:mb-6">Recent Transactions</h2>
-        <div className="space-y-3 sm:space-y-4">
+        <h2 className="text-lg font-light text-gray-900 mb-4 sm:mb-6">Completed Bookings</h2>
+        <div className="space-y-4">
           {mockData.recentTransactions.map((transaction) => (
-            <div
+            <Link
               key={transaction.id}
-              className="flex items-center justify-between p-3 sm:p-4 border rounded-lg"
+              to={`/vendors/dashboard/bookings/${transaction.bookingId}/completed`}
+              className="block hover:bg-gray-50 transition-colors"
             >
-              <div>
-                <p className="text-xs sm:text-sm font-medium text-gray-900 line-clamp-1">{transaction.description}</p>
-                <p className="text-xs font-light text-gray-500">{transaction.date}</p>
+              <div className="flex items-start justify-between p-4 border rounded-lg">
+                <div className="flex items-start space-x-4">
+                  <img
+                    src={transaction.clientPhoto || `https://ui-avatars.com/api/?name=${transaction.clientName}`}
+                    alt={transaction.clientName}
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">{transaction.description}</p>
+                    <p className="text-xs font-light text-gray-500">{transaction.clientName}</p>
+                    <p className="text-xs font-light text-gray-500">{transaction.date}</p>
+                    {transaction.review && (
+                      <div className="mt-2">
+                        <div className="flex items-center">
+                          {[...Array(5)].map((_, i) => (
+                            <StarIcon
+                              key={i}
+                              className={`h-3 w-3 ${
+                                i < transaction.review!.rating
+                                  ? 'text-yellow-400'
+                                  : 'text-gray-300'
+                              }`}
+                            />
+                          ))}
+                          <span className="ml-1 text-xs font-light text-gray-600">
+                            {transaction.review.date}
+                          </span>
+                        </div>
+                        <p className="text-xs font-light text-gray-600 mt-1 line-clamp-2">
+                          {transaction.review.comment}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div className="text-right">
+                  <span className="text-sm font-medium text-gray-900">
+                    ${transaction.amount.toLocaleString()}
+                  </span>
+                  <div className="mt-1">
+                    <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-light rounded-full">
+                      Completed
+                    </span>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center space-x-2 sm:space-x-4">
-                <span className={`px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-light ${
-                  transaction.status === 'completed' ? 'bg-green-100 text-green-800' :
-                  transaction.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                  'bg-gray-100 text-gray-800'
-                }`}>
-                  {transaction.status}
-                </span>
-                <span className="text-xs sm:text-sm font-medium text-gray-900 min-w-[60px] text-right">
-                  ${transaction.amount.toLocaleString()}
-                </span>
-              </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>

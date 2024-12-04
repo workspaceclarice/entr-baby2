@@ -1,58 +1,79 @@
 import React from 'react';
-import { CalendarIcon, TagIcon, CurrencyDollarIcon, StarIcon } from '@heroicons/react/24/outline';
+import { Link } from 'react-router-dom';
+import { StarIcon } from '@heroicons/react/24/outline';
 
 interface BookingHistoryProps {
   booking: {
-    id: number;
+    id: string;
+    bookingId: string;
     eventName: string;
-    client: string;
+    client: {
+      name: string;
+      photo?: string;
+    };
     date: string;
-    package: string;
     amount: string;
-    status: string;
+    status: 'completed';
     rating: number;
-    review?: string;
+    review?: {
+      comment: string;
+      date: string;
+    };
   };
 }
 
 const BookingHistoryCard: React.FC<BookingHistoryProps> = ({ booking }) => (
-  <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-100">
-    <div className="flex justify-between items-start mb-4">
-      <div>
-        <h3 className="text-lg font-medium text-gray-900">{booking.eventName}</h3>
-        <p className="text-sm text-gray-500">{booking.client}</p>
-      </div>
-      <div className="flex items-center">
-        <div className="flex text-yellow-400 mr-2">
-          {[...Array(booking.rating)].map((_, i) => (
-            <StarIcon key={i} className="h-4 w-4 fill-current" />
-          ))}
+  <Link
+    to={`/vendors/dashboard/bookings/${booking.bookingId}/completed`}
+    className="block hover:bg-gray-50 transition-colors"
+  >
+    <div className="flex items-start justify-between p-4 border rounded-lg">
+      <div className="flex items-start space-x-4">
+        <img
+          src={booking.client.photo || `https://ui-avatars.com/api/?name=${booking.client.name}`}
+          alt={booking.client.name}
+          className="w-10 h-10 rounded-full object-cover"
+        />
+        <div>
+          <p className="text-sm font-medium text-gray-900">{booking.eventName}</p>
+          <p className="text-xs font-light text-gray-500">{booking.client.name}</p>
+          <p className="text-xs font-light text-gray-500">{booking.date}</p>
+          {booking.review && (
+            <div className="mt-2">
+              <div className="flex items-center">
+                {[...Array(booking.rating)].map((_, i) => (
+                  <StarIcon
+                    key={i}
+                    className={`h-3 w-3 ${
+                      i < booking.rating
+                        ? 'text-yellow-400'
+                        : 'text-gray-300'
+                    }`}
+                  />
+                ))}
+                <span className="ml-1 text-xs font-light text-gray-600">
+                  {booking.review.date}
+                </span>
+              </div>
+              <p className="text-xs font-light text-gray-600 mt-1 line-clamp-2">
+                {booking.review.comment}
+              </p>
+            </div>
+          )}
         </div>
-        <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
-          {booking.status}
+      </div>
+      <div className="text-right">
+        <span className="text-sm font-medium text-gray-900">
+          {booking.amount}
         </span>
+        <div className="mt-1">
+          <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-light rounded-full">
+            Completed
+          </span>
+        </div>
       </div>
     </div>
-    <div className="grid grid-cols-3 gap-4 mb-4">
-      <div className="flex items-center text-sm text-gray-600">
-        <CalendarIcon className="h-5 w-5 text-gray-400 mr-2" />
-        {booking.date}
-      </div>
-      <div className="flex items-center text-sm text-gray-600">
-        <TagIcon className="h-5 w-5 text-gray-400 mr-2" />
-        {booking.package}
-      </div>
-      <div className="flex items-center text-sm text-gray-600">
-        <CurrencyDollarIcon className="h-5 w-5 text-gray-400 mr-2" />
-        {booking.amount}
-      </div>
-    </div>
-    {booking.review && (
-      <div className="pt-4 border-t border-gray-100">
-        <p className="text-sm text-gray-600 italic">"{booking.review}"</p>
-      </div>
-    )}
-  </div>
+  </Link>
 );
 
 export default BookingHistoryCard; 
