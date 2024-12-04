@@ -132,7 +132,7 @@ export const FilterPopover: React.FC<FilterPopoverProps> = ({
 
   return (
     <Popover className="relative ml-auto">
-      {({ open }) => (
+      {({ open, close }) => (
         <>
           <Popover.Button
             className={`
@@ -191,6 +191,7 @@ export const FilterPopover: React.FC<FilterPopoverProps> = ({
                       <button
                         onClick={() => {
                           filters.forEach(filter => onFilterChange(filter.id, []));
+                          close();
                         }}
                         className="text-sm text-gray-500 hover:text-gray-700 font-light"
                       >

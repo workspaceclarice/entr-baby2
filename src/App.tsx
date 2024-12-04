@@ -33,6 +33,7 @@ import VendorCalendar from './pages/vendors/dashboard/VendorCalendar';
 import VendorProfileEditor from './pages/vendors/dashboard/VendorProfileEditor';
 import VendorProfilePreview from './pages/vendors/dashboard/VendorProfilePreview';
 import CompletedBooking from './pages/vendors/dashboard/CompletedBooking';
+import VenueDetailPage from './pages/VenueDetailPage';
 
 const AppRoutes = () => {
   const location = useLocation();
@@ -48,6 +49,7 @@ const AppRoutes = () => {
         <Route path="/events" element={<DiscoveryPage category="events" />} />
         <Route path="/services" element={<DiscoveryPage category="services" />} />
         <Route path="/venues" element={<DiscoveryPage category="venues" />} />
+        <Route path="/venues/:id" element={<VenueDetailPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/services/:id" element={<ServiceDetailsPage />} />

@@ -3,6 +3,7 @@ import { ListingCategory } from '../../types';
 import VenueCard from '../venues/VenueCard';
 import ServiceCard from '../services/ServiceCard';
 import EventCard from '../events/EventCard';
+import { useNavigate } from 'react-router-dom';
 
 interface ListingGridProps {
   category: ListingCategory;
@@ -22,6 +23,8 @@ const ListingGrid: React.FC<ListingGridProps> = ({
   searchQuery,
   filters
 }) => {
+  const navigate = useNavigate();
+
   const filteredListings = listings.filter(listing => {
     if (!listing) return false;
     
@@ -31,7 +34,12 @@ const ListingGrid: React.FC<ListingGridProps> = ({
     ) : true;
 
     const matchesCategory = !filters.categoryId || listing.categoryId === filters.categoryId;
-    const matchesLocation = !filters.location || listing.location?.includes(filters.location);
+    
+    const matchesLocation = !filters.location || (
+      category === 'venues' 
+        ? `${listing.location.city}, ${listing.location.state}`.includes(filters.location)
+        : listing.location?.includes(filters.location)
+    );
     
     return matchesSearch && matchesCategory && matchesLocation;
   });
@@ -41,11 +49,13 @@ const ListingGrid: React.FC<ListingGridProps> = ({
     
     switch (filters.sort) {
       case 'price-low':
-        return (a.basePrice || 0) - (b.basePrice || 0);
+        return (a.pricePerHour || 0) - (b.pricePerHour || 0);
       case 'price-high':
-        return (b.basePrice || 0) - (a.basePrice || 0);
+        return (b.pricePerHour || 0) - (a.pricePerHour || 0);
       case 'rating':
-        return (b.rating || 0) - (a.rating || 0);
+        const aRating = a.reviews?.reduce((acc: number, r: any) => acc + r.rating, 0) / (a.reviews?.length || 1);
+        const bRating = b.reviews?.reduce((acc: number, r: any) => acc + r.rating, 0) / (b.reviews?.length || 1);
+        return bRating - aRating;
       default:
         return 0;
     }
@@ -54,7 +64,11 @@ const ListingGrid: React.FC<ListingGridProps> = ({
   const renderCard = (listing: any) => {
     switch (category) {
       case 'venues':
-        return <VenueCard key={listing.id} venue={listing} />;
+        return (
+          <div key={listing.id} onClick={() => navigate(`/venues/${listing.id}`)}>
+            <VenueCard venue={listing} />
+          </div>
+        );
       case 'services':
         return <ServiceCard key={listing.id} service={listing} />;
       case 'events':

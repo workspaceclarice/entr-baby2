@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { StarIcon, MapPinIcon, UsersIcon, ChevronLeftIcon } from '@heroicons/react/24/outline';
-import { venues } from '../../data/venues';
-import VenueGallery from '../../components/venues/VenueGallery';
-import VenueEstimator from '../../components/venues/VenueEstimator';
-import VenueBookingFlow from '../../components/venues/VenueBookingFlow';
+import { ChevronLeftIcon, MapPinIcon, ClockIcon, UsersIcon } from '@heroicons/react/24/outline';
+import { StarIcon } from '@heroicons/react/24/solid';
+import VenueGallery from '../components/venues/VenueGallery';
+import VenueEstimator from '../components/venues/VenueEstimator';
+import { venues } from '../data/venues';
 
-export default function VenueDetailsPage() {
+export default function VenueDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [isBookingOpen, setIsBookingOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
-
+  const [isBookingOpen, setIsBookingOpen] = useState(false);
+  
   const venue = venues.find(v => v.id === id);
   
   if (!venue) {
@@ -85,7 +85,63 @@ export default function VenueDetailsPage() {
             </div>
 
             {/* Tab Content */}
-            {/* ... (rest of the tab content remains the same) ... */}
+            <div className="prose max-w-none">
+              {activeTab === 'overview' && (
+                <div>
+                  <p className="text-gray-600">{venue.description}</p>
+                  <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    {venue.features.map((feature) => (
+                      <div key={feature.id} className="border rounded-lg p-4">
+                        <h3 className="font-medium text-gray-900 mb-2">{feature.name}</h3>
+                        <p className="text-sm text-gray-600">{feature.description}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'amenities' && (
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  {venue.amenities.map((amenity) => (
+                    <div key={amenity.id} className="flex items-center space-x-2">
+                      <span className="text-gray-400">{amenity.icon}</span>
+                      <span className="text-gray-600">{amenity.name}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {activeTab === 'reviews' && (
+                <div className="space-y-6">
+                  {venue.reviews.map((review) => (
+                    <div key={review.id} className="border-b pb-6">
+                      <div className="flex items-center justify-between mb-2">
+                        <div>
+                          <h4 className="font-medium text-gray-900">{review.author}</h4>
+                          <p className="text-sm text-gray-500">{review.date}</p>
+                        </div>
+                        <div className="flex items-center">
+                          <StarIcon className="h-5 w-5 text-yellow-400" />
+                          <span className="ml-1 text-gray-600">{review.rating}</span>
+                        </div>
+                      </div>
+                      <p className="text-gray-600">{review.comment}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {activeTab === 'rules' && (
+                <div className="space-y-4">
+                  {venue.rules.map((rule, index) => (
+                    <div key={index} className="flex items-start">
+                      <span className="text-gray-400 mr-2">•</span>
+                      <span className="text-gray-600">{rule}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Sidebar */}
@@ -97,13 +153,6 @@ export default function VenueDetailsPage() {
           </div>
         </div>
       </div>
-
-      {/* Booking Flow */}
-      <VenueBookingFlow
-        venue={venue}
-        isOpen={isBookingOpen}
-        onClose={() => setIsBookingOpen(false)}
-      />
     </div>
   );
 } 

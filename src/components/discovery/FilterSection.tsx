@@ -70,6 +70,16 @@ export default function FilterSection({
           {/* Desktop Controls */}
           <div className="hidden sm:flex items-center justify-between w-full">
             <div className="flex items-center space-x-6">
+              {/* Filter Button */}
+              <FilterPopover
+                category={category}
+                selectedFilters={selectedFilters}
+                onFilterChange={onFilterChange}
+              />
+
+              {/* Divider */}
+              <div className="h-4 w-px bg-gray-200" />
+
               {/* Sort Dropdown */}
               <Menu as="div" className="relative">
                 <Menu.Button className="flex items-center space-x-1.5 text-sm text-gray-700 hover:text-gray-900">
@@ -110,60 +120,51 @@ export default function FilterSection({
                   </Menu.Items>
                 </Transition>
               </Menu>
-
-              {/* Filter Button */}
-              <FilterPopover
-                category={category}
-                selectedFilters={selectedFilters}
-                onFilterChange={onFilterChange}
-              />
             </div>
-          </div>
 
-          {/* Results Count */}
-          <div className="flex items-center space-x-4">
+            {/* Results Count - Now in one line */}
             <p className="text-sm text-gray-500 font-light">
-              {totalResults} results
+              {totalResults.toLocaleString()} results
             </p>
-            
-            {/* Mobile Sort Button */}
-            <Menu as="div" className="sm:hidden relative">
-              <Menu.Button className="flex items-center text-sm text-gray-700 hover:text-gray-900">
-                <AdjustmentsHorizontalIcon className="h-4 w-4" />
-              </Menu.Button>
-
-              <Transition
-                as={Fragment}
-                enter="transition ease-out duration-100"
-                enterFrom="opacity-0 scale-95"
-                enterTo="opacity-100 scale-100"
-                leave="transition ease-in duration-75"
-                leaveFrom="opacity-100 scale-100"
-                leaveTo="opacity-0 scale-95"
-              >
-                <Menu.Items className="absolute right-0 z-20 mt-2 w-56 origin-top-right rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                  <div className="py-1">
-                    {sortOptions.map((option) => (
-                      <Menu.Item key={option.value}>
-                        {({ active }) => (
-                          <button
-                            onClick={() => onSortChange(option.value)}
-                            className={`
-                              ${active ? 'bg-gray-50' : ''}
-                              ${selectedSort === option.value ? 'text-gray-900' : 'text-gray-600'}
-                              block px-4 py-2 text-sm w-full text-left font-light hover:text-gray-900
-                            `}
-                          >
-                            {option.label}
-                          </button>
-                        )}
-                      </Menu.Item>
-                    ))}
-                  </div>
-                </Menu.Items>
-              </Transition>
-            </Menu>
           </div>
+
+          {/* Mobile Sort Button */}
+          <Menu as="div" className="sm:hidden relative">
+            <Menu.Button className="flex items-center text-sm text-gray-700 hover:text-gray-900">
+              <AdjustmentsHorizontalIcon className="h-4 w-4" />
+            </Menu.Button>
+
+            <Transition
+              as={Fragment}
+              enter="transition ease-out duration-100"
+              enterFrom="opacity-0 scale-95"
+              enterTo="opacity-100 scale-100"
+              leave="transition ease-in duration-75"
+              leaveFrom="opacity-100 scale-100"
+              leaveTo="opacity-0 scale-95"
+            >
+              <Menu.Items className="absolute right-0 z-20 mt-2 w-56 origin-top-right rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                <div className="py-1">
+                  {sortOptions.map((option) => (
+                    <Menu.Item key={option.value}>
+                      {({ active }) => (
+                        <button
+                          onClick={() => onSortChange(option.value)}
+                          className={`
+                            ${active ? 'bg-gray-50' : ''}
+                            ${selectedSort === option.value ? 'text-gray-900' : 'text-gray-600'}
+                            block px-4 py-2 text-sm w-full text-left font-light hover:text-gray-900
+                          `}
+                        >
+                          {option.label}
+                        </button>
+                      )}
+                    </Menu.Item>
+                  ))}
+                </div>
+              </Menu.Items>
+            </Transition>
+          </Menu>
         </div>
       </div>
     </div>
