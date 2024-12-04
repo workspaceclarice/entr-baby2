@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, Fragment } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Menu, Transition } from '@headlessui/react';
+import { Menu, Transition, Dialog } from '@headlessui/react';
 import { 
   PlusIcon, 
   EllipsisVerticalIcon,
@@ -8,8 +8,11 @@ import {
   PauseIcon,
   PlayIcon,
   TrashIcon,
-  EyeIcon
+  EyeIcon,
+  CheckIcon,
+  XMarkIcon
 } from '@heroicons/react/24/outline';
+import NotificationToast from '../../../components/common/NotificationToast';
 
 interface ListingBase {
   id: string;
@@ -39,9 +42,7 @@ const VendorListings: React.FC = () => {
   const navigate = useNavigate();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedListing, setSelectedListing] = useState<Listing | null>(null);
-
-  // Mock listings data
-  const listings: Listing[] = [
+  const [listings, setListings] = useState<Listing[]>([
     {
       id: 's1',
       type: 'service',
@@ -66,12 +67,59 @@ const VendorListings: React.FC = () => {
       reviewCount: 45,
       pricePerHour: 500
     },
-    // Add more mock listings...
-  ];
+  ]);
+  const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [pendingStatusChange, setPendingStatusChange] = useState<{
+    listing: Listing;
+    newStatus: 'active' | 'paused';
+  } | null>(null);
+  const [notification, setNotification] = useState<{
+    show: boolean;
+    message: string;
+    type: 'success' | 'error';
+    onClose?: () => void;
+  } | null>(null);
 
-  const handleStatusChange = (listing: Listing, newStatus: 'active' | 'paused') => {
-    // Handle status change logic
-    console.log(`Changing status of ${listing.name} to ${newStatus}`);
+  const initiateStatusChange = (listing: Listing, newStatus: 'active' | 'paused') => {
+    setPendingStatusChange({ listing, newStatus });
+    setShowStatusModal(true);
+  };
+
+  const handleStatusChange = async (listing: Listing, newStatus: 'active' | 'paused') => {
+    try {
+      setUpdatingStatus(listing.id);
+      setShowStatusModal(false);
+
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      setListings(prevListings => 
+        prevListings.map(item => 
+          item.id === listing.id 
+            ? { ...item, status: newStatus }
+            : item
+        )
+      );
+
+      // Show success notification
+      const action = newStatus === 'active' ? 'activated' : 'paused';
+      showNotification('success', `Listing successfully ${action}`);
+    } catch (error) {
+      showNotification('error', 'Failed to update listing status');
+    } finally {
+      setUpdatingStatus(null);
+      setPendingStatusChange(null);
+    }
+  };
+
+  const showNotification = (type: 'success' | 'error', message: string) => {
+    setNotification({
+      show: true,
+      type,
+      message,
+      onClose: () => setNotification(null)
+    });
   };
 
   const handleDelete = (listing: Listing) => {
@@ -122,12 +170,20 @@ const VendorListings: React.FC = () => {
                 <Menu.Item>
                   {({ active }) => (
                     <button
-                      onClick={() => handleStatusChange(listing, listing.status === 'active' ? 'paused' : 'active')}
+                      onClick={() => initiateStatusChange(listing, listing.status === 'active' ? 'paused' : 'active')}
+                      disabled={updatingStatus === listing.id}
                       className={`${
                         active ? 'bg-gray-50' : ''
-                      } group flex w-full items-center px-4 py-2 text-sm text-gray-700`}
+                      } group flex w-full items-center px-4 py-2 text-sm text-gray-700 ${
+                        updatingStatus === listing.id ? 'opacity-50 cursor-not-allowed' : ''
+                      }`}
                     >
-                      {listing.status === 'active' ? (
+                      {updatingStatus === listing.id ? (
+                        <svg className="animate-spin h-5 w-5 mr-3 text-gray-400" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                        </svg>
+                      ) : listing.status === 'active' ? (
                         <PauseIcon className="mr-3 h-5 w-5 text-gray-400" />
                       ) : (
                         <PlayIcon className="mr-3 h-5 w-5 text-gray-400" />
@@ -203,6 +259,84 @@ const VendorListings: React.FC = () => {
     </div>
   );
 
+  const StatusConfirmationModal = () => {
+    if (!pendingStatusChange) return null;
+    const { listing, newStatus } = pendingStatusChange;
+    const action = newStatus === 'active' ? 'activate' : 'pause';
+
+    return (
+      <Transition appear show={showStatusModal} as={Fragment}>
+        <Dialog 
+          as="div" 
+          className="relative z-50" 
+          onClose={() => setShowStatusModal(false)}
+        >
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-black bg-opacity-25" />
+          </Transition.Child>
+
+          <div className="fixed inset-0 overflow-y-auto">
+            <div className="flex min-h-full items-center justify-center p-4 text-center">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 scale-95"
+                enterTo="opacity-100 scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 scale-100"
+                leaveTo="opacity-0 scale-95"
+              >
+                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                  <Dialog.Title
+                    as="h3"
+                    className="text-lg font-medium leading-6 text-gray-900"
+                  >
+                    {action.charAt(0).toUpperCase() + action.slice(1)} Listing
+                  </Dialog.Title>
+                  <div className="mt-2">
+                    <p className="text-sm text-gray-500">
+                      Are you sure you want to {action} "{listing.name}"? 
+                      {newStatus === 'paused' && ' This will hide your listing from the marketplace.'}
+                    </p>
+                  </div>
+
+                  <div className="mt-4 flex justify-end space-x-3">
+                    <button
+                      type="button"
+                      className="inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                      onClick={() => setShowStatusModal(false)}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      className={`inline-flex justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white 
+                        ${newStatus === 'active' 
+                          ? 'bg-green-600 hover:bg-green-700'
+                          : 'bg-yellow-600 hover:bg-yellow-700'
+                        }`}
+                      onClick={() => handleStatusChange(listing, newStatus)}
+                    >
+                      {action.charAt(0).toUpperCase() + action.slice(1)}
+                    </button>
+                  </div>
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
+          </div>
+        </Dialog>
+      </Transition>
+    );
+  };
+
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="sm:flex sm:items-center sm:justify-between mb-8">
@@ -236,6 +370,17 @@ const VendorListings: React.FC = () => {
 
       {/* Delete Confirmation Modal */}
       {/* Add your delete confirmation modal here */}
+      
+      {/* Status Confirmation Modal */}
+      <StatusConfirmationModal />
+      
+      {/* Notification */}
+      <NotificationToast
+        show={notification?.show || false}
+        message={notification?.message || ''}
+        type={notification?.type || 'success'}
+        onClose={() => setNotification(null)}
+      />
     </main>
   );
 };
