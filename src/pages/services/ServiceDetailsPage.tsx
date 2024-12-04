@@ -10,6 +10,9 @@ import ServiceBookingFlow from '../../components/services/ServiceBookingFlow';
 import VendorProfile from '../../components/vendors/VendorProfile';
 import { Disclosure, Transition } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/24/outline';
+import { Link } from 'react-router-dom';
+import { HomeIcon } from '@heroicons/react/24/outline';
+import { Breadcrumb } from '../../components/common';
 
 const ServiceDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -112,7 +115,14 @@ const ServiceDetailsPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 mt-16">
+      <Breadcrumb 
+        items={[
+          { label: 'Services', href: '/services' },
+          { label: service.title }
+        ]} 
+      />
+
       {/* Hero Section */}
       <div className="relative h-[40vh]">
         <img

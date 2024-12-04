@@ -21,23 +21,14 @@ const EventGallery: React.FC<EventGalleryProps> = ({ images }) => {
   };
 
   return (
-    <div>
-      {/* Thumbnail Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-        {images.map((image, index) => (
-          <div
-            key={index}
-            className="relative aspect-w-16 aspect-h-9 rounded-lg overflow-hidden group cursor-pointer"
-            onClick={() => setSelectedImage(index)}
-          >
-            <img
-              src={image}
-              alt={`Event photo ${index + 1}`}
-              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-            />
-            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
-          </div>
-        ))}
+    <div className="h-full">
+      <div className="relative h-full">
+        <img
+          src={images[0]}
+          alt="Event main"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
       </div>
 
       {/* Fullscreen Modal */}
@@ -45,21 +36,21 @@ const EventGallery: React.FC<EventGalleryProps> = ({ images }) => {
         <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center">
           <button
             onClick={() => setSelectedImage(null)}
-            className="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors"
+            className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors"
           >
             <XMarkIcon className="h-8 w-8" />
           </button>
 
           <button
             onClick={handlePrev}
-            className="absolute left-4 text-white hover:text-gray-300 transition-colors"
+            className="absolute left-4 text-white/50 hover:text-white/90 transition-colors"
           >
             <ArrowLeftIcon className="h-8 w-8" />
           </button>
 
           <button
             onClick={handleNext}
-            className="absolute right-4 text-white hover:text-gray-300 transition-colors"
+            className="absolute right-4 text-white/50 hover:text-white/90 transition-colors"
           >
             <ArrowRightIcon className="h-8 w-8" />
           </button>
@@ -70,7 +61,7 @@ const EventGallery: React.FC<EventGalleryProps> = ({ images }) => {
             className="max-h-[90vh] max-w-[90vw] object-contain"
           />
 
-          <div className="absolute bottom-4 left-0 right-0 text-center text-white">
+          <div className="absolute bottom-4 left-0 right-0 text-center text-white/70">
             {selectedImage + 1} / {images.length}
           </div>
         </div>
