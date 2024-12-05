@@ -368,7 +368,14 @@ export default function VenueDetailsPage() {
                 </div>
               </div>
 
-              {/* Menu Tabs - Directly below vendor profile */}
+              {/* Mobile VenueEstimator - Below vendor profile, above menu tabs */}
+              <div className="block lg:hidden my-6">
+                <div className="bg-gray-50 p-6 rounded-lg">
+                  <VenueEstimator venue={venue} onBookNow={() => setIsBookingOpen(true)} />
+                </div>
+              </div>
+
+              {/* Menu Tabs */}
               <div className="border-b mt-0">
                 <nav className="flex overflow-x-auto scrollbar-hide -mb-px">
                   {tabs.map((tab) => (
@@ -662,8 +669,8 @@ export default function VenueDetailsPage() {
               </div>
             </div>
 
-            {/* Right column - Sticky VenueEstimator */}
-            <div className="lg:col-span-4">
+            {/* Desktop Right column - Sticky VenueEstimator */}
+            <div className="hidden lg:block lg:col-span-4">
               <div className="sticky top-6">
                 <div className="bg-gray-50 p-6 rounded-lg">
                   <VenueEstimator venue={venue} onBookNow={() => setIsBookingOpen(true)} />
