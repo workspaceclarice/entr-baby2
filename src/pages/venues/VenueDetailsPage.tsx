@@ -13,6 +13,31 @@ import VenueEstimator from '../../components/venues/VenueEstimator';
 import VenueBookingFlow from '../../components/venues/VenueBookingFlow';
 import { Breadcrumb } from '../../components/common';
 
+interface Vendor {
+  id: string;
+  name: string;
+  profileImage?: string;
+}
+
+interface Venue {
+  id: string;
+  name: string;
+  description: string;
+  images: string[];
+  location: {
+    address: string;
+    city: string;
+    state: string;
+  };
+  maxCapacity: number;
+  squareFeet?: number;
+  reviews: any[]; // Update this based on your review interface
+  features: any[]; // Update this based on your feature interface
+  amenities: any[]; // Update this based on your amenity interface
+  vendor: Vendor;
+  vendorId: string;
+}
+
 const mockReviews = [
   {
     id: '1',
@@ -148,7 +173,7 @@ export default function VenueDetailsPage() {
       answer: "Yes, we allow outside catering with approved vendors. We can provide a list of preferred caterers who are familiar with our facilities, or you can bring your own licensed caterer. There is a small kitchen facility available for catering prep."
     },
     {
-      question: "What is your cancellation policy?",
+      question: "What is our cancellation policy?",
       answer: "We understand plans can change. Cancellations made 60+ days before the event receive a full refund minus the deposit. Cancellations 30-59 days prior receive a 50% refund. Unfortunately, we cannot offer refunds for cancellations less than 30 days before the event."
     },
     {
@@ -258,10 +283,12 @@ export default function VenueDetailsPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
         <div className="mb-6">
-          <h1 className="text-2xl md:text-3xl font-light text-gray-900 mb-4">{venue.name}</h1>
-          
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="text-2xl md:text-3xl font-light text-gray-900">{venue.name}</h1>
+          </div>
+
           {/* Stats Bar - Wrapped for mobile */}
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-gray-600 text-sm">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-gray-600 text-sm mb-4">
             <div className="flex items-center gap-1">
               <MapPinIcon className="h-5 w-5" />
               <span className="font-light">{venue.location.city}, {venue.location.state}</span>
@@ -279,301 +306,368 @@ export default function VenueDetailsPage() {
               <span className="font-light">{averageRating.toFixed(1)} ({venue.reviews.length} reviews)</span>
             </div>
           </div>
-        </div>
 
-        <div className="block lg:hidden mb-6">
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <VenueEstimator venue={venue} onBookNow={() => setIsBookingOpen(true)} />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
-          <div className="lg:col-span-8">
-            <div className="border-b mb-6 md:mb-8">
-              <nav className="flex overflow-x-auto scrollbar-hide -mb-px">
-                {tabs.map((tab) => (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`
-                      flex-none px-4 md:px-6 py-3 text-sm font-light transition-colors whitespace-nowrap
-                      ${activeTab === tab.id
-                        ? 'text-purple-600 border-b-2 border-purple-500'
-                        : 'text-gray-500 hover:text-gray-700'
-                      }
-                    `}
-                  >
-                    {tab.name}
-                  </button>
-                ))}
-              </nav>
-            </div>
-
-            <div className="space-y-8">
-              {activeTab === 'overview' && (
-                <div className="space-y-8">
-                  <div className="prose max-w-none space-y-6">
-                    <p className="text-gray-600 leading-relaxed">{expandedDescription.main}</p>
-                    <p className="text-gray-600 leading-relaxed">{expandedDescription.features}</p>
-                    <p className="text-gray-600 leading-relaxed">{expandedDescription.location}</p>
-                    <p className="text-gray-600 leading-relaxed">{expandedDescription.experience}</p>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-                    {venue.features.map((feature, index) => (
-                      <div key={index} className="space-y-1">
-                        <h4 className="font-medium text-gray-900">{feature.name}</h4>
-                        <p className="text-sm text-gray-500">{feature.description}</p>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Location Map Section */}
-                  <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-                    <div className="p-6">
-                      <h3 className="text-xl font-light text-gray-900 mb-4">Location</h3>
-                      <div className="mb-4">
-                        <p className="text-gray-600">
-                          {venue.location.address}<br />
-                          {venue.location.city}, {venue.location.state} {venue.location.zip}
-                        </p>
-                      </div>
-                      <div className="w-full h-[400px] bg-gray-100 rounded-lg flex items-center justify-center">
-                        <p className="text-gray-500">Map Component Goes Here</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {activeTab === 'gallery' && (
-                <div className="space-y-8">
-                  {galleryPhotos.map((section, idx) => (
-                    <div key={idx} className="space-y-4">
-                      <h3 className="text-xl font-light text-gray-900">{section.category}</h3>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                        {section.images.map((photo, index) => (
-                          <div 
-                            key={index}
-                            onClick={() => setSelectedImage(photo.url)}
-                            className="relative aspect-square cursor-pointer group overflow-hidden rounded-lg"
-                          >
-                            <img
-                              src={photo.url}
-                              alt={photo.caption}
-                              className="h-full w-full object-cover transition-transform group-hover:scale-105"
-                            />
-                            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity" />
-                            <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/60">
-                              <p className="text-sm text-white">{photo.caption}</p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {activeTab === 'amenities' && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
-                  {venue.amenities.map((amenity, index) => (
-                    <div 
-                      key={amenity.id || index} 
-                      className="flex items-center gap-3 p-3 md:p-4 bg-gray-50 rounded-lg"
-                    >
-                      {amenity.icon && <span className="text-purple-500">{amenity.icon}</span>}
-                      <span className="text-gray-700 font-medium">{amenity.name}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {activeTab === 'faq' && (
-                <div className="space-y-6">
-                  {faqItems.map((item, index) => (
-                    <div 
-                      key={index}
-                      className="border-b border-gray-100 last:border-0 pb-6 last:pb-0"
-                    >
-                      <h3 className="text-lg font-medium text-gray-900 mb-2">
-                        {item.question}
-                      </h3>
-                      <p className="text-gray-600 text-sm leading-relaxed">
-                        {item.answer}
+          {/* Main content grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
+            {/* Left column - Vendor Profile and Menu Tabs */}
+            <div className="lg:col-span-8">
+              {/* Vendor Profile Section */}
+              <div className="border-t border-b border-gray-100 py-8 mb-0">
+                {/* Host Info */}
+                <div 
+                  onClick={() => navigate(`/vendors/${venue.id}`)}
+                  className="flex items-center gap-3 cursor-pointer group mb-6"
+                >
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={'/images/profile/vendor-profile.jpg'}
+                      alt={'Venue Host'}
+                      className="h-14 w-14 rounded-full object-cover border-2 border-purple-100 group-hover:border-purple-300 transition-colors"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = 'https://via.placeholder.com/56?text=V';
+                      }}
+                    />
+                    <div className="text-left">
+                      <p className="text-base font-medium text-gray-900 group-hover:text-purple-600 transition-colors">
+                        John
                       </p>
+                      <div className="flex items-center gap-2 text-sm text-gray-500">
+                        <span>5 years in business</span>
+                      </div>
                     </div>
-                  ))}
-                  <div className="mt-8 p-4 bg-gray-50 rounded-lg">
-                    <p className="text-sm text-gray-500">
-                      Have more questions? Contact our events team at{' '}
-                      <a href="mailto:events@venue.com" className="text-purple-600 hover:text-purple-700">
-                        events@venue.com
-                      </a>
-                      {' '}or call us at{' '}
-                      <a href="tel:+1234567890" className="text-purple-600 hover:text-purple-700">
-                        (123) 456-7890
-                      </a>
-                    </p>
                   </div>
                 </div>
-              )}
 
-              {activeTab === 'floorplan' && (
-                <div className="space-y-8">
-                  <div className="prose max-w-none mb-8">
-                    <p className="text-gray-600">
-                      Explore our versatile spaces designed to accommodate events of any size. 
-                      Each floor plan can be customized to meet your specific needs.
-                    </p>
+                {/* Listing Highlights */}
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Listing highlights</h3>
+                <div className="space-y-4 lg:pb-0">
+                  <div className="flex gap-4">
+                    <StarIcon className="h-6 w-6 text-purple-600 flex-shrink-0" />
+                    <div>
+                      <p className="text-base font-medium text-gray-900">Experienced host</p>
+                      <p className="text-sm text-gray-500">John has been hosting events for over 5 years.</p>
+                    </div>
                   </div>
 
-                  {floorPlans.map((plan) => (
-                    <div key={plan.id} className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-                      <div className="grid md:grid-cols-2 gap-6 p-6">
-                        {/* Floor Plan Image */}
-                        <div className="relative aspect-[4/3] bg-gray-100 rounded-lg overflow-hidden">
-                          <img
-                            src={plan.image}
-                            alt={`${plan.name} floor plan`}
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement;
-                              target.src = 'https://via.placeholder.com/800x600?text=Floor+Plan';
-                            }}
-                          />
-                        </div>
+                  <div className="flex gap-4">
+                    <Square3Stack3DIcon className="h-6 w-6 text-purple-600 flex-shrink-0" />
+                    <div>
+                      <p className="text-base font-medium text-gray-900">Exceptional venue management</p>
+                      <p className="text-sm text-gray-500">Recent clients gave the booking process a 5-star rating.</p>
+                    </div>
+                  </div>
 
-                        {/* Floor Plan Details */}
-                        <div className="space-y-6">
-                          <div>
-                            <h3 className="text-xl font-light text-gray-900 mb-2">{plan.name}</h3>
-                            <div className="grid grid-cols-2 gap-4 text-sm">
-                              <div>
-                                <span className="text-gray-500">Square Footage:</span>
-                                <p className="text-gray-900 font-medium">{plan.squareFeet.toLocaleString()} sq ft</p>
+                  <div className="flex gap-4">
+                    <UsersIcon className="h-6 w-6 text-purple-600 flex-shrink-0" />
+                    <div>
+                      <p className="text-base font-medium text-gray-900">Professional service</p>
+                      <p className="text-sm text-gray-500">The venue setup and staff support are highly praised by guests.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Menu Tabs - Directly below vendor profile */}
+              <div className="border-b mt-0">
+                <nav className="flex overflow-x-auto scrollbar-hide -mb-px">
+                  {tabs.map((tab) => (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`
+                        flex-none px-4 md:px-6 py-3 text-sm font-light transition-colors whitespace-nowrap
+                        ${activeTab === tab.id
+                          ? 'text-purple-600 border-b-2 border-purple-500'
+                          : 'text-gray-500 hover:text-gray-700'
+                        }
+                      `}
+                    >
+                      {tab.name}
+                    </button>
+                  ))}
+                </nav>
+              </div>
+
+              {/* Tab content */}
+              <div className="space-y-8">
+                {activeTab === 'overview' && (
+                  <div className="space-y-8">
+                    <div className="prose max-w-none space-y-6">
+                      <p className="text-gray-600 leading-relaxed">{expandedDescription.main}</p>
+                      <p className="text-gray-600 leading-relaxed">{expandedDescription.features}</p>
+                      <p className="text-gray-600 leading-relaxed">{expandedDescription.location}</p>
+                      <p className="text-gray-600 leading-relaxed">{expandedDescription.experience}</p>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                      <div className="bg-purple-50 rounded-lg p-6 space-y-2">
+                        <h4 className="text-purple-900 font-medium">Grand Staircase</h4>
+                        <p className="text-purple-700 text-sm">Perfect for dramatic entrances and photo opportunities</p>
+                      </div>
+                      <div className="bg-purple-50 rounded-lg p-6 space-y-2">
+                        <h4 className="text-purple-900 font-medium">Crystal Chandeliers</h4>
+                        <p className="text-purple-700 text-sm">Elegant lighting throughout the main hall</p>
+                      </div>
+                      <div className="bg-purple-50 rounded-lg p-6 space-y-2">
+                        <h4 className="text-purple-900 font-medium">Garden Space</h4>
+                        <p className="text-purple-700 text-sm">Connected outdoor area perfect for ceremonies</p>
+                      </div>
+                      {venue.features.map((feature, index) => (
+                        <div key={index} className="bg-purple-50 rounded-lg p-6 space-y-2">
+                          <h4 className="text-purple-900 font-medium">{feature.name}</h4>
+                          <p className="text-purple-700 text-sm">{feature.description}</p>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Location Map */}
+                    <div className="mt-12">
+                      <h3 className="text-2xl font-light text-gray-900 mb-6">Location</h3>
+                      <div className="aspect-w-21 aspect-h-9 md:aspect-h-12">
+                        <iframe
+                          src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyAD2oe_5RikSO2Vj8x4nfy5esTMfT0tp2Q&q=${encodeURIComponent(venue.location.address)}`}
+                          width="100%"
+                          height="600"
+                          style={{ border: 0 }}
+                          allowFullScreen={true}
+                          loading="lazy"
+                          className="w-full h-full rounded-lg shadow-lg"
+                        ></iframe>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {activeTab === 'gallery' && (
+                  <div className="space-y-8">
+                    {galleryPhotos.map((section, idx) => (
+                      <div key={idx} className="space-y-4">
+                        <h3 className="text-xl font-light text-gray-900">{section.category}</h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                          {section.images.map((photo, index) => (
+                            <div 
+                              key={index}
+                              onClick={() => setSelectedImage(photo.url)}
+                              className="relative aspect-square cursor-pointer group overflow-hidden rounded-lg"
+                            >
+                              <img
+                                src={photo.url}
+                                alt={photo.caption}
+                                className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                              />
+                              <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity" />
+                              <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/60">
+                                <p className="text-sm text-white">{photo.caption}</p>
                               </div>
-                              <div>
-                                <span className="text-gray-500">Dimensions:</span>
-                                <p className="text-gray-900 font-medium">{plan.dimensions}</p>
-                              </div>
                             </div>
-                          </div>
-
-                          {/* Capacity Section */}
-                          <div>
-                            <h4 className="text-sm font-medium text-gray-900 mb-3">Capacity by Setup</h4>
-                            <div className="grid grid-cols-2 gap-4 text-sm">
-                              {Object.entries(plan.capacity).map(([setup, count]) => (
-                                <div key={setup} className="flex items-center space-x-2">
-                                  <UsersIcon className="h-4 w-4 text-purple-500" />
-                                  <span className="text-gray-600 capitalize">{setup}:</span>
-                                  <span className="font-medium text-gray-900">{count}</span>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-
-                          {/* Features Section */}
-                          <div>
-                            <h4 className="text-sm font-medium text-gray-900 mb-3">Key Features</h4>
-                            <div className="grid grid-cols-2 gap-2 text-sm">
-                              {plan.features.map((feature, index) => (
-                                <div key={index} className="flex items-center space-x-2">
-                                  <Square3Stack3DIcon className="h-4 w-4 text-purple-500" />
-                                  <span className="text-gray-600">{feature}</span>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-
-                  {/* Additional Information */}
-                  <div className="mt-8 p-4 bg-gray-50 rounded-lg">
-                    <div className="flex items-start space-x-3">
-                      <QuestionMarkCircleIcon className="h-5 w-5 text-purple-500 flex-shrink-0 mt-0.5" />
-                      <div className="text-sm text-gray-600">
-                        <p className="mb-2">
-                          Need help planning your space layout? Our event coordinators can help you create the perfect floor plan for your event.
-                        </p>
-                        <p>
-                          Contact us at{' '}
-                          <a href="tel:+1234567890" className="text-purple-600 hover:text-purple-700">
-                            (123) 456-7890
-                          </a>
-                          {' '}to schedule a consultation.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {activeTab === 'rules' && (
-                <div className="space-y-4">
-                  {venueRules.map((rule, index) => (
-                    <div key={index} className="bg-gray-50 p-4 rounded-lg">
-                      <h3 className="font-medium text-gray-900 mb-2">{rule.title}</h3>
-                      <p className="text-gray-600 text-sm">{rule.description}</p>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {activeTab === 'reviews' && (
-                <div className="space-y-8">
-                  <div className="bg-gray-50 p-6 rounded-lg mb-8">
-                    <div className="flex items-center justify-between mb-4">
-                      <div>
-                        <h3 className="text-xl font-light text-gray-900">Guest Reviews</h3>
-                        <p className="text-sm text-gray-600">Based on {mockReviews.length} reviews</p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <StarIcon className="h-6 w-6 text-yellow-400" />
-                        <span className="text-2xl font-light">{averageRating.toFixed(1)}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-6">
-                    {mockReviews.map((review) => (
-                      <div key={review.id} className="border-b border-gray-100 last:border-0 pb-6 last:pb-0">
-                        <div className="flex justify-between items-start mb-2">
-                          <div>
-                            <h4 className="font-medium text-gray-900">{review.author}</h4>
-                            <p className="text-sm text-gray-500">{review.eventType}</p>
-                          </div>
-                          <span className="text-sm text-gray-500">{review.date}</span>
-                        </div>
-                        
-                        <div className="flex items-center mb-2">
-                          {[...Array(5)].map((_, i) => (
-                            <StarIcon
-                              key={i}
-                              className={`h-4 w-4 ${
-                                i < review.rating ? 'text-yellow-400' : 'text-gray-200'
-                              }`}
-                            />
                           ))}
                         </div>
-                        
-                        <p className="text-gray-600 text-sm leading-relaxed">{review.comment}</p>
                       </div>
                     ))}
                   </div>
-                </div>
-              )}
-            </div>
-          </div>
+                )}
 
-          {/* Desktop Estimator - Right Side, Now Sticky Across All Tabs */}
-          <div className="hidden lg:block lg:col-span-4">
-            <div className="sticky top-6">
-              <div className="bg-gray-50 p-6 rounded-lg">
-                <VenueEstimator venue={venue} onBookNow={() => setIsBookingOpen(true)} />
+                {activeTab === 'amenities' && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
+                    {venue.amenities.map((amenity, index) => (
+                      <div 
+                        key={amenity.id || index} 
+                        className="flex items-center gap-3 p-3 md:p-4 bg-gray-50 rounded-lg"
+                      >
+                        {amenity.icon && <span className="text-purple-500">{amenity.icon}</span>}
+                        <span className="text-gray-700 font-medium">{amenity.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {activeTab === 'faq' && (
+                  <div className="space-y-6">
+                    {faqItems.map((item, index) => (
+                      <div 
+                        key={index}
+                        className="border-b border-gray-100 last:border-0 pb-6 last:pb-0"
+                      >
+                        <h3 className="text-lg font-medium text-gray-900 mb-2">
+                          {item.question}
+                        </h3>
+                        <p className="text-gray-600 text-sm leading-relaxed">
+                          {item.answer}
+                        </p>
+                      </div>
+                    ))}
+                    <div className="mt-8 p-4 bg-gray-50 rounded-lg">
+                      <p className="text-sm text-gray-500">
+                        Have more questions? Contact our events team at{' '}
+                        <a href="mailto:events@venue.com" className="text-purple-600 hover:text-purple-700">
+                          events@venue.com
+                        </a>
+                        {' '}or call us at{' '}
+                        <a href="tel:+1234567890" className="text-purple-600 hover:text-purple-700">
+                          (123) 456-7890
+                        </a>
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {activeTab === 'floorplan' && (
+                  <div className="space-y-8">
+                    <div className="prose max-w-none mb-8">
+                      <p className="text-gray-600">
+                        Explore our versatile spaces designed to accommodate events of any size. 
+                        Each floor plan can be customized to meet your specific needs.
+                      </p>
+                    </div>
+
+                    {floorPlans.map((plan) => (
+                      <div key={plan.id} className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                        <div className="grid md:grid-cols-2 gap-6 p-6">
+                          {/* Floor Plan Image */}
+                          <div className="relative aspect-[4/3] bg-gray-100 rounded-lg overflow-hidden">
+                            <img
+                              src={plan.image}
+                              alt={`${plan.name} floor plan`}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.src = 'https://via.placeholder.com/800x600?text=Floor+Plan';
+                              }}
+                            />
+                          </div>
+
+                          {/* Floor Plan Details */}
+                          <div className="space-y-6">
+                            <div>
+                              <h3 className="text-xl font-light text-gray-900 mb-2">{plan.name}</h3>
+                              <div className="grid grid-cols-2 gap-4 text-sm">
+                                <div>
+                                  <span className="text-gray-500">Square Footage:</span>
+                                  <p className="text-gray-900 font-medium">{plan.squareFeet.toLocaleString()} sq ft</p>
+                                </div>
+                                <div>
+                                  <span className="text-gray-500">Dimensions:</span>
+                                  <p className="text-gray-900 font-medium">{plan.dimensions}</p>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Capacity Section */}
+                            <div>
+                              <h4 className="text-sm font-medium text-gray-900 mb-3">Capacity by Setup</h4>
+                              <div className="grid grid-cols-2 gap-4 text-sm">
+                                {Object.entries(plan.capacity).map(([setup, count]) => (
+                                  <div key={setup} className="flex items-center space-x-2">
+                                    <UsersIcon className="h-4 w-4 text-purple-500" />
+                                    <span className="text-gray-600 capitalize">{setup}:</span>
+                                    <span className="font-medium text-gray-900">{count}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* Features Section */}
+                            <div>
+                              <h4 className="text-sm font-medium text-gray-900 mb-3">Key Features</h4>
+                              <div className="grid grid-cols-2 gap-2 text-sm">
+                                {plan.features.map((feature, index) => (
+                                  <div key={index} className="flex items-center space-x-2">
+                                    <Square3Stack3DIcon className="h-4 w-4 text-purple-500" />
+                                    <span className="text-gray-600">{feature}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+
+                    {/* Additional Information */}
+                    <div className="mt-8 p-4 bg-gray-50 rounded-lg">
+                      <div className="flex items-start space-x-3">
+                        <QuestionMarkCircleIcon className="h-5 w-5 text-purple-500 flex-shrink-0 mt-0.5" />
+                        <div className="text-sm text-gray-600">
+                          <p className="mb-2">
+                            Need help planning your space layout? Our event coordinators can help you create the perfect floor plan for your event.
+                          </p>
+                          <p>
+                            Contact us at{' '}
+                            <a href="tel:+1234567890" className="text-purple-600 hover:text-purple-700">
+                              (123) 456-7890
+                            </a>
+                            {' '}to schedule a consultation.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {activeTab === 'rules' && (
+                  <div className="space-y-4">
+                    {venueRules.map((rule, index) => (
+                      <div key={index} className="bg-gray-50 p-4 rounded-lg">
+                        <h3 className="font-medium text-gray-900 mb-2">{rule.title}</h3>
+                        <p className="text-gray-600 text-sm">{rule.description}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {activeTab === 'reviews' && (
+                  <div className="space-y-8">
+                    <div className="bg-gray-50 p-6 rounded-lg mb-8">
+                      <div className="flex items-center justify-between mb-4">
+                        <div>
+                          <h3 className="text-xl font-light text-gray-900">Guest Reviews</h3>
+                          <p className="text-sm text-gray-600">Based on {mockReviews.length} reviews</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <StarIcon className="h-6 w-6 text-yellow-400" />
+                          <span className="text-2xl font-light">{averageRating.toFixed(1)}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-6">
+                      {mockReviews.map((review) => (
+                        <div key={review.id} className="border-b border-gray-100 last:border-0 pb-6 last:pb-0">
+                          <div className="flex justify-between items-start mb-2">
+                            <div>
+                              <h4 className="font-medium text-gray-900">{review.author}</h4>
+                              <p className="text-sm text-gray-500">{review.eventType}</p>
+                            </div>
+                            <span className="text-sm text-gray-500">{review.date}</span>
+                          </div>
+                          
+                          <div className="flex items-center mb-2">
+                            {[...Array(5)].map((_, i) => (
+                              <StarIcon
+                                key={i}
+                                className={`h-4 w-4 ${
+                                  i < review.rating ? 'text-yellow-400' : 'text-gray-200'
+                                }`}
+                              />
+                            ))}
+                          </div>
+                          
+                          <p className="text-gray-600 text-sm leading-relaxed">{review.comment}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Right column - Sticky VenueEstimator */}
+            <div className="lg:col-span-4">
+              <div className="sticky top-6">
+                <div className="bg-gray-50 p-6 rounded-lg">
+                  <VenueEstimator venue={venue} onBookNow={() => setIsBookingOpen(true)} />
+                </div>
               </div>
             </div>
           </div>
