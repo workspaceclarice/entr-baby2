@@ -134,6 +134,66 @@ export default function VenueDetailsPage() {
     experience: "With years of experience hosting everything from corporate conferences to dream weddings, our dedicated team understands that every event is unique. We pride ourselves on our attention to detail and personalized service, ensuring your event runs smoothly from setup to cleanup."
   };
 
+  const floorPlans = [
+    {
+      id: 'fp1',
+      name: 'Main Hall',
+      image: '/images/floor-plans/main-hall.jpg',
+      squareFeet: 3000,
+      dimensions: "50' x 60'",
+      capacity: {
+        reception: 300,
+        theater: 250,
+        banquet: 200,
+        classroom: 150,
+      },
+      features: [
+        'Stage area',
+        'Built-in bar',
+        'Dance floor',
+        'High ceilings'
+      ]
+    },
+    {
+      id: 'fp2',
+      name: 'Garden Terrace',
+      image: '/images/floor-plans/garden-terrace.jpg',
+      squareFeet: 2000,
+      dimensions: "40' x 50'",
+      capacity: {
+        reception: 200,
+        theater: 150,
+        banquet: 120,
+        classroom: 100,
+      },
+      features: [
+        'Outdoor space',
+        'Covered pavilion',
+        'Garden lighting',
+        'Heating elements'
+      ]
+    },
+    {
+      id: 'fp3',
+      name: 'VIP Lounge',
+      image: '/images/floor-plans/vip-lounge.jpg',
+      squareFeet: 1000,
+      dimensions: "25' x 40'",
+      capacity: {
+        reception: 100,
+        theater: 80,
+        banquet: 60,
+        classroom: 40,
+      },
+      features: [
+        'Private entrance',
+        'Lounge seating',
+        'Private bar',
+        'AV equipment'
+      ]
+    }
+  ];
+
   return (
     <div className="min-h-screen bg-white pt-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -160,17 +220,21 @@ export default function VenueDetailsPage() {
           <div className={`${activeTab === 'overview' ? 'lg:col-span-8' : 'lg:col-span-12'}`}>
             <div className="mb-6">
               <h1 className="text-2xl md:text-3xl font-light text-gray-900 mb-4">{venue.name}</h1>
-              <div className="flex flex-wrap gap-3 md:gap-4 text-sm text-gray-500">
-                <div className="flex items-center">
-                  <MapPinIcon className="h-5 w-5 mr-2 text-purple-500" />
-                  <span>{venue.location.city}, {venue.location.state}</span>
+              <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-6 text-gray-600">
+                <div className="flex items-center gap-1">
+                  <MapPinIcon className="h-5 w-5" />
+                  <span>San Francisco, CA</span>
                 </div>
-                <div className="flex items-center">
-                  <UsersIcon className="h-5 w-5 mr-2 text-purple-500" />
-                  <span>Up to {venue.maxCapacity} guests</span>
+                <div className="flex items-center gap-1">
+                  <UsersIcon className="h-5 w-5" />
+                  <span>Up to 350 guests</span>
                 </div>
-                <div className="flex items-center">
-                  <StarIcon className="h-5 w-5 mr-2 text-yellow-400" />
+                <div className="flex items-center gap-1">
+                  <Square3Stack3DIcon className="h-5 w-5" />
+                  <span>{venue.squareFeet?.toLocaleString() || '3,000'} sq ft</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <StarIcon className="h-5 w-5" />
                   <span>{averageRating.toFixed(1)} ({venue.reviews.length} reviews)</span>
                 </div>
               </div>
@@ -315,7 +379,94 @@ export default function VenueDetailsPage() {
 
               {activeTab === 'floorplan' && (
                 <div className="space-y-8">
-                  {/* Add floor plan content here */}
+                  <div className="prose max-w-none mb-8">
+                    <p className="text-gray-600">
+                      Explore our versatile spaces designed to accommodate events of any size. 
+                      Each floor plan can be customized to meet your specific needs.
+                    </p>
+                  </div>
+
+                  {floorPlans.map((plan) => (
+                    <div key={plan.id} className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                      <div className="grid md:grid-cols-2 gap-6 p-6">
+                        {/* Floor Plan Image */}
+                        <div className="relative aspect-[4/3] bg-gray-100 rounded-lg overflow-hidden">
+                          <img
+                            src={plan.image}
+                            alt={`${plan.name} floor plan`}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.src = 'https://via.placeholder.com/800x600?text=Floor+Plan';
+                            }}
+                          />
+                        </div>
+
+                        {/* Floor Plan Details */}
+                        <div className="space-y-6">
+                          <div>
+                            <h3 className="text-xl font-light text-gray-900 mb-2">{plan.name}</h3>
+                            <div className="grid grid-cols-2 gap-4 text-sm">
+                              <div>
+                                <span className="text-gray-500">Square Footage:</span>
+                                <p className="text-gray-900 font-medium">{plan.squareFeet.toLocaleString()} sq ft</p>
+                              </div>
+                              <div>
+                                <span className="text-gray-500">Dimensions:</span>
+                                <p className="text-gray-900 font-medium">{plan.dimensions}</p>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Capacity Section */}
+                          <div>
+                            <h4 className="text-sm font-medium text-gray-900 mb-3">Capacity by Setup</h4>
+                            <div className="grid grid-cols-2 gap-4 text-sm">
+                              {Object.entries(plan.capacity).map(([setup, count]) => (
+                                <div key={setup} className="flex items-center space-x-2">
+                                  <UsersIcon className="h-4 w-4 text-purple-500" />
+                                  <span className="text-gray-600 capitalize">{setup}:</span>
+                                  <span className="font-medium text-gray-900">{count}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Features Section */}
+                          <div>
+                            <h4 className="text-sm font-medium text-gray-900 mb-3">Key Features</h4>
+                            <div className="grid grid-cols-2 gap-2 text-sm">
+                              {plan.features.map((feature, index) => (
+                                <div key={index} className="flex items-center space-x-2">
+                                  <Square3Stack3DIcon className="h-4 w-4 text-purple-500" />
+                                  <span className="text-gray-600">{feature}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* Additional Information */}
+                  <div className="mt-8 p-4 bg-gray-50 rounded-lg">
+                    <div className="flex items-start space-x-3">
+                      <QuestionMarkCircleIcon className="h-5 w-5 text-purple-500 flex-shrink-0 mt-0.5" />
+                      <div className="text-sm text-gray-600">
+                        <p className="mb-2">
+                          Need help planning your space layout? Our event coordinators can help you create the perfect floor plan for your event.
+                        </p>
+                        <p>
+                          Contact us at{' '}
+                          <a href="tel:+1234567890" className="text-purple-600 hover:text-purple-700">
+                            (123) 456-7890
+                          </a>
+                          {' '}to schedule a consultation.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
 

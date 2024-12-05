@@ -40,23 +40,35 @@ export interface Venue {
   id: string;
   name: string;
   description: string;
+  images: string[];
   location: {
     address: string;
     city: string;
     state: string;
     zip: string;
   };
-  images: string[];
+  capacity: number;
+  squareFeet: number;
+  amenities: {
+    id: string;
+    name: string;
+    icon?: string;
+  }[];
+  reviews: {
+    id: string;
+    rating: number;
+    comment: string;
+    author: string;
+    date: string;
+  }[];
   pricePerHour: number;
   pricePerGuest: number;
   minimumHours: number;
   maxCapacity: number;
   minCapacity: number;
-  amenities: Amenity[];
   rules: string[];
   cancellationPolicy: string;
   tags: string[];
-  reviews: any[]; // Replace with proper Review interface if needed
   availability: DailyAvailability;
   features: Feature[];
 }
