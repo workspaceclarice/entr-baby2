@@ -16,55 +16,49 @@ export interface VenueAddOn {
   priceType: 'flat' | 'per_hour' | 'per_guest';
 }
 
+export interface TimeSlot {
+  start: string;
+  end: string;
+}
+
+export interface DailyAvailability {
+  [key: string]: TimeSlot;
+}
+
+export interface Amenity {
+  id: string;
+  name: string;
+  icon: string;
+}
+
+export interface Feature {
+  name: string;
+  description: string;
+}
+
 export interface Venue {
   id: string;
   name: string;
   description: string;
-  images: string[];
-  pricePerHour: number;
-  pricePerGuest: number;
-  capacity: number;
-  maxCapacity: number;
-  minimumHours: number;
   location: {
     address: string;
     city: string;
     state: string;
     zip: string;
   };
-  amenities: {
-    id: string;
-    name: string;
-    icon: string;
-  }[];
+  images: string[];
+  pricePerHour: number;
+  pricePerGuest: number;
+  minimumHours: number;
+  maxCapacity: number;
+  minCapacity: number;
+  amenities: Amenity[];
   rules: string[];
-  reviews: {
-    id: string;
-    author: string;
-    rating: number;
-    date: string;
-    comment: string;
-  }[];
-  features: {
-    id: string;
-    name: string;
-    description: string;
-  }[];
-  availability: {
-    monday: string[];
-    tuesday: string[];
-    wednesday: string[];
-    thursday: string[];
-    friday: string[];
-    saturday: string[];
-    sunday: string[];
-  };
-  packages: VenuePackage[];
-  addOns: VenueAddOn[];
-  faq: {
-    question: string;
-    answer: string;
-  }[];
+  cancellationPolicy: string;
+  tags: string[];
+  reviews: any[]; // Replace with proper Review interface if needed
+  availability: DailyAvailability;
+  features: Feature[];
 }
 
 export {}; 

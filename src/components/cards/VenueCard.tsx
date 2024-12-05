@@ -1,78 +1,54 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { StarIcon } from '@heroicons/react/24/solid';
-import { MapPinIcon, UserGroupIcon } from '@heroicons/react/24/outline';
+import { Venue } from '../../types/venue';
+import { StarIcon, MapPinIcon, UsersIcon } from '@heroicons/react/24/outline';
 
 interface VenueCardProps {
-  id: string;
-  title: string;
-  category: string;
-  rating: number;
-  reviews: number;
-  image: string;
-  price: string;
-  location: string;
-  capacity: string;
+  venue: Venue;
 }
 
-const VenueCard: React.FC<VenueCardProps> = ({
-  id,
-  title,
-  category,
-  rating,
-  reviews,
-  image,
-  price,
-  location,
-  capacity
-}) => {
+const VenueCard: React.FC<VenueCardProps> = ({ venue }) => {
   return (
-    <Link to={`/venues/${id}`} className="group">
-      <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
-        <div className="aspect-[4/3] relative overflow-hidden">
-          <img
-            src={image}
-            alt={title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-          />
-          <div className="absolute top-4 left-4">
-            <span className="inline-block px-3 py-1 bg-purple-600 text-white text-sm rounded-full">
-              {category}
-            </span>
-          </div>
-        </div>
-        <div className="p-4">
-          <h3 className="text-lg font-medium text-gray-900 mb-2 group-hover:text-purple-600">
-            {title}
-          </h3>
-          <div className="flex items-center mb-2">
-            <div className="flex items-center text-yellow-400">
-              {[...Array(5)].map((_, i) => (
-                <StarIcon
-                  key={i}
-                  className={`h-4 w-4 ${i < rating ? 'text-yellow-400' : 'text-gray-300'}`}
-                />
-              ))}
-            </div>
-            <span className="text-sm text-gray-500 ml-2">({reviews} reviews)</span>
-          </div>
-          <div className="space-y-2">
-            <div className="flex items-center text-gray-500">
-              <MapPinIcon className="h-4 w-4 mr-2" />
-              <span className="text-sm">{location}</span>
-            </div>
-            <div className="flex items-center text-gray-500">
-              <UserGroupIcon className="h-4 w-4 mr-2" />
-              <span className="text-sm">{capacity}</span>
-            </div>
-          </div>
-          <div className="mt-4 flex items-center justify-between">
-            <span className="text-sm font-medium text-gray-900">{price}</span>
-            <span className="text-sm text-gray-500">per hour</span>
-          </div>
+    <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+      <div className="relative aspect-[4/3]">
+        <img
+          src={venue.images[0]}
+          alt={venue.name}
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute top-4 left-4">
+          <span className="inline-block px-3 py-1 bg-purple-600 text-white text-sm rounded-full">
+            ${venue.pricePerHour}/hr
+          </span>
         </div>
       </div>
-    </Link>
+      
+      <div className="p-4">
+        <h3 className="text-lg font-medium text-gray-900 mb-2">{venue.name}</h3>
+        
+        <div className="space-y-2">
+          <div className="flex items-center text-sm text-gray-500">
+            <MapPinIcon className="h-4 w-4 mr-1" />
+            {venue.location.city}, {venue.location.state}
+          </div>
+          <div className="flex items-center text-sm text-gray-500">
+            <UsersIcon className="h-4 w-4 mr-1" />
+            Up to {venue.maxCapacity} guests
+          </div>
+        </div>
+
+        {/* Tags */}
+        <div className="flex flex-wrap gap-2 mt-3">
+          {venue.amenities.slice(0, 3).map((amenity, index) => (
+            <span
+              key={index}
+              className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-50 text-purple-700"
+            >
+              {amenity.name}
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 };
 
