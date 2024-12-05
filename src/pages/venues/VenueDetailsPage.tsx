@@ -1,20 +1,60 @@
 import React, { useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { 
   StarIcon, 
   MapPinIcon, 
   UsersIcon, 
-  ChevronLeftIcon, 
   Square3Stack3DIcon, 
-  QuestionMarkCircleIcon, 
-  HomeIcon, 
+  QuestionMarkCircleIcon,
   XMarkIcon 
 } from '@heroicons/react/24/outline';
 import { venues } from '../../data/venues';
-import VenueGallery from '../../components/venues/VenueGallery';
 import VenueEstimator from '../../components/venues/VenueEstimator';
 import VenueBookingFlow from '../../components/venues/VenueBookingFlow';
 import { Breadcrumb } from '../../components/common';
+
+const mockReviews = [
+  {
+    id: '1',
+    author: 'Sarah Johnson',
+    date: '2024-02-15',
+    rating: 5,
+    comment: `Beautiful venue! Perfect for our wedding. The staff was incredibly helpful and the space exceeded our expectations. The lighting and acoustics were perfect, and our guests couldn't stop complimenting the elegant atmosphere.`,
+    eventType: 'Wedding'
+  },
+  {
+    id: '2',
+    author: 'Michael Chen',
+    date: '2024-01-30',
+    rating: 4,
+    comment: `Great location and amenities. The AV setup was perfect for our corporate presentation, and the staff was very professional. The only minor issue was parking, but otherwise a fantastic experience.`,
+    eventType: 'Corporate Event'
+  },
+  {
+    id: '3',
+    author: 'Emily Rodriguez',
+    date: '2024-01-15',
+    rating: 5,
+    comment: `Hosted our corporate event here and received numerous compliments from attendees. The space was versatile and easily accommodated our breakout sessions. The catering options were excellent.`,
+    eventType: 'Corporate Event'
+  },
+  {
+    id: '4',
+    author: 'David Thompson',
+    date: '2024-01-10',
+    rating: 5,
+    comment: `Perfect venue for our holiday party! The decorations and lighting created the perfect ambiance. The staff was attentive and helped with all our special requests.`,
+    eventType: 'Holiday Party'
+  },
+  {
+    id: '5',
+    author: 'Lisa Patel',
+    date: '2023-12-28',
+    rating: 4,
+    comment: `Beautiful space with great natural light. The getting-ready rooms were spacious and well-appointed. Would highly recommend for any special occasion.`,
+    eventType: 'Wedding'
+  }
+];
 
 export default function VenueDetailsPage() {
   const { id } = useParams();
@@ -38,6 +78,7 @@ export default function VenueDetailsPage() {
     { id: 'faq', name: 'FAQ' },
     { id: 'floorplan', name: 'Floor Plan' },
     { id: 'rules', name: 'Policies' },
+    { id: 'reviews', name: 'Reviews' },
   ];
 
   const galleryPhotos = [
@@ -216,30 +257,38 @@ export default function VenueDetailsPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
-          <div className={`${activeTab === 'overview' ? 'lg:col-span-8' : 'lg:col-span-12'}`}>
-            <div className="mb-6">
-              <h1 className="text-2xl md:text-3xl font-light text-gray-900 mb-4">{venue.name}</h1>
-              <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-6 text-gray-600">
-                <div className="flex items-center gap-1">
-                  <MapPinIcon className="h-5 w-5" />
-                  <span>San Francisco, CA</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <UsersIcon className="h-5 w-5" />
-                  <span>Up to 350 guests</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Square3Stack3DIcon className="h-5 w-5" />
-                  <span>{venue.squareFeet?.toLocaleString() || '3,000'} sq ft</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <StarIcon className="h-5 w-5" />
-                  <span>{averageRating.toFixed(1)} ({venue.reviews.length} reviews)</span>
-                </div>
-              </div>
+        <div className="mb-6">
+          <h1 className="text-2xl md:text-3xl font-light text-gray-900 mb-4">{venue.name}</h1>
+          
+          {/* Stats Bar - Wrapped for mobile */}
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-gray-600 text-sm">
+            <div className="flex items-center gap-1">
+              <MapPinIcon className="h-5 w-5" />
+              <span className="font-light">{venue.location.city}, {venue.location.state}</span>
             </div>
+            <div className="flex items-center gap-1">
+              <UsersIcon className="h-5 w-5" />
+              <span className="font-light">Up to {venue.maxCapacity} guests</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Square3Stack3DIcon className="h-5 w-5" />
+              <span className="font-light">{venue.squareFeet?.toLocaleString() || '3,000'} sq ft</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <StarIcon className="h-5 w-5" />
+              <span className="font-light">{averageRating.toFixed(1)} ({venue.reviews.length} reviews)</span>
+            </div>
+          </div>
+        </div>
 
+        <div className="block lg:hidden mb-6">
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <VenueEstimator venue={venue} onBookNow={() => setIsBookingOpen(true)} />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
+          <div className="lg:col-span-8">
             <div className="border-b mb-6 md:mb-8">
               <nav className="flex overflow-x-auto scrollbar-hide -mb-px">
                 {tabs.map((tab) => (
@@ -279,26 +328,19 @@ export default function VenueDetailsPage() {
                     ))}
                   </div>
 
-                  <div className="pt-8">
-                    <h3 className="text-xl font-light text-gray-900 mb-6">Guest Reviews</h3>
-                    <div className="space-y-8">
-                      {venue.reviews.slice(0, 3).map((review, index) => (
-                        <div key={index} className="space-y-2">
-                          <div className="flex items-center">
-                            <div className="flex items-center">
-                              {[...Array(5)].map((_, i) => (
-                                <StarIcon
-                                  key={i}
-                                  className={`h-4 w-4 ${i < review.rating ? 'text-yellow-400' : 'text-gray-200'}`}
-                                />
-                              ))}
-                            </div>
-                            <span className="ml-2 text-sm text-gray-500">{review.date}</span>
-                          </div>
-                          <p className="text-gray-600 text-sm">{review.comment}</p>
-                          <div className="text-sm text-gray-500">- {review.author}</div>
-                        </div>
-                      ))}
+                  {/* Location Map Section */}
+                  <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                    <div className="p-6">
+                      <h3 className="text-xl font-light text-gray-900 mb-4">Location</h3>
+                      <div className="mb-4">
+                        <p className="text-gray-600">
+                          {venue.location.address}<br />
+                          {venue.location.city}, {venue.location.state} {venue.location.zip}
+                        </p>
+                      </div>
+                      <div className="w-full h-[400px] bg-gray-100 rounded-lg flex items-center justify-center">
+                        <p className="text-gray-500">Map Component Goes Here</p>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -480,19 +522,61 @@ export default function VenueDetailsPage() {
                   ))}
                 </div>
               )}
+
+              {activeTab === 'reviews' && (
+                <div className="space-y-8">
+                  <div className="bg-gray-50 p-6 rounded-lg mb-8">
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <h3 className="text-xl font-light text-gray-900">Guest Reviews</h3>
+                        <p className="text-sm text-gray-600">Based on {mockReviews.length} reviews</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <StarIcon className="h-6 w-6 text-yellow-400" />
+                        <span className="text-2xl font-light">{averageRating.toFixed(1)}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-6">
+                    {mockReviews.map((review) => (
+                      <div key={review.id} className="border-b border-gray-100 last:border-0 pb-6 last:pb-0">
+                        <div className="flex justify-between items-start mb-2">
+                          <div>
+                            <h4 className="font-medium text-gray-900">{review.author}</h4>
+                            <p className="text-sm text-gray-500">{review.eventType}</p>
+                          </div>
+                          <span className="text-sm text-gray-500">{review.date}</span>
+                        </div>
+                        
+                        <div className="flex items-center mb-2">
+                          {[...Array(5)].map((_, i) => (
+                            <StarIcon
+                              key={i}
+                              className={`h-4 w-4 ${
+                                i < review.rating ? 'text-yellow-400' : 'text-gray-200'
+                              }`}
+                            />
+                          ))}
+                        </div>
+                        
+                        <p className="text-gray-600 text-sm leading-relaxed">{review.comment}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
-          {activeTab === 'overview' && (
-            <div className="lg:col-span-4">
-              <div className="sticky top-24">
-                <VenueEstimator 
-                  venue={venue}
-                  onBookNow={() => setIsBookingOpen(true)}
-                />
+          {/* Desktop Estimator - Right Side, Now Sticky Across All Tabs */}
+          <div className="hidden lg:block lg:col-span-4">
+            <div className="sticky top-6">
+              <div className="bg-gray-50 p-6 rounded-lg">
+                <VenueEstimator venue={venue} onBookNow={() => setIsBookingOpen(true)} />
               </div>
             </div>
-          )}
+          </div>
         </div>
       </div>
 
@@ -517,6 +601,7 @@ export default function VenueDetailsPage() {
         </div>
       )}
 
+      {/* Booking Flow Modal */}
       <VenueBookingFlow
         venue={venue}
         isOpen={isBookingOpen}

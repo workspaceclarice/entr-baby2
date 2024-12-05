@@ -1,21 +1,17 @@
-import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { Box, Container, Tab, Tabs, useMediaQuery, useTheme, Typography } from '@mui/material';
 import { venues } from '../../data/venues';
-import VenueDetails from '../../components/venues/VenueDetails';
-import VenuePhotos from '../../components/venues/VenuePhotos';
 import VenueAmenities from '../../components/venues/VenueAmenities';
-import VenueRules from '../../components/venues/VenueRules';
-import VenueReviews from '../../components/venues/VenueReviews';
 import VenueEstimator from '../../components/venues/VenueEstimator';
 import NotFound from '../NotFound';
 
 function VenuesPage() {
   const { id } = useParams();
-  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState(0);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const [isBookingOpen, setIsBookingOpen] = useState(false);
 
   const venue = venues.find(v => v.id === id);
   if (!venue) return <NotFound />;
@@ -25,21 +21,13 @@ function VenuesPage() {
   };
 
   const handleBookNow = () => {
-    navigate(`/book/${venue.id}`);
+    setIsBookingOpen(true);
   };
 
   const renderTabContent = () => {
     switch (activeTab) {
       case 0:
-        return <VenueDetails venue={venue} hideTitle />;
-      case 1:
-        return <VenuePhotos venue={venue} />;
-      case 2:
         return <VenueAmenities venue={venue} />;
-      case 3:
-        return <VenueRules venue={venue} />;
-      case 4:
-        return <VenueReviews venue={venue} />;
       default:
         return null;
     }
@@ -89,11 +77,7 @@ function VenuesPage() {
               scrollButtons="auto"
               aria-label="venue tabs"
             >
-              <Tab label="Details" />
-              <Tab label="Photos" />
               <Tab label="Amenities" />
-              <Tab label="Rules" />
-              <Tab label="Reviews" />
             </Tabs>
           </Box>
 
