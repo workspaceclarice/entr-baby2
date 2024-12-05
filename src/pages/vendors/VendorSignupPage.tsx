@@ -33,7 +33,11 @@ const VendorSignupPage: React.FC = () => {
     try {
       setError('');
       setLoading(true);
-      await signup(formData.email, formData.password, 'vendor');
+      await signup(formData.email, formData.password, {
+        type: 'vendor',
+        email: formData.email,
+        vendorStatus: 'pending'
+      });
       navigate('/vendor/dashboard');
     } catch (err) {
       setError('Failed to create an account');

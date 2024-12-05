@@ -1,139 +1,88 @@
-import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { auth, googleProvider } from '../config/firebase';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, signOut, User, UserCredential } from 'firebase/auth';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { User, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { auth, db } from '../config/firebase';
+import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 
 export interface BaseProfile {
   id: string;
   email: string;
-  firstName: string;
-  lastName: string;
-  profileImage: string;
-  displayName?: string;
-  userType: 'user' | 'vendor';
+  firstName?: string;
+  lastName?: string;
   phone?: string;
+  profileImage?: string;
+  displayName?: string;
+}
+
+export interface CustomerProfile extends BaseProfile {
+  type: 'customer';
 }
 
 export interface VendorProfile extends BaseProfile {
-  userType: 'vendor';
+  type: 'vendor';
   businessName?: string;
   serviceType?: string;
-  vendorStatus?: 'active' | 'pending' | 'inactive';
   businessAddress?: string;
   businessDescription?: string;
   taxId?: string;
+  vendorStatus?: 'pending' | 'active' | 'suspended';
   documents?: Array<{
     name: string;
     url: string;
     type: string;
   }>;
-  phone: string;
-  introduction?: string;
-  website?: string;
-  yearFounded?: string;
-  teamSize?: string;
-  isBackgroundChecked?: boolean;
-  location?: string;
-  featuredProjects?: Array<{
-    id: string;
-    title: string;
-    imageUrl: string;
-    description?: string;
-  }>;
-  socialMedia?: {
-    facebook?: string;
-    instagram?: string;
-    twitter?: string;
-  };
 }
 
-export interface CustomerProfile extends BaseProfile {
-  userType: 'user';
-  preferences?: string[];
-  phone?: string;
-}
+export type UserProfile = CustomerProfile | VendorProfile;
 
 interface AuthContextType {
   currentUser: User | null;
-  userProfile: VendorProfile | CustomerProfile | null;
+  userProfile: UserProfile | null;
   loading: boolean;
-  isVendor: boolean;
   login: (email: string, password: string) => Promise<void>;
-  signup: (email: string, password: string, userType: 'user' | 'vendor') => Promise<void>;
+  signup: (email: string, password: string, profileData: Partial<UserProfile>) => Promise<void>;
+  loginWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
-  loginWithGoogle: () => Promise<UserCredential>;
-  googleSignIn: () => Promise<void>;
-  updateUserProfile: (profile: VendorProfile | CustomerProfile) => Promise<void>;
+  updateUserProfile: (data: Partial<UserProfile>) => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | null>(null);
+const AuthContext = createContext<AuthContextType>({
+  currentUser: null,
+  userProfile: null,
+  loading: true,
+  login: async () => {},
+  signup: async () => {},
+  loginWithGoogle: async () => {},
+  logout: async () => {},
+  updateUserProfile: async () => {},
+});
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
+export function useAuth() {
+  return useContext(AuthContext);
+}
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+export function AuthProvider({ children }: AuthProviderProps) {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [userProfile, setUserProfile] = useState<VendorProfile | CustomerProfile | null>(null);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
 
-  const isVendor = useMemo(() => userProfile?.userType === 'vendor', [userProfile]);
-
-  const signup = async (email: string, password: string, userType: 'user' | 'vendor') => {
-    await createUserWithEmailAndPassword(auth, email, password);
-  };
-
-  const login = async (email: string, password: string) => {
-    await signInWithEmailAndPassword(auth, email, password);
-  };
-
-  const loginWithGoogle = async () => {
-    const result = await signInWithPopup(auth, googleProvider);
-    // Here you might want to create/update user profile in your database
-    navigate('/dashboard');
-    return result;
-  };
-
-  const googleSignIn = async () => {
-    try {
-      await signInWithPopup(auth, googleProvider);
-      navigate('/vendor/dashboard');
-    } catch (error) {
-      console.error('Google sign in error:', error);
-      throw error;
+  const fetchUserProfile = async (user: User) => {
+    const userDoc = await getDoc(doc(db, 'users', user.uid));
+    if (userDoc.exists()) {
+      setUserProfile({ id: user.uid, ...userDoc.data() } as UserProfile);
     }
   };
 
-  const logout = async () => {
-    await signOut(auth);
-    setUserProfile(null);
-    navigate('/');
-  };
-
-  const updateUserProfile = async (profile: VendorProfile | CustomerProfile) => {
-    setUserProfile(profile);
-  };
-
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setCurrentUser(user);
       if (user) {
-        const nameParts = user.displayName?.split(' ') || ['', ''];
-        setUserProfile({
-          id: user.uid,
-          email: user.email || '',
-          firstName: nameParts[0],
-          lastName: nameParts[1] || '',
-          profileImage: user.photoURL || `https://ui-avatars.com/api/?name=${nameParts[0]}+${nameParts[1]}`,
-          userType: 'user',
-          displayName: user.displayName || undefined,
-          phone: user.phoneNumber || ''
-        } as CustomerProfile);
+        await fetchUserProfile(user);
+      } else {
+        setUserProfile(null);
       }
       setLoading(false);
     });
@@ -141,17 +90,58 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return unsubscribe;
   }, []);
 
+  const login = async (email: string, password: string) => {
+    const result = await signInWithEmailAndPassword(auth, email, password);
+    await fetchUserProfile(result.user);
+  };
+
+  const signup = async (email: string, password: string, profileData: Partial<UserProfile>) => {
+    const result = await createUserWithEmailAndPassword(auth, email, password);
+    const userDocRef = doc(db, 'users', result.user.uid);
+    await setDoc(userDocRef, {
+      ...profileData,
+      email,
+      id: result.user.uid,
+    });
+    await fetchUserProfile(result.user);
+  };
+
+  const loginWithGoogle = async () => {
+    const provider = new GoogleAuthProvider();
+    const result = await signInWithPopup(auth, provider);
+    const userDocRef = doc(db, 'users', result.user.uid);
+    const userDoc = await getDoc(userDocRef);
+    
+    if (!userDoc.exists()) {
+      await setDoc(userDocRef, {
+        email: result.user.email,
+        firstName: result.user.displayName?.split(' ')[0],
+        lastName: result.user.displayName?.split(' ')[1],
+        profileImage: result.user.photoURL,
+        id: result.user.uid,
+        type: 'customer',
+      });
+    }
+    
+    await fetchUserProfile(result.user);
+  };
+
+  const updateUserProfile = async (data: Partial<UserProfile>) => {
+    if (!currentUser) throw new Error('No user logged in');
+    const userDocRef = doc(db, 'users', currentUser.uid);
+    await updateDoc(userDocRef, data);
+    await fetchUserProfile(currentUser);
+  };
+
   const value = {
     currentUser,
     userProfile,
     loading,
-    isVendor,
     login,
     signup,
-    logout,
     loginWithGoogle,
-    googleSignIn,
-    updateUserProfile
+    logout: () => auth.signOut(),
+    updateUserProfile,
   };
 
   return (
@@ -159,6 +149,4 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       {!loading && children}
     </AuthContext.Provider>
   );
-};
-
-export default AuthContext; 
+} 

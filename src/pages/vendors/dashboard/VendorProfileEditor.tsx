@@ -59,7 +59,7 @@ declare module '../../../contexts/AuthContext' {
 }
 
 const isVendorProfile = (profile: VendorProfile | CustomerProfile | null): profile is VendorProfile => {
-  return profile?.userType === 'vendor';
+  return profile?.type === 'vendor';
 };
 
 const VendorProfileEditor: React.FC = () => {
