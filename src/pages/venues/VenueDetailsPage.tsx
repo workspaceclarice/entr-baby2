@@ -157,7 +157,7 @@ export default function VenueDetailsPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
-          <div className="lg:col-span-8">
+          <div className={`${activeTab === 'overview' ? 'lg:col-span-8' : 'lg:col-span-12'}`}>
             <div className="mb-6">
               <h1 className="text-2xl md:text-3xl font-light text-gray-900 mb-4">{venue.name}</h1>
               <div className="flex flex-wrap gap-3 md:gap-4 text-sm text-gray-500">
@@ -332,14 +332,16 @@ export default function VenueDetailsPage() {
             </div>
           </div>
 
-          <div className="lg:col-span-4">
-            <div className="sticky top-24 bg-gray-50 rounded-lg p-4 md:p-6">
-              <VenueEstimator 
-                venue={venue}
-                onBookNow={() => setIsBookingOpen(true)}
-              />
+          {activeTab === 'overview' && (
+            <div className="lg:col-span-4">
+              <div className="sticky top-24">
+                <VenueEstimator 
+                  venue={venue}
+                  onBookNow={() => setIsBookingOpen(true)}
+                />
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
 

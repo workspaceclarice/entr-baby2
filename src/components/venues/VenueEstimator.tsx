@@ -1,81 +1,90 @@
-import React, { useState } from 'react';
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { Venue } from '../../types/venue';
+import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
-import { Venue, VenuePackage, VenueAddOn } from '../../types/venue';
-import { CheckIcon } from '@heroicons/react/24/outline';
 
-interface VenueEstimatorProps {
+export interface VenueEstimatorProps {
   venue: Venue;
   onBookNow: () => void;
 }
 
-export default function VenueEstimator({ venue, onBookNow }: VenueEstimatorProps) {
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [startTime, setStartTime] = useState<string>('');
-  const [duration, setDuration] = useState(4);
-  const [selectedPackage, setSelectedPackage] = useState<VenuePackage | null>(null);
-  const [guests, setGuests] = useState(50);
-  const [selectedAddOns, setSelectedAddOns] = useState<string[]>([]);
+interface AdditionalItem {
+  id: string;
+  name: string;
+  price: number;
+  selected: boolean;
+}
 
-  // Calculate end time based on start time and duration
-  const getEndTime = () => {
-    if (!startTime) return '';
-    const [hours, minutes] = startTime.split(':').map(Number);
-    const endHours = hours + duration;
-    return `${endHours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+const VenueEstimator: React.FC<VenueEstimatorProps> = ({ venue, onBookNow }) => {
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [startTime, setStartTime] = useState('');
+  const [duration, setDuration] = useState(4);
+  const [guestCount, setGuestCount] = useState(50);
+  const [timeError, setTimeError] = useState<string | null>(null);
+  const [additionalItems, setAdditionalItems] = useState<AdditionalItem[]>([
+    { id: 'setup', name: 'Setup & Cleanup', price: 250, selected: false },
+    { id: 'security', name: 'Security Staff', price: 200, selected: false },
+    { id: 'av', name: 'AV Equipment', price: 300, selected: false },
+    { id: 'decor', name: 'Basic Decor Package', price: 400, selected: false },
+  ]);
+
+  const validateTime = (time: string) => {
+    if (!time) return null;
+    const hour = parseInt(time.split(':')[0]);
+    if (hour < 8 || hour > 22) {
+      return "Booking hours are between 8 AM and 10 PM";
+    }
+    return null;
   };
 
+  useEffect(() => {
+    const error = validateTime(startTime);
+    setTimeError(error);
+  }, [startTime]);
+
   const calculateTotal = () => {
-    let total = 0;
+    const basePrice = venue.pricePerHour * duration;
+    const guestFee = venue.pricePerGuest * guestCount;
+    const additionalItemsTotal = additionalItems
+      .filter(item => item.selected)
+      .reduce((sum, item) => sum + item.price, 0);
 
-    // Package price
-    if (selectedPackage) {
-      total += selectedPackage.price;
-    } else {
-      // Base pricing if no package selected
-      total += venue.pricePerHour * duration;
-      total += venue.pricePerGuest * guests;
-    }
+    return basePrice + guestFee + additionalItemsTotal;
+  };
 
-    // Add-ons
-    selectedAddOns.forEach(addOnId => {
-      const addOn = venue.addOns.find(a => a.id === addOnId);
-      if (addOn) {
-        switch (addOn.priceType) {
-          case 'flat':
-            total += addOn.price;
-            break;
-          case 'per_hour':
-            total += addOn.price * duration;
-            break;
-          case 'per_guest':
-            total += addOn.price * guests;
-            break;
-        }
-      }
-    });
+  const toggleItem = (itemId: string) => {
+    setAdditionalItems(items =>
+      items.map(item =>
+        item.id === itemId ? { ...item, selected: !item.selected } : item
+      )
+    );
+  };
 
-    return total;
+  const handleBookNow = () => {
+    onBookNow();
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6 sticky top-8">
-      <div className="space-y-6">
-        {/* Date & Time Selection */}
+    <div className="bg-white rounded-xl shadow-sm p-6">
+      {/* Date and Time Selection */}
+      <div className="mb-6">
+        <h3 className="text-lg font-medium text-gray-900 mb-4">Select Date & Time</h3>
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Event Date
+              Date
             </label>
             <DatePicker
               selected={selectedDate}
-              onChange={setSelectedDate}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              placeholderText="Select date"
+              onChange={(date) => setSelectedDate(date)}
               minDate={new Date()}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              placeholderText="Select date"
             />
           </div>
-
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -84,143 +93,103 @@ export default function VenueEstimator({ venue, onBookNow }: VenueEstimatorProps
               <select
                 value={startTime}
                 onChange={(e) => setStartTime(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
+                  timeError ? 'border-red-300' : 'border-gray-300'
+                }`}
               >
                 <option value="">Select time</option>
-                {venue.availability[selectedDate?.getDay() === 0 ? 'sunday' : 
-                  selectedDate?.getDay() === 1 ? 'monday' :
-                  selectedDate?.getDay() === 2 ? 'tuesday' :
-                  selectedDate?.getDay() === 3 ? 'wednesday' :
-                  selectedDate?.getDay() === 4 ? 'thursday' :
-                  selectedDate?.getDay() === 5 ? 'friday' : 'saturday']
-                  ?.map(time => (
-                    <option key={time} value={time}>{time}</option>
-                  ))
-                }
+                {Array.from({ length: 15 }, (_, i) => i + 8).map((hour) => (
+                  <option key={hour} value={`${hour}:00`}>
+                    {hour > 12 ? `${hour - 12}:00 PM` : `${hour}:00 AM`}
+                  </option>
+                ))}
               </select>
             </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                End Time
+                Duration
               </label>
-              <input
-                type="text"
-                value={getEndTime()}
-                disabled
-                className="w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-gray-600"
-              />
+              <select
+                value={duration}
+                onChange={(e) => setDuration(parseInt(e.target.value))}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              >
+                {[4, 5, 6, 7, 8].map((hours) => (
+                  <option key={hours} value={hours}>{hours} hours</option>
+                ))}
+              </select>
             </div>
           </div>
+          {timeError && (
+            <div className="flex items-center text-sm text-red-600">
+              <ExclamationCircleIcon className="h-4 w-4 mr-1" />
+              {timeError}
+            </div>
+          )}
+        </div>
+      </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Duration
-            </label>
-            <select
-              value={duration}
-              onChange={(e) => setDuration(Number(e.target.value))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+      {/* Guest Count */}
+      <div className="mb-6">
+        <h3 className="text-lg font-medium text-gray-900 mb-4">Number of Guests</h3>
+        <input
+          type="number"
+          value={guestCount}
+          onChange={(e) => setGuestCount(Math.min(parseInt(e.target.value), venue.maxCapacity))}
+          min="1"
+          max={venue.maxCapacity}
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+        />
+        <p className="text-sm text-gray-500 mt-1">Maximum capacity: {venue.maxCapacity} guests</p>
+      </div>
+
+      {/* Additional Items */}
+      <div className="mb-6">
+        <h3 className="text-lg font-medium text-gray-900 mb-4">Additional Services</h3>
+        <div className="space-y-3">
+          {additionalItems.map((item) => (
+            <label
+              key={item.id}
+              className="flex items-center justify-between p-3 rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors"
             >
-              {[2, 3, 4, 5, 6, 8].map(hours => (
-                <option key={hours} value={hours}>{hours} hours</option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        {/* Packages Section */}
-        <div>
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Select a Package</h3>
-          <div className="space-y-4">
-            {venue.packages.map((pkg) => (
-              <div
-                key={pkg.id}
-                onClick={() => setSelectedPackage(selectedPackage?.id === pkg.id ? null : pkg)}
-                className={`
-                  cursor-pointer rounded-lg border-2 p-4 transition-colors
-                  ${selectedPackage?.id === pkg.id 
-                    ? 'border-purple-500 bg-purple-50' 
-                    : 'border-gray-200 hover:border-purple-200'
-                  }
-                `}
-              >
-                <div className="flex justify-between items-start mb-2">
-                  <div>
-                    <h4 className="font-medium text-gray-900">{pkg.name}</h4>
-                    <p className="text-sm text-gray-500">{pkg.description}</p>
-                  </div>
-                  <span className="font-medium text-gray-900">${pkg.price}</span>
-                </div>
-                <ul className="mt-4 space-y-2">
-                  {pkg.features.map((feature, index) => (
-                    <li key={index} className="flex items-center text-sm text-gray-600">
-                      <CheckIcon className="h-4 w-4 text-green-500 mr-2" />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Add-ons Section */}
-        <div>
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Additional Services</h3>
-          <div className="space-y-3">
-            {venue.addOns.map((addOn) => (
-              <label
-                key={addOn.id}
-                className="flex items-start p-3 border rounded-lg cursor-pointer hover:bg-gray-50"
-              >
+              <div className="flex items-center">
                 <input
                   type="checkbox"
-                  checked={selectedAddOns.includes(addOn.id)}
-                  onChange={(e) => {
-                    setSelectedAddOns(prev => 
-                      e.target.checked 
-                        ? [...prev, addOn.id]
-                        : prev.filter(id => id !== addOn.id)
-                    );
-                  }}
-                  className="mt-1 h-4 w-4 text-purple-600 rounded"
+                  checked={item.selected}
+                  onChange={() => toggleItem(item.id)}
+                  className="h-4 w-4 text-purple-600 rounded border-gray-300 focus:ring-purple-500"
                 />
-                <div className="ml-3 flex-1">
-                  <div className="flex justify-between">
-                    <span className="font-medium text-gray-900">{addOn.name}</span>
-                    <span className="text-gray-900">
-                      ${addOn.price}
-                      {addOn.priceType === 'per_hour' && '/hour'}
-                      {addOn.priceType === 'per_guest' && '/guest'}
-                    </span>
-                  </div>
-                  <p className="text-sm text-gray-500">{addOn.description}</p>
-                </div>
-              </label>
-            ))}
-          </div>
+                <span className="ml-3 text-gray-900">{item.name}</span>
+              </div>
+              <span className="text-gray-600">${item.price}</span>
+            </label>
+          ))}
         </div>
+      </div>
 
-        {/* Price Summary */}
-        <div className="border-t pt-4">
-          <div className="flex justify-between text-lg font-medium text-gray-900">
-            <span>Total Estimate</span>
-            <span>${calculateTotal()}</span>
-          </div>
-          <p className="text-sm text-gray-500 mt-1">
-            Includes venue rental, selected package, and add-ons
-          </p>
+      {/* Total and Book Button */}
+      <div className="border-t pt-6">
+        <div className="flex justify-between items-center mb-4">
+          <span className="text-gray-900 font-medium">Estimated Total</span>
+          <span className="text-2xl font-semibold text-gray-900">
+            ${calculateTotal()}
+          </span>
         </div>
-
-        {/* Book Now Button */}
         <button
-          onClick={onBookNow}
-          className="w-full bg-purple-600 text-white py-3 px-4 rounded-md hover:bg-purple-700 transition-colors"
+          onClick={handleBookNow}
+          disabled={!selectedDate || !startTime || !!timeError}
+          className="w-full py-3 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
         >
           Book Now
         </button>
+        {(!selectedDate || !startTime || timeError) && (
+          <p className="text-sm text-gray-500 text-center mt-2">
+            {timeError || 'Please select date and time to continue'}
+          </p>
+        )}
       </div>
     </div>
   );
-} 
+};
+
+export default VenueEstimator; 
