@@ -1,20 +1,5 @@
 {
-  "version": 2,
-  "framework": "create-react-app",
-  "buildCommand": "npm run build",
-  "devCommand": "npm start",
-  "installCommand": "npm install --legacy-peer-deps",
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
-    }
-  ],
-  "env": {
-    "CI": "false",
-    "DISABLE_ESLINT_PLUGIN": "true",
-    "SKIP_PREFLIGHT_CHECK": "true",
-    "NODE_VERSION": "18",
-    "NODE_OPTIONS": "--openssl-legacy-provider"
-  }
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
 } 
