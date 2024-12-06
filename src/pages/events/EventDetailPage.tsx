@@ -53,7 +53,7 @@ type RSVPStatus = 'going' | 'maybe' | 'not-going' | null;
 const EventDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [rsvpStatus, setRSVPStatus] = useState<RSVPStatus>(null);
+  const [rsvpStatus, setRsvpStatus] = useState<'going' | 'maybe' | 'not-going' | null>(null);
   const [showRSVPFlow, setShowRSVPFlow] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [newComment, setNewComment] = useState('');
@@ -80,7 +80,7 @@ const EventDetailPage: React.FC = () => {
   }
 
   const handleRSVP = (response: 'going' | 'maybe' | 'not-going') => {
-    setRSVPStatus(response);
+    setRsvpStatus(response);
     setShowRSVPFlow(true);
   };
 
@@ -88,7 +88,7 @@ const EventDetailPage: React.FC = () => {
     if (rsvpStatus) {
       console.log('Submitting RSVP:', rsvpStatus);
       setShowRSVPFlow(false);
-      setRSVPStatus(null);
+      setRsvpStatus(null);
     }
   };
 
@@ -462,14 +462,25 @@ const EventDetailPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Floating Button */}
-      <FloatingTicketPurchase 
-        event={event} 
-        onPurchase={(ticketTypes) => {
-          setSelectedTicketTypes(ticketTypes);
-          setShowBuyTicketFlow(true);
-        }} 
-      />
+      {/* Conditional Floater */}
+      {event.isRSVP ? (
+        <FloatingRSVP 
+          event={event}
+          status={rsvpStatus}
+          onRSVP={(response) => {
+            setRsvpStatus(response);
+            // Handle RSVP logic here
+          }}
+        />
+      ) : (
+        <FloatingTicketPurchase 
+          event={event} 
+          onPurchase={(ticketTypes) => {
+            setSelectedTicketTypes(ticketTypes);
+            setShowBuyTicketFlow(true);
+          }} 
+        />
+      )}
 
       {/* Buy Ticket Flow Modal */}
       <AnimatePresence>
