@@ -20,16 +20,20 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ service }) => {
     reviewCount,
     basePrice,
     profileImage,
-    tags = ['Professional', 'Experienced', 'Insured'] // Default tags if none provided
+    tags = ['Professional', 'Experienced', 'Insured']
   } = service;
 
   return (
-    <Link to={`/services/${id}`}>
-      <motion.div 
-        className="group bg-white rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300"
-        whileHover={{ y: -4 }}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      whileHover={{ y: -4 }}
+      className="h-full"
+    >
+      <Link 
+        to={`/services/${id}`}
+        className="block h-full bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300"
       >
         {/* Image Container */}
         <div className="relative aspect-w-16 aspect-h-9">
@@ -90,8 +94,8 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ service }) => {
             {description}
           </p>
         </div>
-      </motion.div>
-    </Link>
+      </Link>
+    </motion.div>
   );
 };
 

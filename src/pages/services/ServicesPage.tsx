@@ -1,5 +1,16 @@
 import React from 'react';
 import ServiceCard from '../../components/cards/ServiceCard';
+import { motion } from 'framer-motion';
+
+const container = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
 
 const ServicesPage: React.FC = () => {
   // Mock data - replace with real data from your backend
@@ -47,21 +58,19 @@ const ServicesPage: React.FC = () => {
         </div>
 
         {/* Services Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <motion.div 
+          variants={container}
+          initial="hidden"
+          animate="show"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+        >
           {services.map((service) => (
             <ServiceCard
               key={service.id}
-              id={service.id}
-              title={service.title}
-              category={service.category}
-              rating={service.rating}
-              reviews={service.reviews}
-              image={service.image}
-              price={service.price}
-              location={service.location}
+              {...service}
             />
           ))}
-        </div>
+        </motion.div>
       </div>
     </div>
   );
