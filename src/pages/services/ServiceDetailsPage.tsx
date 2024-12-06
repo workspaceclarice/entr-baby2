@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { MapPinIcon, TagIcon, ShareIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
+import { MapPinIcon, TagIcon, ShareIcon, CheckCircleIcon, CameraIcon } from '@heroicons/react/24/outline';
 import { HeartIcon, StarIcon } from '@heroicons/react/24/solid';
 import { Service, ServicePackage, AdditionalItem } from '../../types/service';
 import { services } from '../../data/services';
@@ -14,8 +14,61 @@ import { Link } from 'react-router-dom';
 import { HomeIcon } from '@heroicons/react/24/outline';
 import { Breadcrumb } from '../../components/common';
 
+interface ServiceReview {
+  id: string;
+  author: string;
+  date: string;
+  rating: number;
+  comment: string;
+  eventType: string;
+}
+
+const mockReviews: ServiceReview[] = [
+  {
+    id: '1',
+    author: 'Sarah Johnson',
+    date: '2024-02-15',
+    rating: 5,
+    comment: 'Exceptional service! The photographer captured every special moment perfectly. Their attention to detail and professional approach made our wedding day even more memorable.',
+    eventType: 'Wedding Photography'
+  },
+  {
+    id: '2',
+    author: 'Michael Chen',
+    date: '2024-01-30',
+    rating: 4,
+    comment: 'Great corporate event photography. They were unobtrusive yet managed to capture all the key moments. The turnaround time for edited photos was impressive.',
+    eventType: 'Corporate Event'
+  },
+  {
+    id: '3',
+    author: 'Emily Rodriguez',
+    date: '2024-01-15',
+    rating: 5,
+    comment: 'Amazing family portrait session! They were great with the kids and the photos turned out beautiful. The whole experience was enjoyable and stress-free.',
+    eventType: 'Family Portrait'
+  },
+  {
+    id: '4',
+    author: 'David Thompson',
+    date: '2024-01-10',
+    rating: 5,
+    comment: 'Fantastic product photography for our e-commerce site. The quality of work exceeded our expectations. Very professional and efficient.',
+    eventType: 'Commercial Photography'
+  }
+];
+
+const tabs = [
+  { id: 'overview' as const, name: 'Overview' },
+  { id: 'packages' as const, name: 'Packages' },
+  { id: 'gallery' as const, name: 'Gallery' },
+  { id: 'reviews' as const, name: 'Reviews' },
+  { id: 'faq' as const, name: 'FAQ' }
+];
+
 const ServiceDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [showBookingFlow, setShowBookingFlow] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState<ServicePackage | null>(null);
@@ -23,7 +76,7 @@ const ServiceDetailsPage: React.FC = () => {
   const [selectedStartTime, setSelectedStartTime] = useState<string>('');
   const [selectedEndTime, setSelectedEndTime] = useState<string>('');
   const [selectedAdditionalItems, setSelectedAdditionalItems] = useState<AdditionalItem[]>([]);
-  const [activeTab, setActiveTab] = useState<'overview' | 'packages' | 'gallery' | 'faq'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'packages' | 'gallery' | 'faq' | 'reviews'>('overview');
 
   const service = services.find(s => s.id === id);
   if (!service) return <div>Service not found</div>;
@@ -115,260 +168,432 @@ const ServiceDetailsPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 mt-16">
-      <Breadcrumb 
-        items={[
-          { label: 'Services', href: '/services' },
-          { label: service.title }
-        ]} 
-      />
+    <div className="min-h-screen bg-white pt-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="py-2">
+          <Breadcrumb 
+            items={[
+              { label: 'Services', href: '/services' },
+              { label: service.title }
+            ]} 
+          />
+        </div>
+      </div>
 
-      {/* Hero Section */}
-      <div className="relative h-[40vh]">
-        <img
-          src={service.profileImage}
+      {/* Hero Image */}
+      <div className="relative w-full aspect-video md:aspect-[21/9] bg-gray-100">
+        <img 
+          src={service.profileImage} 
           alt={service.title}
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
-        
-        {/* Action Buttons */}
-        <div className="absolute top-4 right-4 flex space-x-2">
-          <button onClick={() => setIsLiked(!isLiked)} className="p-2 bg-white/10 backdrop-blur-md rounded-full">
-            <HeartIcon className={`h-6 w-6 ${isLiked ? 'text-red-500' : 'text-white'}`} />
-          </button>
-          <button className="p-2 bg-white/10 backdrop-blur-md rounded-full">
-            <ShareIcon className="h-6 w-6 text-white" />
-          </button>
-        </div>
+      </div>
 
-        {/* Service Info */}
-        <div className="absolute bottom-4 left-0 right-0 px-4">
-          <div className="max-w-7xl mx-auto text-white">
-            <h1 className="text-3xl font-light mb-2">{service.title}</h1>
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center">
-                <MapPinIcon className="h-5 w-5 mr-1" />
-                <span>{service.location}</span>
-              </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
+        {/* Title and Stats Section */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="text-2xl md:text-3xl font-light text-gray-900">{service.title}</h1>
+          </div>
+
+          {/* Stats Bar - Wrapped for mobile */}
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-gray-600 text-sm mb-4">
+            <div className="flex items-center gap-1">
+              <MapPinIcon className="h-5 w-5" />
+              <span className="font-light">{service.location}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <TagIcon className="h-5 w-5" />
+              <span className="font-light">${service.basePrice}/hour</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <StarIcon className="h-5 w-5" />
+              <span className="font-light">{mockServiceDetails.vendorProfile.rating} ({mockServiceDetails.vendorProfile.reviewCount} reviews)</span>
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* Navigation Tabs */}
-      <div className="border-b bg-white">
-        <div className="max-w-7xl mx-auto px-4">
-          <nav className="flex space-x-8">
-            {['overview', 'packages', 'gallery', 'faq'].map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab as typeof activeTab)}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === tab
-                    ? 'border-purple-500 text-purple-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700'
-                }`}
-              >
-                {tab.charAt(0).toUpperCase() + tab.slice(1)}
-              </button>
-            ))}
-          </nav>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Left Column - Content */}
-          <div className={`${activeTab === 'overview' ? 'lg:w-2/3' : 'w-full'}`}>
-            {activeTab === 'overview' && (
-              <div className="space-y-8">
-                {/* Vendor Profile */}
-                <VendorProfile {...mockServiceDetails.vendorProfile} />
-
-                {/* Highlights */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {mockServiceDetails.highlights.map((highlight, index) => (
-                    <div key={index} className="bg-white rounded-lg p-4 text-center">
-                      <span className="text-2xl">{highlight.icon}</span>
-                      <p className="mt-2 text-sm font-medium text-gray-600">{highlight.text}</p>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Description */}
-                <div>
-                  <h2 className="text-2xl font-light mb-4">About this service</h2>
-                  <p className="text-gray-600 leading-relaxed">{service.description}</p>
-                </div>
-
-                {/* Features */}
-                <div>
-                  <h2 className="text-2xl font-light mb-4">What's included</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {service.features.map((feature, index) => (
-                      <div key={index} className="flex items-start space-x-3">
-                        <span className="text-2xl">{feature.icon}</span>
-                        <div>
-                          <h3 className="font-medium">{feature.title}</h3>
-                          <p className="text-sm text-gray-600">{feature.description}</p>
-                        </div>
+          {/* Main content grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
+            {/* Left column - Content */}
+            <div className="lg:col-span-8">
+              {/* Vendor Profile Section */}
+              <div className="border-t border-b border-gray-100 py-8 mb-0">
+                {/* Host Info */}
+                <div 
+                  onClick={() => navigate(`/vendors/${service.vendorId}`)}
+                  className="flex items-center gap-3 cursor-pointer group mb-6"
+                >
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={service.vendorImage}
+                      alt={service.vendorName}
+                      className="h-14 w-14 rounded-full object-cover border-2 border-purple-100 group-hover:border-purple-300 transition-colors"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = 'https://via.placeholder.com/56?text=V';
+                      }}
+                    />
+                    <div className="text-left">
+                      <p className="text-base font-medium text-gray-900 group-hover:text-purple-600 transition-colors">
+                        {service.vendorName}
+                      </p>
+                      <div className="flex items-center gap-2 text-sm text-gray-500">
+                        <span>5 years in business</span>
                       </div>
-                    ))}
+                    </div>
                   </div>
                 </div>
 
-                {/* Testimonials */}
-                <div>
-                  <h2 className="text-2xl font-light mb-4">What people are saying</h2>
-                  <div className="grid gap-6">
-                    {mockServiceDetails.testimonials.map((testimonial) => (
-                      <div key={testimonial.id} className="bg-white rounded-xl p-6 shadow-sm">
-                        <div className="flex items-start space-x-4">
-                          <img
-                            src={testimonial.image}
-                            alt={testimonial.author}
-                            className="w-12 h-12 rounded-full"
-                          />
-                          <div className="flex-1">
-                            <div className="flex items-center justify-between">
-                              <h3 className="font-medium">{testimonial.author}</h3>
-                              <span className="text-sm text-gray-500">{testimonial.date}</span>
-                            </div>
-                            <div className="flex items-center mt-1 mb-2">
-                              {[...Array(testimonial.rating)].map((_, i) => (
-                                <StarIcon key={i} className="h-4 w-4 text-yellow-400" />
-                              ))}
-                            </div>
-                            <p className="text-gray-600">{testimonial.text}</p>
+                {/* Listing Highlights */}
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Listing highlights</h3>
+                <div className="space-y-4 lg:pb-0">
+                  <div className="flex gap-4">
+                    <StarIcon className="h-6 w-6 text-purple-600 flex-shrink-0" />
+                    <div>
+                      <p className="text-base font-medium text-gray-900">Experienced photographer</p>
+                      <p className="text-sm text-gray-500">{service.vendorName} has been capturing moments for over 5 years.</p>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-4">
+                    <CheckCircleIcon className="h-6 w-6 text-purple-600 flex-shrink-0" />
+                    <div>
+                      <p className="text-base font-medium text-gray-900">Professional service</p>
+                      <p className="text-sm text-gray-500">Recent clients gave the photography service a 5-star rating.</p>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-4">
+                    <CameraIcon className="h-6 w-6 text-purple-600 flex-shrink-0" />
+                    <div>
+                      <p className="text-base font-medium text-gray-900">Premium equipment</p>
+                      <p className="text-sm text-gray-500">Uses professional-grade cameras and lighting for exceptional quality.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Mobile ServiceEstimator */}
+              <div className="block lg:hidden my-6">
+                <div className="bg-gray-50 p-6 rounded-lg">
+                  <ServiceEstimator
+                    service={service}
+                    onBookNow={handleBookNow}
+                    selectedPackage={selectedPackage}
+                  />
+                </div>
+              </div>
+
+              {/* Menu Tabs */}
+              <div className="border-b mt-0">
+                <nav className="flex overflow-x-auto scrollbar-hide -mb-px">
+                  {tabs.map((tab) => (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id as typeof activeTab)}
+                      className={`
+                        flex-none px-4 md:px-6 py-3 text-sm font-light transition-colors whitespace-nowrap
+                        ${activeTab === tab.id
+                          ? 'text-purple-600 border-b-2 border-purple-500'
+                          : 'text-gray-500 hover:text-gray-700'
+                        }
+                      `}
+                    >
+                      {tab.name}
+                    </button>
+                  ))}
+                </nav>
+              </div>
+
+              {/* Tab Content */}
+              <div className="pt-6 md:pt-8 space-y-8">
+                {/* Keep existing tab content but update styling */}
+                {activeTab === 'overview' && (
+                  <div className="space-y-12">
+                    {/* Main Description */}
+                    <div className="prose max-w-none space-y-6">
+                      <h3 className="text-xl font-light text-gray-900">About Our Photography Services</h3>
+                      <p className="text-gray-600 leading-relaxed">
+                        Elite Photography Studio brings over a decade of experience capturing life's most precious moments. 
+                        Our team of professional photographers combines technical expertise with creative vision to deliver 
+                        stunning imagery that tells your unique story. Whether it's a wedding, corporate event, family 
+                        portrait session, or commercial photography, we approach each project with dedication and artistry.
+                      </p>
+                      <p className="text-gray-600 leading-relaxed">
+                        Using state-of-the-art equipment and drawing from years of experience, we ensure every detail is 
+                        captured perfectly. Our post-processing techniques enhance the natural beauty of each image while 
+                        maintaining authenticity.
+                      </p>
+                    </div>
+
+                    {/* Photo Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-6">
+                        <img 
+                          src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc"
+                          alt="Wedding photography"
+                          className="w-full h-64 object-cover rounded-lg"
+                        />
+                        <img 
+                          src="https://images.unsplash.com/photo-1519741497674-611481863552"
+                          alt="Corporate event photography"
+                          className="w-full h-80 object-cover rounded-lg"
+                        />
+                      </div>
+                      <div className="space-y-6">
+                        <img 
+                          src="https://images.unsplash.com/photo-1472653431158-6364773b2a56"
+                          alt="Family portrait"
+                          className="w-full h-80 object-cover rounded-lg"
+                        />
+                        <img 
+                          src="https://images.unsplash.com/photo-1542038784456-1ea8e935640e"
+                          alt="Product photography"
+                          className="w-full h-64 object-cover rounded-lg"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Specialties */}
+                    <div className="space-y-6">
+                      <h3 className="text-xl font-light text-gray-900">Our Specialties</h3>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                        {[
+                          {
+                            title: "Wedding Photography",
+                            description: "Capturing the magic of your special day with a perfect blend of candid moments and artistic portraits.",
+                            icon: "💑"
+                          },
+                          {
+                            title: "Corporate Events",
+                            description: "Professional coverage of business events, conferences, and corporate portraits.",
+                            icon: "🏢"
+                          },
+                          {
+                            title: "Family Portraits",
+                            description: "Creating lasting memories with natural, relaxed family photography sessions.",
+                            icon: "👨‍👩‍👧‍👦"
+                          },
+                          {
+                            title: "Product Photography",
+                            description: "High-quality commercial photography for your products and marketing materials.",
+                            icon: "📸"
+                          },
+                          {
+                            title: "Special Events",
+                            description: "From birthdays to anniversaries, we capture all of life's celebrations.",
+                            icon: "🎉"
+                          },
+                          {
+                            title: "Fashion & Portrait",
+                            description: "Creative portrait sessions for models, professionals, and individuals.",
+                            icon: "👔"
+                          }
+                        ].map((specialty, index) => (
+                          <div key={index} className="bg-purple-50 rounded-lg p-6 space-y-2">
+                            <span className="text-2xl">{specialty.icon}</span>
+                            <h4 className="text-purple-900 font-medium">{specialty.title}</h4>
+                            <p className="text-purple-700 text-sm">{specialty.description}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Equipment & Process */}
+                    <div className="space-y-6">
+                      <h3 className="text-xl font-light text-gray-900">Our Equipment & Process</h3>
+                      <div className="bg-gray-50 rounded-lg p-6">
+                        <div className="grid md:grid-cols-2 gap-6">
+                          <div>
+                            <h4 className="font-medium text-gray-900 mb-2">Professional Equipment</h4>
+                            <ul className="space-y-2 text-gray-600">
+                              <li>• Full-frame professional DSLR cameras</li>
+                              <li>• Wide range of prime and zoom lenses</li>
+                              <li>• Professional lighting equipment</li>
+                              <li>• Backup equipment for every shoot</li>
+                              <li>• Latest editing software and tools</li>
+                            </ul>
+                          </div>
+                          <div>
+                            <h4 className="font-medium text-gray-900 mb-2">Our Process</h4>
+                            <ul className="space-y-2 text-gray-600">
+                              <li>• Initial consultation to understand your vision</li>
+                              <li>• Detailed planning and shot list preparation</li>
+                              <li>• Professional shooting with attention to detail</li>
+                              <li>• Careful selection and professional editing</li>
+                              <li>• Quick turnaround and delivery</li>
+                            </ul>
                           </div>
                         </div>
                       </div>
-                    ))}
+                    </div>
                   </div>
-                </div>
-              </div>
-            )}
+                )}
 
-            {activeTab === 'packages' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {service.packages.map((pkg) => (
-                  <div
-                    key={pkg.id}
-                    className={`bg-white rounded-xl p-6 shadow-sm ${
-                      pkg.isPopular ? 'ring-2 ring-purple-500' : ''
-                    }`}
-                  >
-                    {pkg.isPopular && (
-                      <span className="inline-block px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm mb-4">
-                        Most Popular
-                      </span>
-                    )}
-                    <h3 className="text-xl font-medium mb-2">{pkg.name}</h3>
-                    <p className="text-3xl font-light mb-4">${pkg.price}</p>
-                    <p className="text-sm text-gray-600 mb-4">{pkg.description}</p>
-                    <ul className="space-y-2 mb-6">
-                      {pkg.features.map((feature, index) => (
-                        <li key={index} className="flex items-center text-sm">
-                          <CheckCircleIcon className="h-5 w-5 text-green-500 mr-2" />
-                          {feature}
-                        </li>
-                      ))}
-                    </ul>
-                    <button
-                      onClick={() => {
-                        setSelectedPackage(pkg);
-                        setShowBookingFlow(true);
-                      }}
-                      className="w-full py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
-                    >
-                      Select Package
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {activeTab === 'gallery' && (
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {service.gallery.map((image, index) => (
-                  <img
-                    key={index}
-                    src={image}
-                    alt={`Gallery ${index + 1}`}
-                    className="rounded-lg w-full h-64 object-cover"
-                  />
-                ))}
-              </div>
-            )}
-
-            {activeTab === 'faq' && (
-              <div className="max-w-3xl mx-auto">
-                <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-                  <div className="p-6 border-b border-gray-200">
-                    <h2 className="text-2xl font-light">Frequently Asked Questions</h2>
-                    <p className="mt-2 text-gray-600">Everything you need to know about our photography services.</p>
-                  </div>
-                  <div className="divide-y divide-gray-200">
-                    {mockServiceDetails.faq.map((item, index) => (
-                      <Disclosure key={index}>
-                        {({ open }) => (
-                          <>
-                            <Disclosure.Button className="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50">
-                              <span className="text-gray-900 font-medium">{item.question}</span>
-                              <ChevronDownIcon
-                                className={`${
-                                  open ? 'transform rotate-180' : ''
-                                } w-5 h-5 text-gray-500 transition-transform duration-200`}
-                              />
-                            </Disclosure.Button>
-                            <Transition
-                              enter="transition duration-100 ease-out"
-                              enterFrom="transform scale-95 opacity-0"
-                              enterTo="transform scale-100 opacity-100"
-                              leave="transition duration-75 ease-out"
-                              leaveFrom="transform scale-100 opacity-100"
-                              leaveTo="transform scale-95 opacity-0"
-                            >
-                              <Disclosure.Panel className="px-6 py-4 bg-gray-50">
-                                <p className="text-gray-600 leading-relaxed">
-                                  {item.answer}
-                                </p>
-                              </Disclosure.Panel>
-                            </Transition>
-                          </>
+                {activeTab === 'packages' && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {service.packages.map((pkg) => (
+                      <div
+                        key={pkg.id}
+                        className={`bg-white rounded-xl p-6 shadow-sm ${
+                          pkg.isPopular ? 'ring-2 ring-purple-500' : ''
+                        }`}
+                      >
+                        {pkg.isPopular && (
+                          <span className="inline-block px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm mb-4">
+                            Most Popular
+                          </span>
                         )}
-                      </Disclosure>
+                        <h3 className="text-xl font-medium mb-2">{pkg.name}</h3>
+                        <p className="text-3xl font-light mb-4">${pkg.price}</p>
+                        <p className="text-sm text-gray-600 mb-4">{pkg.description}</p>
+                        <ul className="space-y-2 mb-6">
+                          {pkg.features.map((feature, index) => (
+                            <li key={index} className="flex items-center text-sm">
+                              <CheckCircleIcon className="h-5 w-5 text-green-500 mr-2" />
+                              {feature}
+                            </li>
+                          ))}
+                        </ul>
+                        <button
+                          onClick={() => {
+                            setSelectedPackage(pkg);
+                            setShowBookingFlow(true);
+                          }}
+                          className="w-full py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                        >
+                          Select Package
+                        </button>
+                      </div>
                     ))}
                   </div>
-                </div>
+                )}
 
-                {/* Contact Support */}
-                <div className="mt-8 text-center">
-                  <p className="text-gray-600">
-                    Still have questions?{' '}
-                    <button className="text-purple-600 font-medium hover:text-purple-700">
-                      Contact our support team
-                    </button>
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
+                {activeTab === 'gallery' && (
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {service.gallery.map((image, index) => (
+                      <img
+                        key={index}
+                        src={image}
+                        alt={`Gallery ${index + 1}`}
+                        className="rounded-lg w-full h-64 object-cover"
+                      />
+                    ))}
+                  </div>
+                )}
 
-          {/* Right Column - Estimator (only shown in overview tab) */}
-          {activeTab === 'overview' && (
-            <div className="lg:w-1/3">
-              <div className="sticky top-4">
-                <ServiceEstimator
-                  service={service}
-                  onBookNow={handleBookNow}
-                  selectedPackage={selectedPackage}
-                />
+                {activeTab === 'faq' && (
+                  <div className="max-w-3xl mx-auto">
+                    <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+                      <div className="p-6 border-b border-gray-200">
+                        <h2 className="text-2xl font-light">Frequently Asked Questions</h2>
+                        <p className="mt-2 text-gray-600">Everything you need to know about our photography services.</p>
+                      </div>
+                      <div className="divide-y divide-gray-200">
+                        {mockServiceDetails.faq.map((item, index) => (
+                          <Disclosure key={index}>
+                            {({ open }) => (
+                              <>
+                                <Disclosure.Button className="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50">
+                                  <span className="text-gray-900 font-medium">{item.question}</span>
+                                  <ChevronDownIcon
+                                    className={`${
+                                      open ? 'transform rotate-180' : ''
+                                    } w-5 h-5 text-gray-500 transition-transform duration-200`}
+                                  />
+                                </Disclosure.Button>
+                                <Transition
+                                  enter="transition duration-100 ease-out"
+                                  enterFrom="transform scale-95 opacity-0"
+                                  enterTo="transform scale-100 opacity-100"
+                                  leave="transition duration-75 ease-out"
+                                  leaveFrom="transform scale-100 opacity-100"
+                                  leaveTo="transform scale-95 opacity-0"
+                                >
+                                  <Disclosure.Panel className="px-6 py-4 bg-gray-50">
+                                    <p className="text-gray-600 leading-relaxed">
+                                      {item.answer}
+                                    </p>
+                                  </Disclosure.Panel>
+                                </Transition>
+                              </>
+                            )}
+                          </Disclosure>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Contact Support */}
+                    <div className="mt-8 text-center">
+                      <p className="text-gray-600">
+                        Still have questions?{' '}
+                        <button className="text-purple-600 font-medium hover:text-purple-700">
+                          Contact our support team
+                        </button>
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {activeTab === 'reviews' && (
+                  <div className="space-y-8">
+                    <div className="bg-gray-50 p-6 rounded-lg mb-8">
+                      <div className="flex items-center justify-between mb-4">
+                        <div>
+                          <h3 className="text-xl font-light text-gray-900">Client Reviews</h3>
+                          <p className="text-sm text-gray-600">Based on {mockReviews.length} reviews</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <StarIcon className="h-6 w-6 text-yellow-400" />
+                          <span className="text-2xl font-light">{mockServiceDetails.vendorProfile.rating}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-6">
+                      {mockReviews.map((review) => (
+                        <div key={review.id} className="border-b border-gray-100 last:border-0 pb-6 last:pb-0">
+                          <div className="flex justify-between items-start mb-2">
+                            <div>
+                              <h4 className="font-medium text-gray-900">{review.author}</h4>
+                              <p className="text-sm text-gray-500">{review.eventType}</p>
+                            </div>
+                            <span className="text-sm text-gray-500">{review.date}</span>
+                          </div>
+                          
+                          <div className="flex items-center mb-2">
+                            {[...Array(5)].map((_, i) => (
+                              <StarIcon
+                                key={i}
+                                className={`h-4 w-4 ${
+                                  i < review.rating ? 'text-yellow-400' : 'text-gray-200'
+                                }`}
+                              />
+                            ))}
+                          </div>
+                          
+                          <p className="text-gray-600 text-sm leading-relaxed">{review.comment}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
-          )}
+
+            {/* Desktop Right column - Sticky ServiceEstimator */}
+            <div className="hidden lg:block lg:col-span-4">
+              <div className="sticky top-6">
+                <div className="bg-gray-50 p-6 rounded-lg">
+                  <ServiceEstimator
+                    service={service}
+                    onBookNow={handleBookNow}
+                    selectedPackage={selectedPackage}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 

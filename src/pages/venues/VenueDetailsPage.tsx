@@ -12,6 +12,8 @@ import { venues } from '../../data/venues';
 import VenueEstimator from '../../components/venues/VenueEstimator';
 import VenueBookingFlow from '../../components/venues/VenueBookingFlow';
 import { Breadcrumb } from '../../components/common';
+import { Disclosure, Transition } from '@headlessui/react';
+import { ChevronDownIcon } from '@heroicons/react/24/outline';
 
 interface Vendor {
   id: string;
@@ -490,30 +492,52 @@ export default function VenueDetailsPage() {
                 )}
 
                 {activeTab === 'faq' && (
-                  <div className="space-y-6">
-                    {faqItems.map((item, index) => (
-                      <div 
-                        key={index}
-                        className="border-b border-gray-100 last:border-0 pb-6 last:pb-0"
-                      >
-                        <h3 className="text-lg font-medium text-gray-900 mb-2">
-                          {item.question}
-                        </h3>
-                        <p className="text-gray-600 text-sm leading-relaxed">
-                          {item.answer}
-                        </p>
+                  <div className="max-w-3xl mx-auto">
+                    <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+                      <div className="p-6 border-b border-gray-200">
+                        <h2 className="text-2xl font-light">Frequently Asked Questions</h2>
+                        <p className="mt-2 text-gray-600">Everything you need to know about our venue and services.</p>
                       </div>
-                    ))}
-                    <div className="mt-8 p-4 bg-gray-50 rounded-lg">
-                      <p className="text-sm text-gray-500">
-                        Have more questions? Contact our events team at{' '}
-                        <a href="mailto:events@venue.com" className="text-purple-600 hover:text-purple-700">
-                          events@venue.com
-                        </a>
-                        {' '}or call us at{' '}
-                        <a href="tel:+1234567890" className="text-purple-600 hover:text-purple-700">
-                          (123) 456-7890
-                        </a>
+                      <div className="divide-y divide-gray-200">
+                        {faqItems.map((item, index) => (
+                          <Disclosure key={index}>
+                            {({ open }) => (
+                              <div className="border-b border-gray-100 last:border-0">
+                                <Disclosure.Button className="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50">
+                                  <span className="text-gray-900 font-medium">{item.question}</span>
+                                  <ChevronDownIcon
+                                    className={`${
+                                      open ? 'transform rotate-180' : ''
+                                    } w-5 h-5 text-gray-500 transition-transform duration-200`}
+                                  />
+                                </Disclosure.Button>
+                                <Transition
+                                  enter="transition duration-100 ease-out"
+                                  enterFrom="transform scale-95 opacity-0"
+                                  enterTo="transform scale-100 opacity-100"
+                                  leave="transition duration-75 ease-out"
+                                  leaveFrom="transform scale-100 opacity-100"
+                                  leaveTo="transform scale-95 opacity-0"
+                                >
+                                  <Disclosure.Panel className="px-6 py-4 bg-gray-50">
+                                    <p className="text-gray-600 leading-relaxed">
+                                      {item.answer}
+                                    </p>
+                                  </Disclosure.Panel>
+                                </Transition>
+                              </div>
+                            )}
+                          </Disclosure>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="mt-8 text-center">
+                      <p className="text-gray-600">
+                        Still have questions?{' '}
+                        <button className="text-purple-600 font-medium hover:text-purple-700">
+                          Contact our support team
+                        </button>
                       </p>
                     </div>
                   </div>
