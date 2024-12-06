@@ -1,22 +1,27 @@
 export interface Event {
   id: string;
   title: string;
-  description: string;
   date: string;
   time: string;
   location: string;
-  price: string;
+  description: string;
+  price: number;
   formattedPrice?: string;
   category: string;
   image: string;
+  coverImage?: string;
   ticketsAvailable: number;
   isRSVP: boolean;
+  hostId: string;
+  hostName: string;
+  hostImage: string;
   attendeeCount: number;
-  organizer: {
-    name: string;
-    image: string;
+  guestList?: {
+    going: number;
+    maybe: number;
+    notGoing: number;
   };
-  rsvpStatus?: 'going' | 'not-going' | 'maybe';
+  rsvpDeadline?: string;
 }
 
 export interface RSVPFormData {
