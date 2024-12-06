@@ -1,27 +1,53 @@
+export interface Highlight {
+  iconType: string;
+  title: string;
+  description: string;
+}
+
+export interface Speaker {
+  name: string;
+  role: string;
+  image: string;
+}
+
+export interface Comment {
+  authorName: string;
+  authorImage: string;
+  content: string;
+  timeAgo: string;
+  likes: number;
+  replies?: Comment[];
+}
+
 export interface Event {
   id: string;
   title: string;
-  date: string;
-  time: string;
-  location: string;
   description: string;
   price: number;
   formattedPrice?: string;
   category: string;
   image: string;
+  imageUrl: string;
   coverImage?: string;
   ticketsAvailable: number;
-  isRSVP: boolean;
   hostId: string;
   hostName: string;
   hostImage: string;
+  date: string;
+  time: string;
+  location: string;
+  isRSVP: boolean;
   attendeeCount: number;
+  rsvpDeadline?: string;
   guestList?: {
     going: number;
     maybe: number;
     notGoing: number;
   };
-  rsvpDeadline?: string;
+  highlights?: Highlight[];
+  speakers?: Speaker[];
+  speakersTitle?: string;
+  comments?: Comment[];
 }
 
 export interface RSVPFormData {

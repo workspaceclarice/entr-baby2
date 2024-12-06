@@ -10,10 +10,12 @@ import {
 
 interface FloatingRSVPProps {
   event: Event;
-  onRSVP: (status: 'going' | 'not-going' | 'maybe') => void;
+  onRSVP: (response: 'going' | 'maybe' | 'not-going') => void;
+  status?: 'going' | 'maybe' | 'not-going' | null;
+  onSubmit?: () => void;
 }
 
-const FloatingRSVP: React.FC<FloatingRSVPProps> = ({ event, onRSVP }) => {
+const FloatingRSVP: React.FC<FloatingRSVPProps> = ({ event, onRSVP, status, onSubmit }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
 

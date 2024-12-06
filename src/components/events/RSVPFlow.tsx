@@ -10,12 +10,17 @@ import {
 
 interface RSVPFlowProps {
   event: Event;
-  status: 'going' | 'maybe';
+  status?: 'going' | 'maybe' | 'not-going' | null;
   onClose: () => void;
-  onSubmit: (data: any) => void;
+  onSubmit?: () => void;
 }
 
-const RSVPFlow: React.FC<RSVPFlowProps> = ({ event, status, onClose, onSubmit }) => {
+export const RSVPFlow: React.FC<RSVPFlowProps> = ({
+  event,
+  status,
+  onClose,
+  onSubmit
+}) => {
   const [step, setStep] = useState(1);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [formData, setFormData] = useState({
@@ -29,7 +34,10 @@ const RSVPFlow: React.FC<RSVPFlowProps> = ({ event, status, onClose, onSubmit })
     e.preventDefault();
     console.log('Submitting form...'); // Debug log
     setShowConfirmation(true);
-    onSubmit(formData);
+    
+    if (onSubmit) {
+      onSubmit();
+    }
     
     // Close after 3 seconds
     setTimeout(() => {
@@ -143,7 +151,9 @@ const RSVPFlow: React.FC<RSVPFlowProps> = ({ event, status, onClose, onSubmit })
                 type="button"
                 onClick={() => {
                   setShowConfirmation(true);
-                  onSubmit(formData);
+                  if (onSubmit) {
+                    onSubmit();
+                  }
                   setTimeout(() => {
                     onClose();
                   }, 3000);

@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import FloatingRSVP from '../../components/events/FloatingRSVP';
 import FloatingTicketPurchase from '../../components/events/FloatingTicketPurchase';
 import RSVPFlow from '../../components/events/RSVPFlow';
+import GuestList from '../../components/events/GuestList';
+import type { GuestListProps } from '../../components/events/types';
 import {
   MapPinIcon,
   CalendarIcon,
@@ -12,94 +14,163 @@ import {
   HeartIcon,
   ShareIcon,
   ChevronRightIcon,
+  BeakerIcon,
+  MusicalNoteIcon
 } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid';
+import { HeartIcon as HeartIconOutline } from '@heroicons/react/24/outline';
 import { Event } from '../../types/event';
 import { Link } from 'react-router-dom';
+import { events } from '../../data/events';
+
+interface Reply {
+  authorName: string;
+  authorImage: string;
+  content: string;
+  timeAgo: string;
+  likes?: number;
+}
+
+interface Thread {
+  authorName: string;
+  authorImage: string;
+  content: string;
+  timeAgo: string;
+  likes: number;
+  replies?: Reply[];
+}
 
 const EventDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [rsvpStatus, setRsvpStatus] = useState<'going' | 'maybe' | 'not-going' | null>(null);
   const [showRSVPFlow, setShowRSVPFlow] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
-  const [rsvpStatus, setRsvpStatus] = useState<'going' | 'maybe' | null>(null);
+  const [newComment, setNewComment] = useState('');
+  const [newThread, setNewThread] = useState('');
+  const [newReply, setNewReply] = useState('');
+  const [replyingTo, setReplyingTo] = useState<number | null>(null);
+  const [likedThreads, setLikedThreads] = useState<Set<number>>(new Set());
+  const [likedReplies, setLikedReplies] = useState<Set<string>>(new Set());
 
-  const handleShare = async () => {
+  // Find the event from our data
+  const event = events.find(e => e.id === id);
+
+  // Redirect to events page if event not found
+  useEffect(() => {
+    if (!event) {
+      navigate('/events');
+    }
+  }, [event, navigate]);
+
+  if (!event) {
+    return null; // or a loading spinner
+  }
+
+  const handleRSVP = (response: 'going' | 'maybe' | 'not-going') => {
+    setRsvpStatus(response);
+    setShowRSVPFlow(true);
+  };
+
+  const handleRSVPSubmit = () => {
+    if (rsvpStatus) {
+      console.log('Submitting RSVP:', rsvpStatus);
+      setShowRSVPFlow(false);
+      setRsvpStatus(null);
+    }
+  };
+
+  const handlePurchase = () => {
+    console.log('Purchase initiated for event:', event.id);
+    // Add purchase flow logic here
+  };
+
+  const handleShare = () => {
+    // Implement share functionality
     if (navigator.share) {
-      try {
-        await navigator.share({
-          title: event.title,
-          text: event.description,
-          url: window.location.href,
-        });
-      } catch (error) {
-        console.log('Error sharing:', error);
-      }
+      navigator.share({
+        title: event.title,
+        text: event.description,
+        url: window.location.href,
+      }).catch(console.error);
     } else {
       // Fallback for browsers that don't support Web Share API
-      navigator.clipboard.writeText(window.location.href);
-      // You might want to show a toast notification here
+      console.log('Share functionality not supported');
+      // You could show a modal with share options here
     }
   };
 
-  const event: Event = {
-    id: 'mock-1',
-    title: "Craft Cocktail Experience",
-    image: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=3270&auto=format&fit=crop",
-    description: `Join us for an enchanting evening at the historic Mason & Co. as we celebrate the art of craft cocktails and culinary excellence. This intimate gathering brings together mixology enthusiasts, food lovers, and those seeking a sophisticated night out.
+  const isTicketed = !event.isRSVP && event.price > 0;
 
-Our expert mixologists have curated a special menu featuring five signature cocktails, each paired with carefully crafted small plates that complement and enhance the flavors of both the drinks and dishes.
-
-What to expect:
-• Welcome champagne reception
-• 5 unique cocktail and food pairings
-• Live jazz ensemble
-• Interactive mixology demonstration
-• Networking with fellow enthusiasts
-
-The venue's exposed brick walls, warm lighting, and industrial-chic decor provide the perfect backdrop for this elevated social experience. With limited seats available, we ensure an intimate atmosphere where you can engage with our mixologists and fellow guests.
-
-Dress code: Smart casual
-Dietary restrictions can be accommodated with advance notice.`,
-    hostName: "Sarah Chen",
-    hostId: "host_1",
-    hostImage: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
-    location: "Mason & Co. • 789 Valencia St, San Francisco",
-    date: "2024-03-15",
-    time: "7:00 PM - 10:00 PM",
-    attendeeCount: 32,
-    price: 125,
-    category: "Food & Drink",
-    isRSVP: true,
-    ticketsAvailable: 50,
-    formattedPrice: "$125",
-    rsvpDeadline: "2024-03-10",
-    guestList: {
-      going: 32,
-      maybe: 8,
-      notGoing: 4
+  const getIconComponent = (iconType: string) => {
+    switch (iconType) {
+      case 'musical-note':
+        return <MusicalNoteIcon className="w-6 h-6" />;
+      case 'user-group':
+        return <UserGroupIcon className="w-6 h-6" />;
+      case 'beaker':
+        return <BeakerIcon className="w-6 h-6" />;
+      default:
+        return null;
     }
   };
 
-  const handleRSVP = (status: 'going' | 'not-going' | 'maybe') => {
-    if (status === 'not-going') {
-      handleRSVPSubmit({ status: 'not-going' });
-    } else {
-      setRsvpStatus(status as 'going' | 'maybe');
-      setShowRSVPFlow(true);
-    }
+  const handleCommentSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newComment.trim()) return;
+    
+    // In a real app, you would send this to your backend
+    console.log('New comment:', newComment);
+    setNewComment('');
   };
 
-  const handleRSVPSubmit = (formData: any) => {
-    console.log('RSVP Data:', { status: rsvpStatus, ...formData });
-    setShowRSVPFlow(false);
-    setRsvpStatus(null);
+  const handleThreadSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newThread.trim()) return;
+    
+    // In a real app, you would send this to your backend
+    console.log('New thread:', newThread);
+    setNewThread('');
+  };
+
+  const handleReplySubmit = (threadIndex: number, e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newReply.trim()) return;
+    
+    console.log(`New reply to thread ${threadIndex}:`, newReply);
+    setNewReply('');
+    setReplyingTo(null);
+  };
+
+  const toggleThreadLike = (threadIndex: number) => {
+    setLikedThreads(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(threadIndex)) {
+        newSet.delete(threadIndex);
+      } else {
+        newSet.add(threadIndex);
+      }
+      return newSet;
+    });
+  };
+
+  const toggleReplyLike = (threadIndex: number, replyIndex: number) => {
+    const key = `${threadIndex}-${replyIndex}`;
+    setLikedReplies(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(key)) {
+        newSet.delete(key);
+      } else {
+        newSet.add(key);
+      }
+      return newSet;
+    });
   };
 
   return (
-    <div className="min-h-screen bg-white pt-16">
-      <div className="max-w-7xl mx-auto">
-        {/* Breadcrumb with proper spacing */}
+    <div className="min-h-screen bg-white">
+      <div className="pb-32">
+        {/* Breadcrumb */}
         <div className="border-b border-gray-100">
           <div className="px-4 py-2.5">
             <div className="flex items-center space-x-2 text-xs font-light">
@@ -111,20 +182,18 @@ Dietary restrictions can be accommodated with advance notice.`,
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Hero Image */}
-      <div className="w-full h-[60vh]">
-        <img
-          src={event.image}
-          alt={event.title}
-          className="w-full h-full object-cover"
-        />
-      </div>
+        {/* Hero Image */}
+        <div className="w-full h-[60vh]">
+          <img
+            src={event.image}
+            alt={event.title}
+            className="w-full h-full object-cover"
+          />
+        </div>
 
-      <div className="max-w-7xl mx-auto">
-        {/* Content */}
-        <div className="max-w-3xl mx-auto px-4 -mt-32 relative z-10">
+        {/* Main content */}
+        <div className="max-w-3xl mx-auto px-4 py-8">
           <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
             {/* Event Header */}
             <div className="mb-8">
@@ -170,7 +239,7 @@ Dietary restrictions can be accommodated with advance notice.`,
             </div>
 
             {/* Host Info */}
-            <div className="flex items-center space-x-4 mb-8 pb-8 border-b">
+            <div className="flex items-center space-x-4 mb-8">
               <img
                 src={event.hostImage}
                 alt={event.hostName}
@@ -182,6 +251,15 @@ Dietary restrictions can be accommodated with advance notice.`,
               </div>
             </div>
 
+            {/* Guest List */}
+            <div className="mb-8 pb-8 border-b">
+              <GuestList 
+                attendeeCount={event.attendeeCount}
+                isRSVP={!isTicketed}
+                guestList={event.guestList || { going: 0, maybe: 0, notGoing: 0 }}
+              />
+            </div>
+
             {/* About */}
             <div className="mb-8">
               <h2 className="text-2xl font-light mb-4">About</h2>
@@ -190,121 +268,222 @@ Dietary restrictions can be accommodated with advance notice.`,
               </div>
             </div>
 
-            {/* Guest List */}
-            <div className="mb-8">
-              <h2 className="text-2xl font-light mb-4">Guests</h2>
-              <div className="flex items-center space-x-6">
-                <div className="flex -space-x-3">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <img
-                      key={i}
-                      src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${i}`}
-                      alt={`Guest ${i + 1}`}
-                      className="w-10 h-10 rounded-full border-2 border-white"
-                    />
+            {/* Highlights Section */}
+            {event.highlights && event.highlights.length > 0 && (
+              <div className="mb-8">
+                <h2 className="text-2xl font-light mb-4">Event Highlights</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {event.highlights.map((highlight, index) => (
+                    <div key={index} className="bg-gray-50 rounded-xl p-6">
+                      <div className="text-purple-600 mb-2">
+                        {getIconComponent(highlight.iconType)}
+                      </div>
+                      <h3 className="font-medium mb-1">{highlight.title}</h3>
+                      <p className="text-sm text-gray-600">{highlight.description}</p>
+                    </div>
                   ))}
                 </div>
-                <div className="text-sm text-gray-600">
-                  <span className="font-medium">{event.attendeeCount} people</span> are going
+              </div>
+            )}
+
+            {/* Featured Speakers/Hosts - Only show if they exist */}
+            {event.speakers && (
+              <div className="mb-8">
+                <h2 className="text-2xl font-light mb-4">{event.speakersTitle || 'Featured Speakers'}</h2>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+                  {event.speakers.map((speaker, index) => (
+                    <div key={index} className="text-center">
+                      <img
+                        src={speaker.image}
+                        alt={speaker.name}
+                        className="w-24 h-24 rounded-full mx-auto mb-3"
+                      />
+                      <h3 className="font-medium">{speaker.name}</h3>
+                      <p className="text-sm text-gray-600">{speaker.role}</p>
+                    </div>
+                  ))}
                 </div>
               </div>
-            </div>
+            )}
 
-            {/* Discussion */}
-            <div>
-              <h2 className="text-2xl font-light mb-4">Discussion</h2>
-              
-              {/* Existing Comments */}
-              <div className="space-y-6 mb-8">
-                <div className="flex space-x-4">
-                  <img
-                    src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400&auto=format&fit=crop&q=60"
-                    alt="Alex"
-                    className="w-10 h-10 rounded-full"
-                  />
-                  <div>
-                    <div className="flex items-baseline space-x-2">
-                      <span className="font-medium">Alex Thompson</span>
-                      <span className="text-sm text-gray-500">2 days ago</span>
-                    </div>
-                    <p className="text-gray-600 mt-1">
-                      Quick question - will there be non-alcoholic cocktail options available? The menu sounds amazing!
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex space-x-4">
-                  <img
-                    src={event.hostImage}
-                    alt={event.hostName}
-                    className="w-10 h-10 rounded-full"
-                  />
-                  <div>
-                    <div className="flex items-baseline space-x-2">
-                      <span className="font-medium">{event.hostName}</span>
-                      <span className="text-sm text-gray-500">1 day ago</span>
-                    </div>
-                    <p className="text-gray-600 mt-1">
-                      Hi Alex! Absolutely - we'll have a full non-alcoholic pairing menu available. Just let us know your preference when you arrive!
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex space-x-4">
-                  <img
-                    src="https://images.unsplash.com/photo-1619895862022-09114b41f16f?w=400&auto=format&fit=crop&q=60"
-                    alt="Emma"
-                    className="w-10 h-10 rounded-full"
-                  />
-                  <div>
-                    <div className="flex items-baseline space-x-2">
-                      <span className="font-medium">Emma Chen</span>
-                      <span className="text-sm text-gray-500">12 hours ago</span>
-                    </div>
-                    <p className="text-gray-600 mt-1">
-                      I attended the last event at Mason & Co. and it was incredible! The jazz band really sets the perfect atmosphere. Already RSVP'd for this one! 🎷✨
-                    </p>
-                  </div>
-                </div>
+            {/* Threads Section */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 mb-12">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-light">Threads</h2>
+                <span className="text-sm text-gray-500">
+                  {event.comments?.length || 0} discussions
+                </span>
               </div>
 
-              {/* Comment Input */}
-              <textarea
-                placeholder="Ask a question or leave a comment..."
-                className="w-full rounded-xl border-gray-200 focus:ring-purple-500 focus:border-purple-500 min-h-[100px] text-sm"
-              />
-              <button className="mt-2 bg-black text-white px-6 py-2 rounded-full text-sm">
-                Post
-              </button>
+              {/* New Thread Form */}
+              <form onSubmit={handleThreadSubmit} className="mb-8">
+                <div className="mb-4">
+                  <textarea
+                    value={newThread}
+                    onChange={(e) => setNewThread(e.target.value)}
+                    placeholder="Start a new thread..."
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+                    rows={3}
+                  />
+                </div>
+                <div className="flex justify-end">
+                  <button
+                    type="submit"
+                    disabled={!newThread.trim()}
+                    className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    Post Thread
+                  </button>
+                </div>
+              </form>
+
+              {/* Threads List */}
+              <div className="space-y-8">
+                {event.comments?.map((thread, threadIndex) => (
+                  <div key={threadIndex} className="border-b border-gray-100 pb-6 last:border-0">
+                    {/* Thread */}
+                    <div className="flex space-x-4">
+                      <img
+                        src={thread.authorImage}
+                        alt={thread.authorName}
+                        className="w-10 h-10 rounded-full flex-shrink-0"
+                      />
+                      <div className="flex-1">
+                        <div className="flex items-baseline space-x-2 mb-1">
+                          <span className="font-medium">{thread.authorName}</span>
+                          <span className="text-sm text-gray-500">{thread.timeAgo}</span>
+                        </div>
+                        <p className="text-gray-600 mb-2">{thread.content}</p>
+                        <div className="flex items-center space-x-4">
+                          <button
+                            onClick={() => toggleThreadLike(threadIndex)}
+                            className="flex items-center space-x-1 text-sm text-gray-500 hover:text-purple-600"
+                          >
+                            {likedThreads.has(threadIndex) ? (
+                              <HeartIconSolid className="w-4 h-4 text-purple-600" />
+                            ) : (
+                              <HeartIconOutline className="w-4 h-4" />
+                            )}
+                            <span>{(thread.likes || 0) + (likedThreads.has(threadIndex) ? 1 : 0)}</span>
+                          </button>
+                          <button
+                            onClick={() => setReplyingTo(threadIndex)}
+                            className="text-sm text-gray-500 hover:text-purple-600"
+                          >
+                            Reply
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Reply Form */}
+                    {replyingTo === threadIndex && (
+                      <form 
+                        onSubmit={(e) => handleReplySubmit(threadIndex, e)}
+                        className="ml-14 mt-4"
+                      >
+                        <div className="mb-3">
+                          <textarea
+                            value={newReply}
+                            onChange={(e) => setNewReply(e.target.value)}
+                            placeholder="Write a reply..."
+                            className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+                            rows={2}
+                          />
+                        </div>
+                        <div className="flex justify-end space-x-2">
+                          <button
+                            type="button"
+                            onClick={() => setReplyingTo(null)}
+                            className="px-4 py-1.5 text-sm text-gray-600 hover:text-gray-800"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            type="submit"
+                            disabled={!newReply.trim()}
+                            className="px-4 py-1.5 text-sm bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            Reply
+                          </button>
+                        </div>
+                      </form>
+                    )}
+
+                    {/* Replies */}
+                    {thread.replies && thread.replies.length > 0 && (
+                      <div className="ml-14 mt-4 space-y-4">
+                        {thread.replies.map((reply, replyIndex) => (
+                          <div key={replyIndex} className="flex space-x-4">
+                            <img
+                              src={reply.authorImage}
+                              alt={reply.authorName}
+                              className="w-8 h-8 rounded-full flex-shrink-0"
+                            />
+                            <div className="flex-1">
+                              <div className="flex items-baseline space-x-2 mb-1">
+                                <span className="font-medium">{reply.authorName}</span>
+                                <span className="text-sm text-gray-500">{reply.timeAgo}</span>
+                              </div>
+                              <p className="text-gray-600 mb-2">{reply.content}</p>
+                              <button
+                                onClick={() => toggleReplyLike(threadIndex, replyIndex)}
+                                className="flex items-center space-x-1 text-sm text-gray-500 hover:text-purple-600"
+                              >
+                                {likedReplies.has(`${threadIndex}-${replyIndex}`) ? (
+                                  <HeartIconSolid className="w-4 h-4 text-purple-600" />
+                                ) : (
+                                  <HeartIconOutline className="w-4 h-4" />
+                                )}
+                                <span>{(reply.likes || 0) + (likedReplies.has(`${threadIndex}-${replyIndex}`) ? 1 : 0)}</span>
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Floating Action Components */}
-      {event.isRSVP ? (
-        <FloatingRSVP
-          event={event}
-          onRSVP={handleRSVP}
-        />
-      ) : (
-        <FloatingTicketPurchase
-          event={event}
-          onPurchase={() => setShowRSVPFlow(true)}
-        />
-      )}
+      {/* Floating Action Components - Fixed positioning */}
+      <div className="fixed bottom-0 inset-x-0 z-50">
+        <div className="bg-white border-t border-gray-100 shadow-lg">
+          <div className="max-w-7xl mx-auto">
+            {isTicketed ? (
+              <FloatingTicketPurchase 
+                event={event} 
+                onPurchase={handlePurchase}
+              />
+            ) : (
+              <FloatingRSVP 
+                event={event} 
+                onRSVP={handleRSVP}
+                status={rsvpStatus}
+                onSubmit={handleRSVPSubmit}
+              />
+            )}
+          </div>
+        </div>
+      </div>
 
       {/* RSVP Flow Modal */}
       {showRSVPFlow && rsvpStatus && (
-        <RSVPFlow
-          event={event}
-          status={rsvpStatus}
-          onClose={() => {
-            setShowRSVPFlow(false);
-            setRsvpStatus(null);
-          }}
-          onSubmit={handleRSVPSubmit}
-        />
+        <div className="fixed inset-0 z-50">
+          <RSVPFlow
+            event={event}
+            status={rsvpStatus}
+            onClose={() => {
+              setShowRSVPFlow(false);
+              setRsvpStatus(null);
+            }}
+            onSubmit={handleRSVPSubmit}
+          />
+        </div>
       )}
     </div>
   );
