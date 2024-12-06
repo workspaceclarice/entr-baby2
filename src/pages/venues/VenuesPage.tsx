@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Box, Container, Tab, Tabs, useMediaQuery, useTheme, Typography } from '@mui/material';
 import { venues } from '../../data/venues';
-import VenueAmenities from '../../components/venues/VenueAmenities';
 import VenueEstimator from '../../components/venues/VenueEstimator';
 import NotFound from '../NotFound';
 
@@ -27,7 +26,7 @@ function VenuesPage() {
   const renderTabContent = () => {
     switch (activeTab) {
       case 0:
-        return <VenueAmenities venue={venue} />;
+        return null;
       default:
         return null;
     }

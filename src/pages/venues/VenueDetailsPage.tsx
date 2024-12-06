@@ -396,8 +396,8 @@ export default function VenueDetailsPage() {
                 </nav>
               </div>
 
-              {/* Tab content */}
-              <div className="space-y-8">
+              {/* Tab content - Added padding top */}
+              <div className="pt-6 md:pt-8 space-y-8">
                 {activeTab === 'overview' && (
                   <div className="space-y-8">
                     <div className="prose max-w-none space-y-6">

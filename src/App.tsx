@@ -34,6 +34,7 @@ import VendorProfileEditor from './pages/vendors/dashboard/VendorProfileEditor';
 import VendorProfilePreview from './pages/vendors/dashboard/VendorProfilePreview';
 import CompletedBooking from './pages/vendors/dashboard/CompletedBooking';
 import VenueDetailsPage from './pages/venues/VenueDetailsPage';
+import { useScrollToTop } from './hooks/useScrollToTop';
 
 const AppRoutes = () => {
   const location = useLocation();
@@ -88,6 +89,8 @@ const AppRoutes = () => {
 };
 
 const App = () => {
+  useScrollToTop();
+  
   return (
     <AuthProvider>
       <AppRoutes />
