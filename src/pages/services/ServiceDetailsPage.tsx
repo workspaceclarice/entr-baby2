@@ -12,7 +12,7 @@ import { Disclosure, Transition } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
 import { HomeIcon } from '@heroicons/react/24/outline';
-import { Breadcrumb } from '../../components/common';
+import { Breadcrumb, BreadcrumbItem } from '../../components/common';
 
 interface ServiceReview {
   id: string;
@@ -167,15 +167,17 @@ const ServiceDetailsPage: React.FC = () => {
     setShowBookingFlow(true);
   };
 
+  const breadcrumbItems: BreadcrumbItem[] = [
+    { label: 'Services', href: '/services' },
+    { label: service.title, href: `/services/${service.id}` }
+  ];
+
   return (
     <div className="min-h-screen bg-white pt-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="py-2">
           <Breadcrumb 
-            items={[
-              { label: 'Services', href: '/services' },
-              { label: service.title }
-            ]} 
+            items={breadcrumbItems} 
           />
         </div>
       </div>

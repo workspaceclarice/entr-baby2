@@ -11,7 +11,7 @@ import {
 import { venues } from '../../data/venues';
 import VenueEstimator from '../../components/venues/VenueEstimator';
 import VenueBookingFlow from '../../components/venues/VenueBookingFlow';
-import { Breadcrumb } from '../../components/common';
+import { Breadcrumb, BreadcrumbItem } from '../../components/common';
 import { Disclosure, Transition } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/24/outline';
 
@@ -262,15 +262,17 @@ export default function VenueDetailsPage() {
     }
   ];
 
+  const breadcrumbItems: BreadcrumbItem[] = [
+    { label: 'Venues', href: '/venues' },
+    { label: venue.name, href: `/venues/${venue.id}` }
+  ];
+
   return (
     <div className="min-h-screen bg-white pt-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="py-2">
           <Breadcrumb 
-            items={[
-              { label: 'Venues', href: '/venues' },
-              { label: venue.name }
-            ]} 
+            items={breadcrumbItems} 
           />
         </div>
       </div>

@@ -60,23 +60,23 @@ export const RSVPFlow: React.FC<RSVPFlowProps> = ({
           >
             <div className="space-y-6">
               <div>
-                <label className="block text-white/60 text-sm mb-2">Your name</label>
+                <label className="block text-white/80 text-sm mb-2">Your name</label>
                 <input
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full bg-white/10 rounded-xl p-4 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/20"
+                  className="w-full bg-white/10 rounded-xl p-4 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/30"
                   placeholder="Enter your name"
                   required
                 />
               </div>
               <div>
-                <label className="block text-white/60 text-sm mb-2">Email</label>
+                <label className="block text-white/80 text-sm mb-2">Email</label>
                 <input
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full bg-white/10 rounded-xl p-4 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/20"
+                  className="w-full bg-white/10 rounded-xl p-4 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/30"
                   placeholder="Enter your email"
                   required
                 />
@@ -106,7 +106,7 @@ export const RSVPFlow: React.FC<RSVPFlowProps> = ({
           >
             <div className="space-y-6">
               <div>
-                <label className="block text-white/60 text-sm mb-4">Number of guests</label>
+                <label className="block text-white/80 text-sm mb-4">Number of guests</label>
                 <div className="flex justify-center gap-3">
                   {[1, 2, 3, 4].map((num) => (
                     <motion.button
@@ -127,11 +127,11 @@ export const RSVPFlow: React.FC<RSVPFlowProps> = ({
                 </div>
               </div>
               <div>
-                <label className="block text-white/60 text-sm mb-2">Message (optional)</label>
+                <label className="block text-white/80 text-sm mb-2">Message (optional)</label>
                 <textarea
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  className="w-full h-32 bg-white/10 rounded-xl p-4 text-white placeholder-white/40 resize-none focus:outline-none focus:ring-2 focus:ring-white/20"
+                  className="w-full h-32 bg-white/10 rounded-xl p-4 text-white placeholder-white/50 resize-none focus:outline-none focus:ring-2 focus:ring-white/30"
                   placeholder="Any message for the host?"
                 />
               </div>
@@ -214,7 +214,7 @@ export const RSVPFlow: React.FC<RSVPFlowProps> = ({
                 {status === 'going' ? "You're all set!" : "Thanks for responding!"}
               </div>
               <motion.div 
-                className="text-white/60"
+                className="text-white/80"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 }}
@@ -228,7 +228,7 @@ export const RSVPFlow: React.FC<RSVPFlowProps> = ({
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-purple-500"></span>
                 </span>
-                <span className="text-sm text-white/60">Pending host confirmation</span>
+                <span className="text-sm text-white/70">Pending host confirmation</span>
               </div>
             </motion.div>
           </div>
@@ -245,7 +245,7 @@ export const RSVPFlow: React.FC<RSVPFlowProps> = ({
             >
               <XMarkIcon className="w-8 h-8" />
             </motion.button>
-            <div className="text-sm text-white/60">
+            <div className="text-sm text-white/70">
               Step {step} of 2
             </div>
           </div>
@@ -254,12 +254,12 @@ export const RSVPFlow: React.FC<RSVPFlowProps> = ({
           <div className="px-4 pt-8 max-w-md mx-auto">
             {/* Event Title */}
             <div className="text-center space-y-4 mb-12">
-              <h1 className="text-4xl font-bold tracking-tight">
+              <h1 className="text-4xl font-bold tracking-tight text-white">
                 {event.title}
               </h1>
               <div className="inline-flex items-center space-x-2 bg-white/10 px-4 py-2 rounded-full">
-                <SparklesIcon className="w-5 h-5" />
-                <span>{status === 'going' ? "You're going!" : "Maybe going"}</span>
+                <SparklesIcon className="w-5 h-5 text-white/80" />
+                <span className="text-white/90">{status === 'going' ? "You're going!" : "Maybe going"}</span>
               </div>
             </div>
 

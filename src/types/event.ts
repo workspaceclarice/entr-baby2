@@ -19,6 +19,14 @@ export interface Comment {
   replies?: Comment[];
 }
 
+export interface TicketType {
+  id: string;
+  name: string;
+  price: number;
+  description?: string;
+  available: number;
+}
+
 export interface Event {
   id: string;
   title: string;
@@ -48,6 +56,7 @@ export interface Event {
   speakers?: Speaker[];
   speakersTitle?: string;
   comments?: Comment[];
+  ticketTypes?: TicketType[];
 }
 
 export interface RSVPFormData {
