@@ -71,6 +71,13 @@ export interface Venue {
   tags: string[];
   availability: DailyAvailability;
   features: Feature[];
+  vendor: {
+    id: string;
+    name: string;
+    profileImage?: string;
+  };
+  vendorId: string;
+  basePrice: number;
 }
 
 export {}; 

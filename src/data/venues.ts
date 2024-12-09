@@ -87,7 +87,14 @@ export const venues: Venue[] = [
       { name: 'Garden Space', description: 'Connected outdoor area perfect for ceremonies' }
     ],
     cancellationPolicy: '30 days notice required for full refund, 50% refund up to 14 days before event',
-    tags: ['Wedding', 'Corporate', 'Gala', 'Luxury', 'Indoor']
+    tags: ['Wedding', 'Corporate', 'Gala', 'Luxury', 'Indoor'],
+    vendor: {
+      id: 'grand-events-01',
+      name: 'Grand Events Co.',
+      profileImage: 'https://example.com/profile.jpg'
+    },
+    vendorId: 'grand-events-01',
+    basePrice: 1000
   },
   {
     id: 'urban-loft',
@@ -138,7 +145,13 @@ export const venues: Venue[] = [
       { name: 'Natural Light', description: 'Floor-to-ceiling windows' }
     ],
     cancellationPolicy: '14 days notice required for full refund',
-    tags: ['Industrial', 'Modern', 'Photo Shoots', 'Corporate']
+    tags: ['Industrial', 'Modern', 'Photo Shoots', 'Corporate'],
+    vendor: {
+      id: 'urban-spaces-01',
+      name: 'Urban Spaces LLC'
+    },
+    vendorId: 'urban-spaces-01',
+    basePrice: 800
   },
   {
     id: 'rooftop-garden',
@@ -189,7 +202,13 @@ export const venues: Venue[] = [
       { name: 'Garden', description: 'Landscaped outdoor space with seating' }
     ],
     cancellationPolicy: '30 days notice for full refund, weather-related cancellations handled case-by-case',
-    tags: ['Rooftop', 'Outdoor', 'Views', 'Cocktail Party']
+    tags: ['Rooftop', 'Outdoor', 'Views', 'Cocktail Party'],
+    vendor: {
+      id: 'skyline-venues-01',
+      name: 'Skyline Venues'
+    },
+    vendorId: 'skyline-venues-01',
+    basePrice: 1200
   },
   {
     id: 'historic-library',
@@ -238,8 +257,14 @@ export const venues: Venue[] = [
       { name: 'Historic Architecture', description: 'Original 1920s architectural details' },
       { name: 'Reading Room', description: 'Grand reading room with 20-foot ceilings' }
     ],
-    cancellationPolicy: '21 days notice required for full refund',
-    tags: ['Historic', 'Elegant', 'Indoor', 'Corporate']
+    cancellationPolicy: '30 days notice required for full refund',
+    tags: ['Historic', 'Classic', 'Elegant', 'Indoor'],
+    vendor: {
+      id: 'heritage-venues-01',
+      name: 'Heritage Venues'
+    },
+    vendorId: 'heritage-venues-01',
+    basePrice: 900
   },
   {
     id: 'beachfront-villa',
@@ -289,7 +314,13 @@ export const venues: Venue[] = [
       { name: 'Private Beach', description: 'Direct access to private beach' }
     ],
     cancellationPolicy: '60 days notice required for full refund',
-    tags: ['Beach', 'Luxury', 'Outdoor', 'Wedding']
+    tags: ['Beach', 'Luxury', 'Outdoor', 'Wedding'],
+    vendor: {
+      id: 'coastal-luxury-01',
+      name: 'Coastal Luxury Venues'
+    },
+    vendorId: 'coastal-luxury-01',
+    basePrice: 1500
   },
   {
     id: 'vineyard-estate',
@@ -339,7 +370,13 @@ export const venues: Venue[] = [
       { name: 'Wine Cave', description: 'Historic wine cave for intimate gatherings' }
     ],
     cancellationPolicy: '90 days notice required for full refund',
-    tags: ['Vineyard', 'Wine Country', 'Outdoor', 'Wedding']
+    tags: ['Vineyard', 'Wine Country', 'Outdoor', 'Wedding'],
+    vendor: {
+      id: 'wine-country-01',
+      name: 'Wine Country Events'
+    },
+    vendorId: 'wine-country-01',
+    basePrice: 1400
   },
   {
     id: 'modern-gallery',
@@ -389,7 +426,13 @@ export const venues: Venue[] = [
       { name: 'Outdoor Sculpture Garden', description: 'Connected sculpture garden space' }
     ],
     cancellationPolicy: '30 days notice required for full refund',
-    tags: ['Art Gallery', 'Modern', 'Corporate', 'Reception']
+    tags: ['Art Gallery', 'Modern', 'Corporate', 'Reception'],
+    vendor: {
+      id: 'gallery-venues-01',
+      name: 'Gallery Venues Co.'
+    },
+    vendorId: 'gallery-venues-01',
+    basePrice: 950
   },
   {
     id: 'greenhouse-gardens',
@@ -439,7 +482,13 @@ export const venues: Venue[] = [
       { name: 'Botanical Gardens', description: 'Access to 5 acres of maintained gardens' }
     ],
     cancellationPolicy: '45 days notice required for full refund',
-    tags: ['Garden', 'Greenhouse', 'Outdoor', 'Wedding']
+    tags: ['Garden', 'Greenhouse', 'Outdoor', 'Wedding'],
+    vendor: {
+      id: 'garden-venues-01',
+      name: 'Garden Venues Co.'
+    },
+    vendorId: 'garden-venues-01',
+    basePrice: 950
   },
   {
     id: 'tech-hub',
@@ -489,7 +538,13 @@ export const venues: Venue[] = [
       { name: 'Digital Wall', description: '40-foot interactive digital wall' }
     ],
     cancellationPolicy: '30 days notice required for full refund',
-    tags: ['Tech', 'Modern', 'Corporate', 'Conference']
+    tags: ['Tech', 'Modern', 'Corporate', 'Conference'],
+    vendor: {
+      id: 'tech-space-01',
+      name: 'Tech Space Solutions'
+    },
+    vendorId: 'tech-space-01',
+    basePrice: 1100
   },
   {
     id: 'mountain-lodge',
@@ -539,7 +594,13 @@ export const venues: Venue[] = [
       { name: 'Lodge Architecture', description: 'Authentic timber and stone construction' }
     ],
     cancellationPolicy: '60 days notice required for full refund, weather considerations',
-    tags: ['Mountain', 'Rustic', 'Winter', 'Wedding']
+    tags: ['Mountain', 'Rustic', 'Winter', 'Wedding'],
+    vendor: {
+      id: 'mountain-retreats-01',
+      name: 'Mountain Retreats'
+    },
+    vendorId: 'mountain-retreats-01',
+    basePrice: 1300
   },
   {
     id: 'jazz-club',
@@ -589,7 +650,13 @@ export const venues: Venue[] = [
       { name: 'Premium Acoustics', description: 'Professionally designed acoustic space' }
     ],
     cancellationPolicy: '21 days notice required for full refund',
-    tags: ['Music', 'Nightlife', 'Entertainment', 'Intimate']
+    tags: ['Music', 'Nightlife', 'Entertainment', 'Intimate'],
+    vendor: {
+      id: 'jazz-venues-01',
+      name: 'Jazz Venue Management'
+    },
+    vendorId: 'jazz-venues-01',
+    basePrice: 750
   },
   {
     id: 'desert-oasis',
@@ -639,7 +706,13 @@ export const venues: Venue[] = [
       { name: 'Modern Architecture', description: 'Award-winning architectural design' }
     ],
     cancellationPolicy: '45 days notice required for full refund',
-    tags: ['Desert', 'Modern', 'Pool', 'Outdoor']
+    tags: ['Desert', 'Modern', 'Pool', 'Outdoor'],
+    vendor: {
+      id: 'desert-luxury-01',
+      name: 'Desert Luxury Properties'
+    },
+    vendorId: 'desert-luxury-01',
+    basePrice: 1100
   },
   {
     id: 'film-studio',
@@ -689,7 +762,13 @@ export const venues: Venue[] = [
       { name: 'Control Room', description: 'State-of-the-art production control room' }
     ],
     cancellationPolicy: '14 days notice required for full refund',
-    tags: ['Film', 'Production', 'Studio', 'Professional']
+    tags: ['Film', 'Production', 'Studio', 'Professional'],
+    vendor: {
+      id: 'studio-ops-01',
+      name: 'Studio Operations Inc'
+    },
+    vendorId: 'studio-ops-01',
+    basePrice: 1600
   },
   {
     id: 'floating-pavilion',
@@ -739,6 +818,12 @@ export const venues: Venue[] = [
       { name: 'Private Dock', description: 'Direct boat access and private dock' }
     ],
     cancellationPolicy: '60 days notice required for full refund',
-    tags: ['Waterfront', 'Maritime', 'Unique', 'Wedding']
+    tags: ['Waterfront', 'Maritime', 'Unique', 'Wedding'],
+    vendor: {
+      id: 'maritime-venues-01',
+      name: 'Maritime Venues'
+    },
+    vendorId: 'maritime-venues-01',
+    basePrice: 1200
   }
 ]; 

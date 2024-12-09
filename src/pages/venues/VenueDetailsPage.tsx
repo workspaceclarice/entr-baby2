@@ -14,6 +14,7 @@ import VenueBookingFlow from '../../components/venues/VenueBookingFlow';
 import { Breadcrumb, BreadcrumbItem } from '../../components/common';
 import { Disclosure, Transition } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/24/outline';
+import FloatingEstimator from '../../components/common/FloatingEstimator';
 
 interface Vendor {
   id: string;
@@ -38,6 +39,7 @@ interface Venue {
   amenities: any[]; // Update this based on your amenity interface
   vendor: Vendor;
   vendorId: string;
+  basePrice: number;
 }
 
 const mockReviews = [
@@ -89,6 +91,10 @@ export default function VenueDetailsPage() {
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedAddOns, setSelectedAddOns] = useState<any[]>([]);
+  const [selectedDate, setSelectedDate] = useState('');
+  const [selectedStartTime, setSelectedStartTime] = useState('');
+  const [selectedEndTime, setSelectedEndTime] = useState('');
 
   const venue = venues.find(v => v.id === id);
   
@@ -369,13 +375,6 @@ export default function VenueDetailsPage() {
                       <p className="text-sm text-gray-500">The venue setup and staff support are highly praised by guests.</p>
                     </div>
                   </div>
-                </div>
-              </div>
-
-              {/* Mobile VenueEstimator - Below vendor profile, above menu tabs */}
-              <div className="block lg:hidden my-6">
-                <div className="bg-gray-50 p-6 rounded-lg">
-                  <VenueEstimator venue={venue} onBookNow={() => setIsBookingOpen(true)} />
                 </div>
               </div>
 
@@ -734,6 +733,19 @@ export default function VenueDetailsPage() {
         isOpen={isBookingOpen}
         onClose={() => setIsBookingOpen(false)}
       />
+
+      <div className="lg:hidden">
+        <FloatingEstimator
+          startingPrice={venue.basePrice || 100}
+          priceUnit="/hour"
+          itemId={venue.id}
+        >
+          <VenueEstimator 
+            venue={venue}
+            onBookNow={() => setIsBookingOpen(true)}
+          />
+        </FloatingEstimator>
+      </div>
     </div>
   );
 }

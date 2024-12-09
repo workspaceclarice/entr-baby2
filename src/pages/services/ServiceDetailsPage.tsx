@@ -13,6 +13,7 @@ import { ChevronDownIcon } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
 import { HomeIcon } from '@heroicons/react/24/outline';
 import { Breadcrumb, BreadcrumbItem } from '../../components/common';
+import FloatingEstimator from '../../components/common/FloatingEstimator';
 
 interface ServiceReview {
   id: string;
@@ -272,17 +273,6 @@ const ServiceDetailsPage: React.FC = () => {
                       <p className="text-sm text-gray-500">Uses professional-grade cameras and lighting for exceptional quality.</p>
                     </div>
                   </div>
-                </div>
-              </div>
-
-              {/* Mobile ServiceEstimator */}
-              <div className="block lg:hidden my-6">
-                <div className="bg-gray-50 p-6 rounded-lg">
-                  <ServiceEstimator
-                    service={service}
-                    onBookNow={handleBookNow}
-                    selectedPackage={selectedPackage}
-                  />
                 </div>
               </div>
 
@@ -614,6 +604,24 @@ const ServiceDetailsPage: React.FC = () => {
           }}
         />
       )}
+
+      <div className="lg:hidden">
+        <FloatingEstimator
+          startingPrice={service.basePrice}
+          priceUnit="/hour"
+          itemId={service.id}
+        >
+          <ServiceEstimator
+            service={service}
+            selectedPackage={selectedPackage}
+            onBookNow={() => {
+              if (selectedPackage) {
+                setShowBookingFlow(true);
+              }
+            }}
+          />
+        </FloatingEstimator>
+      </div>
     </div>
   );
 };

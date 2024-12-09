@@ -8,7 +8,6 @@ import SignupPage from './pages/auth/SignupPage';
 import HomePage from './pages/HomePage';
 import UnifiedDashboard from './pages/dashboard/UnifiedDashboard';
 import ServiceDetailsPage from './pages/services/ServiceDetailsPage';
-import ServiceBookingPage from './pages/services/ServiceBookingPage';
 import VendorLandingPage from './pages/vendors/VendorLandingPage';
 import VendorSignIn from './pages/vendors/VendorSignIn';
 import VendorSignUp from './pages/vendors/VendorSignUp';
@@ -54,7 +53,6 @@ const AppRoutes = () => {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/services/:id" element={<ServiceDetailsPage />} />
-        <Route path="/services/:id/book" element={<ServiceBookingPage />} />
         <Route path="/dashboard" element={<UnifiedDashboard />} />
         <Route path="/events/:id" element={<EventDetailPage />} />
 
