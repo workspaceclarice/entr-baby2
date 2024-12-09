@@ -62,8 +62,8 @@ const samplePackages = [
 
 export const venues: Venue[] = [
   {
-    id: 'grand-ballroom',
-    name: 'The Grand Ballroom',
+    id: 'v1',
+    name: 'Grand Ballroom',
     description: 'An elegant and spacious venue perfect for weddings, galas, and corporate events. Features high ceilings, crystal chandeliers, and a grand staircase.',
     location: {
       address: '123 Market Street',
@@ -149,749 +149,81 @@ export const venues: Venue[] = [
     },
     vendorId: 'grand-events-01',
     basePrice: 1000,
-    packages: samplePackages
-  },
-  {
-    id: 'urban-loft',
-    name: 'Urban Industrial Loft',
-    description: 'Modern industrial space with exposed brick walls, high ceilings, and large windows. Perfect for contemporary events and photo shoots.',
-    location: {
-      address: '456 Creative Ave',
-      city: 'San Francisco',
-      state: 'CA',
-      zip: '94110'
-    },
-    images: [
-      'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267',
-      'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c',
-      'https://images.unsplash.com/photo-1600607687644-c7171b42498b'
+    packages: [
+      {
+        id: 'vp1',
+        name: 'Basic Package',
+        description: '6-hour venue rental with basic amenities',
+        price: 2000,
+        duration: '6 hours',
+        features: [
+          'Basic lighting setup',
+          'Standard sound system',
+          'Tables and chairs for up to 100 guests',
+          'Basic cleaning service',
+          'On-site coordinator'
+        ],
+        isPopular: false
+      },
+      {
+        id: 'vp2',
+        name: 'Premium Package',
+        description: '8-hour venue rental with premium services',
+        price: 3500,
+        duration: '8 hours',
+        features: [
+          'Premium lighting package',
+          'Professional sound system',
+          'Tables and chairs for up to 200 guests',
+          'Full setup and cleanup',
+          'On-site coordinator',
+          'Security staff',
+          'Valet parking'
+        ],
+        isPopular: true
+      }
     ],
-    pricePerHour: 300,
-    pricePerGuest: 20,
-    capacity: 150,
-    maxCapacity: 200,
-    minCapacity: 50,
-    squareFeet: 2000,
-    minimumHours: 4,
-    amenities: [
-      createAmenity('WiFi'),
-      createAmenity('Sound System'),
-      createAmenity('Projector'),
-      createAmenity('Freight Elevator'),
-      createAmenity('Kitchen')
+    addOns: [
+      {
+        id: 'va1',
+        name: 'Dance Floor',
+        description: 'Professional dance floor installation',
+        price: 500
+      },
+      {
+        id: 'va2',
+        name: 'Stage Setup',
+        description: 'Professional stage with lighting',
+        price: 800
+      },
+      {
+        id: 'va3',
+        name: 'Additional Hour',
+        description: 'Extend your event time',
+        price: 300
+      },
+      {
+        id: 'va4',
+        name: 'Security Staff',
+        description: 'Additional security personnel',
+        price: 200
+      }
     ],
-    rules: [
-      'No smoking',
-      'No open flames',
-      'Load in/out through freight elevator only'
-    ],
-    reviews: [],
-    availability: {
-      monday: { start: '08:00', end: '23:00' },
-      tuesday: { start: '08:00', end: '23:00' },
-      wednesday: { start: '08:00', end: '23:00' },
-      thursday: { start: '08:00', end: '23:00' },
-      friday: { start: '08:00', end: '00:00' },
-      saturday: { start: '10:00', end: '00:00' },
-      sunday: { start: '10:00', end: '22:00' }
-    },
-    features: [
-      { name: 'Exposed Brick', description: 'Original exposed brick walls throughout' },
-      { name: 'Natural Light', description: 'Floor-to-ceiling windows' }
-    ],
-    cancellationPolicy: '14 days notice required for full refund',
-    tags: ['Industrial', 'Modern', 'Photo Shoots', 'Corporate'],
-    vendor: {
-      id: 'urban-spaces-01',
-      name: 'Urban Spaces LLC'
-    },
-    vendorId: 'urban-spaces-01',
-    basePrice: 800,
-    packages: samplePackages
-  },
-  {
-    id: 'rooftop-garden',
-    name: 'Skyline Rooftop Garden',
-    description: 'Stunning rooftop venue with panoramic city views, featuring both indoor and outdoor spaces with lush landscaping.',
-    location: {
-      address: '789 Sky Lane',
-      city: 'San Francisco',
-      state: 'CA',
-      zip: '94108'
-    },
-    images: [
-      'https://images.unsplash.com/photo-1519167758481-83f550bb49b3',
-      'https://images.unsplash.com/photo-1519167758481-83f550bb49b3',
-      'https://images.unsplash.com/photo-1519167758481-83f550bb49b3'
-    ],
-    pricePerHour: 600,
-    pricePerGuest: 35,
-    capacity: 150,
-    maxCapacity: 180,
-    minCapacity: 40,
-    squareFeet: 2000,
-    minimumHours: 5,
-    amenities: [
-      createAmenity('Bar'),
-      createAmenity('Lounge Furniture'),
-      createAmenity('Heat Lamps'),
-      createAmenity('Sound System'),
-      createAmenity('Private Elevator')
-    ],
-    rules: [
-      'Weather contingency plan required',
-      'No amplified music after 10 PM',
-      'No confetti or balloons'
-    ],
-    reviews: [],
-    availability: {
-      monday: { start: '10:00', end: '22:00' },
-      tuesday: { start: '10:00', end: '22:00' },
-      wednesday: { start: '10:00', end: '22:00' },
-      thursday: { start: '10:00', end: '22:00' },
-      friday: { start: '10:00', end: '23:00' },
-      saturday: { start: '10:00', end: '23:00' },
-      sunday: { start: '11:00', end: '22:00' }
-    },
-    features: [
-      { name: 'City Views', description: '360-degree views of the city skyline' },
-      { name: 'Garden', description: 'Landscaped outdoor space with seating' }
-    ],
-    cancellationPolicy: '30 days notice for full refund, weather-related cancellations handled case-by-case',
-    tags: ['Rooftop', 'Outdoor', 'Views', 'Cocktail Party'],
-    vendor: {
-      id: 'skyline-venues-01',
-      name: 'Skyline Venues'
-    },
-    vendorId: 'skyline-venues-01',
-    basePrice: 1200,
-    packages: samplePackages
-  },
-  {
-    id: 'historic-library',
-    name: 'The Historic Library',
-    description: 'Elegant historic library with wood-paneled walls, vintage details, and a sophisticated atmosphere.',
-    location: {
-      address: '101 Heritage Row',
-      city: 'San Francisco',
-      state: 'CA',
-      zip: '94102'
-    },
-    images: [
-      'https://images.unsplash.com/photo-1568667256549-094345857637',
-      'https://images.unsplash.com/photo-1568667256549-094345857637',
-      'https://images.unsplash.com/photo-1568667256549-094345857637'
-    ],
-    pricePerHour: 450,
-    pricePerGuest: 30,
-    capacity: 150,
-    maxCapacity: 175,
-    minCapacity: 30,
-    squareFeet: 1200,
-    minimumHours: 4,
-    amenities: [
-      createAmenity('WiFi'),
-      createAmenity('Antique Furniture'),
-      createAmenity('Climate Control'),
-      createAmenity('Security System')
-    ],
-    rules: [
-      'No food or drink in library stacks',
-      'White glove service required for certain areas',
-      'No flash photography'
-    ],
-    reviews: [],
-    availability: {
-      monday: { start: '09:00', end: '21:00' },
-      tuesday: { start: '09:00', end: '21:00' },
-      wednesday: { start: '09:00', end: '21:00' },
-      thursday: { start: '09:00', end: '21:00' },
-      friday: { start: '09:00', end: '22:00' },
-      saturday: { start: '10:00', end: '22:00' },
-      sunday: { start: '11:00', end: '20:00' }
-    },
-    features: [
-      { name: 'Historic Architecture', description: 'Original 1920s architectural details' },
-      { name: 'Reading Room', description: 'Grand reading room with 20-foot ceilings' }
-    ],
-    cancellationPolicy: '30 days notice required for full refund',
-    tags: ['Historic', 'Classic', 'Elegant', 'Indoor'],
-    vendor: {
-      id: 'heritage-venues-01',
-      name: 'Heritage Venues'
-    },
-    vendorId: 'heritage-venues-01',
-    basePrice: 900,
-    packages: samplePackages
-  },
-  {
-    id: 'beachfront-villa',
-    name: 'Oceanside Villa',
-    description: 'Luxurious beachfront villa with private beach access, infinity pool, and stunning ocean views.',
-    location: {
-      address: '1234 Coastal Highway',
-      city: 'Half Moon Bay',
-      state: 'CA',
-      zip: '94019'
-    },
-    images: [
-      'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2', // Stunning beachfront villa
-      'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2',
-      'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2'
-    ],
-    pricePerHour: 800,
-    pricePerGuest: 45,
-    capacity: 150,
-    maxCapacity: 200,
-    minCapacity: 30,
-    squareFeet: 3000,
-    minimumHours: 6,
-    amenities: [
-      createAmenity('Private Beach'),
-      createAmenity('Infinity Pool'),
-      createAmenity('Outdoor Kitchen'),
-      createAmenity('Valet Parking')
-    ],
-    rules: [
-      'No glass on beach area',
-      'Quiet hours after 10 PM',
-      'No fireworks'
-    ],
-    reviews: [],
-    availability: {
-      monday: { start: '10:00', end: '22:00' },
-      tuesday: { start: '10:00', end: '22:00' },
-      wednesday: { start: '10:00', end: '22:00' },
-      thursday: { start: '10:00', end: '22:00' },
-      friday: { start: '10:00', end: '23:00' },
-      saturday: { start: '09:00', end: '23:00' },
-      sunday: { start: '09:00', end: '22:00' }
-    },
-    features: [
-      { name: 'Ocean Views', description: 'Panoramic ocean views from all main spaces' },
-      { name: 'Private Beach', description: 'Direct access to private beach' }
-    ],
-    cancellationPolicy: '60 days notice required for full refund',
-    tags: ['Beach', 'Luxury', 'Outdoor', 'Wedding'],
-    vendor: {
-      id: 'coastal-luxury-01',
-      name: 'Coastal Luxury Venues'
-    },
-    vendorId: 'coastal-luxury-01',
-    basePrice: 1500,
-    packages: samplePackages
-  },
-  {
-    id: 'vineyard-estate',
-    name: 'Wine Country Estate',
-    description: 'Elegant vineyard estate surrounded by rolling hills and endless rows of vines.',
-    location: {
-      address: '789 Vine Road',
-      city: 'Napa',
-      state: 'CA',
-      zip: '94558'
-    },
-    images: [
-      'https://images.unsplash.com/photo-1515315230580-4299548a2e45', // Beautiful vineyard estate
-      'https://images.unsplash.com/photo-1515315230580-4299548a2e45',
-      'https://images.unsplash.com/photo-1515315230580-4299548a2e45'
-    ],
-    pricePerHour: 700,
-    pricePerGuest: 40,
-    capacity: 150,
-    maxCapacity: 200,
-    minCapacity: 20,
-    squareFeet: 2000,
-    minimumHours: 6,
-    amenities: [
-      createAmenity('Wine Tasting'),
-      createAmenity('Barrel Room'),
-      createAmenity('Outdoor Terrace'),
-      createAmenity('Bridal Suite')
-    ],
-    rules: [
-      'No outside alcohol',
-      'Must use approved vendors',
-      'No smoking on property'
-    ],
-    reviews: [],
-    availability: {
-      monday: { start: '10:00', end: '22:00' },
-      tuesday: { start: '10:00', end: '22:00' },
-      wednesday: { start: '10:00', end: '22:00' },
-      thursday: { start: '10:00', end: '22:00' },
-      friday: { start: '10:00', end: '23:00' },
-      saturday: { start: '10:00', end: '23:00' },
-      sunday: { start: '10:00', end: '22:00' }
-    },
-    features: [
-      { name: 'Vineyard Views', description: 'Surrounded by 100 acres of vineyards' },
-      { name: 'Wine Cave', description: 'Historic wine cave for intimate gatherings' }
-    ],
-    cancellationPolicy: '90 days notice required for full refund',
-    tags: ['Vineyard', 'Wine Country', 'Outdoor', 'Wedding'],
-    vendor: {
-      id: 'wine-country-01',
-      name: 'Wine Country Events'
-    },
-    vendorId: 'wine-country-01',
-    basePrice: 1400,
-    packages: samplePackages
-  },
-  {
-    id: 'modern-gallery',
-    name: 'Contemporary Art Gallery',
-    description: 'Minimalist gallery space with rotating art exhibitions and modern amenities.',
-    location: {
-      address: '567 Art District',
-      city: 'San Francisco',
-      state: 'CA',
-      zip: '94107'
-    },
-    images: [
-      'https://images.unsplash.com/photo-1577083552431-6e5fd01aa342', // Modern gallery space
-      'https://images.unsplash.com/photo-1577083552431-6e5fd01aa342',
-      'https://images.unsplash.com/photo-1577083552431-6e5fd01aa342'
-    ],
-    pricePerHour: 400,
-    pricePerGuest: 25,
-    capacity: 150,
-    maxCapacity: 250,
-    minCapacity: 50,
-    squareFeet: 1800,
-    minimumHours: 4,
-    amenities: [
-      createAmenity('Gallery Lighting'),
-      createAmenity('Sound System'),
-      createAmenity('Projector'),
-      createAmenity('Catering Prep')
-    ],
-    rules: [
-      'No touching artwork',
-      'No red wine',
-      'Professional art handling required'
-    ],
-    reviews: [],
-    availability: {
-      monday: { start: '09:00', end: '22:00' },
-      tuesday: { start: '09:00', end: '22:00' },
-      wednesday: { start: '09:00', end: '22:00' },
-      thursday: { start: '09:00', end: '22:00' },
-      friday: { start: '09:00', end: '23:00' },
-      saturday: { start: '10:00', end: '23:00' },
-      sunday: { start: '10:00', end: '22:00' }
-    },
-    features: [
-      { name: 'Gallery Walls', description: 'Professional gallery lighting and hanging system' },
-      { name: 'Outdoor Sculpture Garden', description: 'Connected sculpture garden space' }
-    ],
-    cancellationPolicy: '30 days notice required for full refund',
-    tags: ['Art Gallery', 'Modern', 'Corporate', 'Reception'],
-    vendor: {
-      id: 'gallery-venues-01',
-      name: 'Gallery Venues Co.'
-    },
-    vendorId: 'gallery-venues-01',
-    basePrice: 950,
-    packages: samplePackages
-  },
-  {
-    id: 'greenhouse-gardens',
-    name: 'The Glass House & Gardens',
-    description: 'Victorian-style greenhouse and surrounding botanical gardens perfect for nature-inspired events.',
-    location: {
-      address: '321 Botanical Way',
-      city: 'Berkeley',
-      state: 'CA',
-      zip: '94720'
-    },
-    images: [
-      'https://images.unsplash.com/photo-1516901632977-d566df8e001c', // Beautiful greenhouse
-      'https://images.unsplash.com/photo-1516901632977-d566df8e001c',
-      'https://images.unsplash.com/photo-1516901632977-d566df8e001c'
-    ],
-    pricePerHour: 450,
-    pricePerGuest: 30,
-    capacity: 150,
-    maxCapacity: 200,
-    minCapacity: 40,
-    squareFeet: 1200,
-    minimumHours: 4,
-    amenities: [
-      createAmenity('Climate Control'),
-      createAmenity('Garden Paths'),
-      createAmenity('String Lights'),
-      createAmenity('Rain Contingency')
-    ],
-    rules: [
-      'No picking flowers',
-      'Stay on designated paths',
-      'No confetti or rice'
-    ],
-    reviews: [],
-    availability: {
-      monday: { start: '09:00', end: '21:00' },
-      tuesday: { start: '09:00', end: '21:00' },
-      wednesday: { start: '09:00', end: '21:00' },
-      thursday: { start: '09:00', end: '21:00' },
-      friday: { start: '09:00', end: '22:00' },
-      saturday: { start: '09:00', end: '22:00' },
-      sunday: { start: '10:00', end: '21:00' }
-    },
-    features: [
-      { name: 'Victorian Greenhouse', description: 'Restored Victorian-era glass greenhouse' },
-      { name: 'Botanical Gardens', description: 'Access to 5 acres of maintained gardens' }
-    ],
-    cancellationPolicy: '45 days notice required for full refund',
-    tags: ['Garden', 'Greenhouse', 'Outdoor', 'Wedding'],
-    vendor: {
-      id: 'garden-venues-01',
-      name: 'Garden Venues Co.'
-    },
-    vendorId: 'garden-venues-01',
-    basePrice: 950,
-    packages: samplePackages
-  },
-  {
-    id: 'tech-hub',
-    name: 'Innovation Hub',
-    description: 'Ultra-modern tech space with state-of-the-art facilities and flexible configurations.',
-    location: {
-      address: '888 Tech Avenue',
-      city: 'San Jose',
-      state: 'CA',
-      zip: '95113'
-    },
-    images: [
-      'https://images.unsplash.com/photo-1497366216548-37526070297c', // Modern tech office
-      'https://images.unsplash.com/photo-1497366216548-37526070297c',
-      'https://images.unsplash.com/photo-1497366216548-37526070297c'
-    ],
-    pricePerHour: 550,
-    pricePerGuest: 35,
-    capacity: 150,
-    maxCapacity: 250,
-    minCapacity: 50,
-    squareFeet: 2500,
-    minimumHours: 4,
-    amenities: [
-      createAmenity('High-Speed WiFi'),
-      createAmenity('Video Wall'),
-      createAmenity('Recording Studio'),
-      createAmenity('VR Room')
-    ],
-    rules: [
-      'NDA required',
-      'Security check-in required',
-      'No photography without permission'
-    ],
-    reviews: [],
-    availability: {
-      monday: { start: '08:00', end: '22:00' },
-      tuesday: { start: '08:00', end: '22:00' },
-      wednesday: { start: '08:00', end: '22:00' },
-      thursday: { start: '08:00', end: '22:00' },
-      friday: { start: '08:00', end: '22:00' },
-      saturday: { start: '09:00', end: '21:00' },
-      sunday: { start: '09:00', end: '21:00' }
-    },
-    features: [
-      { name: 'Innovation Lab', description: 'Fully equipped tech demonstration space' },
-      { name: 'Digital Wall', description: '40-foot interactive digital wall' }
-    ],
-    cancellationPolicy: '30 days notice required for full refund',
-    tags: ['Tech', 'Modern', 'Corporate', 'Conference'],
-    vendor: {
-      id: 'tech-space-01',
-      name: 'Tech Space Solutions'
-    },
-    vendorId: 'tech-space-01',
-    basePrice: 1100,
-    packages: samplePackages
-  },
-  {
-    id: 'mountain-lodge',
-    name: 'Alpine Summit Lodge',
-    description: 'Rustic-luxury mountain lodge with panoramic views of the Sierra Nevada mountains.',
-    location: {
-      address: '456 Summit Ridge',
-      city: 'Lake Tahoe',
-      state: 'CA',
-      zip: '96150'
-    },
-    images: [
-      'https://images.unsplash.com/photo-1518732714860-b62714ce0c59', // Stunning mountain lodge
-      'https://images.unsplash.com/photo-1518732714860-b62714ce0c59',
-      'https://images.unsplash.com/photo-1518732714860-b62714ce0c59'
-    ],
-    pricePerHour: 650,
-    pricePerGuest: 40,
-    capacity: 150,
-    maxCapacity: 180,
-    minCapacity: 40,
-    squareFeet: 1800,
-    minimumHours: 6,
-    amenities: [
-      createAmenity('Stone Fireplace'),
-      createAmenity('Outdoor Fire Pit'),
-      createAmenity('Ski Storage'),
-      createAmenity('Heated Floors')
-    ],
-    rules: [
-      'Snow chains required in winter',
-      'No outdoor music after sunset',
-      'Proper winter attire required'
-    ],
-    reviews: [],
-    availability: {
-      monday: { start: '10:00', end: '22:00' },
-      tuesday: { start: '10:00', end: '22:00' },
-      wednesday: { start: '10:00', end: '22:00' },
-      thursday: { start: '10:00', end: '22:00' },
-      friday: { start: '09:00', end: '23:00' },
-      saturday: { start: '09:00', end: '23:00' },
-      sunday: { start: '10:00', end: '22:00' }
-    },
-    features: [
-      { name: 'Mountain Views', description: 'Panoramic views of Lake Tahoe and mountains' },
-      { name: 'Lodge Architecture', description: 'Authentic timber and stone construction' }
-    ],
-    cancellationPolicy: '60 days notice required for full refund, weather considerations',
-    tags: ['Mountain', 'Rustic', 'Winter', 'Wedding'],
-    vendor: {
-      id: 'mountain-retreats-01',
-      name: 'Mountain Retreats'
-    },
-    vendorId: 'mountain-retreats-01',
-    basePrice: 1300,
-    packages: samplePackages
-  },
-  {
-    id: 'jazz-club',
-    name: 'The Blue Note Lounge',
-    description: 'Intimate jazz club with vintage decor, premium sound system, and speakeasy atmosphere.',
-    location: {
-      address: '789 Jazz Street',
-      city: 'San Francisco',
-      state: 'CA',
-      zip: '94133'
-    },
-    images: [
-      'https://images.unsplash.com/photo-1514525253161-7a46d19cd819', // Moody jazz club interior
-      'https://images.unsplash.com/photo-1514525253161-7a46d19cd819',
-      'https://images.unsplash.com/photo-1514525253161-7a46d19cd819'
-    ],
-    pricePerHour: 350,
-    pricePerGuest: 30,
-    capacity: 150,
-    maxCapacity: 175,
-    minCapacity: 25,
-    squareFeet: 1000,
-    minimumHours: 4,
-    amenities: [
-      createAmenity('Professional Sound System'),
-      createAmenity('Stage'),
-      createAmenity('Green Room'),
-      createAmenity('Full Bar')
-    ],
-    rules: [
-      'No outside food or drink',
-      'Professional musicians only',
-      'Sound check required'
-    ],
-    reviews: [],
-    availability: {
-      monday: { start: '16:00', end: '02:00' },
-      tuesday: { start: '16:00', end: '02:00' },
-      wednesday: { start: '16:00', end: '02:00' },
-      thursday: { start: '16:00', end: '02:00' },
-      friday: { start: '16:00', end: '03:00' },
-      saturday: { start: '16:00', end: '03:00' },
-      sunday: { start: '16:00', end: '00:00' }
-    },
-    features: [
-      { name: 'Vintage Stage', description: 'Original 1940s performance stage' },
-      { name: 'Premium Acoustics', description: 'Professionally designed acoustic space' }
-    ],
-    cancellationPolicy: '21 days notice required for full refund',
-    tags: ['Music', 'Nightlife', 'Entertainment', 'Intimate'],
-    vendor: {
-      id: 'jazz-venues-01',
-      name: 'Jazz Venue Management'
-    },
-    vendorId: 'jazz-venues-01',
-    basePrice: 750,
-    packages: samplePackages
-  },
-  {
-    id: 'desert-oasis',
-    name: 'Desert Bloom Estate',
-    description: 'Modern desert retreat with stunning architecture and native desert landscaping.',
-    location: {
-      address: '123 Desert View Road',
-      city: 'Palm Springs',
-      state: 'CA',
-      zip: '92262'
-    },
-    images: [
-      'https://images.unsplash.com/photo-1512917774080-9991f1c4c750', // Modern desert home
-      'https://images.unsplash.com/photo-1512917774080-9991f1c4c750',
-      'https://images.unsplash.com/photo-1512917774080-9991f1c4c750'
-    ],
-    pricePerHour: 550,
-    pricePerGuest: 35,
-    capacity: 150,
-    maxCapacity: 200,
-    minCapacity: 30,
-    squareFeet: 3000,
-    minimumHours: 5,
-    amenities: [
-      createAmenity('Pool'),
-      createAmenity('Outdoor Shower'),
-      createAmenity('Misting System'),
-      createAmenity('Desert Gardens')
-    ],
-    rules: [
-      'No glass near pool',
-      'Respect desert wildlife',
-      'Noise ordinance after 10 PM'
-    ],
-    reviews: [],
-    availability: {
-      monday: { start: '08:00', end: '22:00' },
-      tuesday: { start: '08:00', end: '22:00' },
-      wednesday: { start: '08:00', end: '22:00' },
-      thursday: { start: '08:00', end: '22:00' },
-      friday: { start: '08:00', end: '23:00' },
-      saturday: { start: '08:00', end: '23:00' },
-      sunday: { start: '08:00', end: '22:00' }
-    },
-    features: [
-      { name: 'Desert Views', description: 'Panoramic views of desert landscape' },
-      { name: 'Modern Architecture', description: 'Award-winning architectural design' }
-    ],
-    cancellationPolicy: '45 days notice required for full refund',
-    tags: ['Desert', 'Modern', 'Pool', 'Outdoor'],
-    vendor: {
-      id: 'desert-luxury-01',
-      name: 'Desert Luxury Properties'
-    },
-    vendorId: 'desert-luxury-01',
-    basePrice: 1100,
-    packages: samplePackages
-  },
-  {
-    id: 'film-studio',
-    name: 'Cinematic Studios',
-    description: 'Professional film studio with multiple sets, green screens, and production facilities.',
-    location: {
-      address: '456 Production Blvd',
-      city: 'Burbank',
-      state: 'CA',
-      zip: '91505'
-    },
-    images: [
-      'https://images.unsplash.com/photo-1500210557-5db9e134926b', // Professional film studio
-      'https://images.unsplash.com/photo-1500210557-5db9e134926b',
-      'https://images.unsplash.com/photo-1500210557-5db9e134926b'
-    ],
-    pricePerHour: 750,
-    pricePerGuest: 0,
-    capacity: 150,
-    maxCapacity: 200,
-    minCapacity: 20,
-    squareFeet: 2000,
-    minimumHours: 8,
-    amenities: [
-      createAmenity('Green Screen'),
-      createAmenity('Lighting Grid'),
-      createAmenity('Sound Stage'),
-      createAmenity('Makeup Room')
-    ],
-    rules: [
-      'Production insurance required',
-      'Qualified crew only',
-      'Equipment handling certification needed'
-    ],
-    reviews: [],
-    availability: {
-      monday: { start: '06:00', end: '22:00' },
-      tuesday: { start: '06:00', end: '22:00' },
-      wednesday: { start: '06:00', end: '22:00' },
-      thursday: { start: '06:00', end: '22:00' },
-      friday: { start: '06:00', end: '22:00' },
-      saturday: { start: '08:00', end: '20:00' },
-      sunday: { start: '08:00', end: '20:00' }
-    },
-    features: [
-      { name: 'Sound Stage', description: 'Professional sound-isolated stage' },
-      { name: 'Control Room', description: 'State-of-the-art production control room' }
-    ],
-    cancellationPolicy: '14 days notice required for full refund',
-    tags: ['Film', 'Production', 'Studio', 'Professional'],
-    vendor: {
-      id: 'studio-ops-01',
-      name: 'Studio Operations Inc'
-    },
-    vendorId: 'studio-ops-01',
-    basePrice: 1600,
-    packages: samplePackages
-  },
-  {
-    id: 'floating-pavilion',
-    name: 'Harbor View Pavilion',
-    description: 'Elegant floating venue with 360-degree water views and modern maritime design.',
-    location: {
-      address: '789 Marina Way',
-      city: 'Sausalito',
-      state: 'CA',
-      zip: '94965'
-    },
-    images: [
-      'https://images.unsplash.com/photo-1519167758481-83f550bb49b3', // Waterfront pavilion
-      'https://images.unsplash.com/photo-1519167758481-83f550bb49b3',
-      'https://images.unsplash.com/photo-1519167758481-83f550bb49b3'
-    ],
-    pricePerHour: 600,
-    pricePerGuest: 40,
-    capacity: 150,
-    maxCapacity: 180,
-    minCapacity: 40,
-    squareFeet: 1600,
-    minimumHours: 5,
-    amenities: [
-      createAmenity('Boat Dock'),
-      createAmenity('Waterfront Deck'),
-      createAmenity('Climate Control'),
-      createAmenity('Sunset Lighting')
-    ],
-    rules: [
-      'Life jackets provided',
-      'Weather contingency required',
-      'No swimming'
-    ],
-    reviews: [],
-    availability: {
-      monday: { start: '10:00', end: '22:00' },
-      tuesday: { start: '10:00', end: '22:00' },
-      wednesday: { start: '10:00', end: '22:00' },
-      thursday: { start: '10:00', end: '22:00' },
-      friday: { start: '10:00', end: '23:00' },
-      saturday: { start: '09:00', end: '23:00' },
-      sunday: { start: '09:00', end: '22:00' }
-    },
-    features: [
-      { name: 'Water Views', description: '360-degree bay and marina views' },
-      { name: 'Private Dock', description: 'Direct boat access and private dock' }
-    ],
-    cancellationPolicy: '60 days notice required for full refund',
-    tags: ['Waterfront', 'Maritime', 'Unique', 'Wedding'],
-    vendor: {
-      id: 'maritime-venues-01',
-      name: 'Maritime Venues'
-    },
-    vendorId: 'maritime-venues-01',
-    basePrice: 1200,
-    packages: samplePackages
+    availableTimeSlots: [
+      '09:00',
+      '10:00',
+      '11:00',
+      '12:00',
+      '13:00',
+      '14:00',
+      '15:00',
+      '16:00',
+      '17:00',
+      '18:00',
+      '19:00',
+      '20:00',
+      '21:00',
+      '22:00'
+    ]
   }
 ]; 

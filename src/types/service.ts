@@ -9,6 +9,14 @@ export interface ServicePackage {
   isPopular?: boolean;
 }
 
+export interface AdditionalItem {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  selected?: boolean;
+}
+
 export interface Service {
   id: string;
   title: string;
@@ -39,13 +47,7 @@ export interface Service {
   isAvailable: boolean;
   gallery: string[];
   packages: ServicePackage[];
-}
-
-export interface AdditionalItem {
-  id: string;
-  name: string;
-  price: number;
-  selected: boolean;
+  additionalItems: AdditionalItem[];
 }
 
 export {}; 

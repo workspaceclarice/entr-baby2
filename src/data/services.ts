@@ -63,6 +63,26 @@ export const services: Service[] = [
         includes: ['300 edited photos', 'Digital delivery', 'Print release', 'Engagement session'],
         isPopular: true
       }
+    ],
+    additionalItems: [
+      {
+        id: 'ai1',
+        name: 'Second Photographer',
+        description: 'Additional professional photographer for comprehensive coverage',
+        price: 150
+      },
+      {
+        id: 'ai2',
+        name: 'Photo Album',
+        description: 'Premium hardcover photo album with 20 pages',
+        price: 200
+      },
+      {
+        id: 'ai3',
+        name: 'Extended Hours',
+        description: 'Additional hour of photography coverage',
+        price: 100
+      }
     ]
   },
   {
@@ -126,6 +146,26 @@ export const services: Service[] = [
         features: ['Plated service', 'Full staff', 'Bar service'],
         includes: ['3 entrees', '4 sides', 'Premium beverages', 'Dessert'],
         isPopular: true
+      }
+    ],
+    additionalItems: [
+      {
+        id: 'ai1',
+        name: 'Bar Service',
+        description: 'Professional bartender and premium bar setup',
+        price: 300
+      },
+      {
+        id: 'ai2',
+        name: 'Additional Staff',
+        description: 'Extra service staff member for 4 hours',
+        price: 150
+      },
+      {
+        id: 'ai3',
+        name: 'Dessert Station',
+        description: 'Assorted desserts and setup',
+        price: 200
       }
     ]
   }

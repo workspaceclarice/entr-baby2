@@ -3,17 +3,17 @@ export interface VenuePackage {
   name: string;
   description: string;
   price: number;
+  duration?: string;
   features: string[];
-  minimumHours: number;
-  maxGuests: number;
+  isPopular?: boolean;
 }
 
-export interface VenueAddOn {
+export interface AddOn {
   id: string;
   name: string;
   description: string;
   price: number;
-  priceType: 'flat' | 'per_hour' | 'per_guest';
+  selected?: boolean;
 }
 
 export interface TimeSlot {
@@ -78,14 +78,9 @@ export interface Venue {
   };
   vendorId: string;
   basePrice: number;
-  packages?: {
-    id: string;
-    name: string;
-    description: string;
-    price: number;
-    duration: string;
-    features: string[];
-  }[];
+  packages: VenuePackage[];
+  addOns: AddOn[];
+  availableTimeSlots?: string[];
 }
 
 export {}; 

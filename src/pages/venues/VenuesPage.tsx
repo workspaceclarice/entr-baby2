@@ -62,7 +62,7 @@ function VenuesPage() {
             <Box sx={{ mb: 3 }}>
               <VenueEstimator 
                 venue={venue} 
-                onBookNow={handleBookNow}
+                onBookingClick={handleBookNow}
               />
             </Box>
           )}
@@ -97,7 +97,7 @@ function VenuesPage() {
           }}>
             <VenueEstimator 
               venue={venue} 
-              onBookNow={handleBookNow}
+              onBookingClick={handleBookNow}
             />
           </Box>
         )}

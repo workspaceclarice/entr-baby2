@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { MapPinIcon, TagIcon, ShareIcon, CheckCircleIcon, CameraIcon } from '@heroicons/react/24/outline';
 import { HeartIcon, StarIcon } from '@heroicons/react/24/solid';
-import { Service, ServicePackage, AdditionalItem } from '../../types/service';
+import { Service, ServicePackage, AdditionalItem as ServiceAdditionalItem } from '../../types/service';
 import { services } from '../../data/services';
 import ServiceEstimator from '../../components/services/ServiceEstimator';
 import ServiceBookingFlow from '../../components/services/ServiceBookingFlow';
@@ -67,6 +67,12 @@ const tabs = [
   { id: 'faq' as const, name: 'FAQ' }
 ];
 
+interface ServiceEstimatorProps {
+  service: Service;
+  selectedPackage: ServicePackage | null;
+  onBookNow: (selectedItems: ServiceAdditionalItem[]) => void;
+}
+
 const ServiceDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -76,7 +82,7 @@ const ServiceDetailsPage: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [selectedStartTime, setSelectedStartTime] = useState<string>('');
   const [selectedEndTime, setSelectedEndTime] = useState<string>('');
-  const [selectedAdditionalItems, setSelectedAdditionalItems] = useState<AdditionalItem[]>([]);
+  const [selectedAdditionalItems, setSelectedAdditionalItems] = useState<ServiceAdditionalItem[]>([]);
   const [activeTab, setActiveTab] = useState<'overview' | 'packages' | 'gallery' | 'faq' | 'reviews'>('overview');
 
   const service = services.find(s => s.id === id);
@@ -163,8 +169,8 @@ const ServiceDetailsPage: React.FC = () => {
     ]
   };
 
-  const handleBookNow = (items: AdditionalItem[]) => {
-    setSelectedAdditionalItems(items);
+  const handleBookNow = (selectedItems: ServiceAdditionalItem[]) => {
+    setSelectedAdditionalItems(selectedItems);
     setShowBookingFlow(true);
   };
 
@@ -423,41 +429,77 @@ const ServiceDetailsPage: React.FC = () => {
                 )}
 
                 {activeTab === 'packages' && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {service.packages.map((pkg) => (
-                      <div
-                        key={pkg.id}
-                        className={`bg-white rounded-xl p-6 shadow-sm ${
-                          pkg.isPopular ? 'ring-2 ring-purple-500' : ''
-                        }`}
-                      >
-                        {pkg.isPopular && (
-                          <span className="inline-block px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm mb-4">
-                            Most Popular
-                          </span>
-                        )}
-                        <h3 className="text-xl font-medium mb-2">{pkg.name}</h3>
-                        <p className="text-3xl font-light mb-4">${pkg.price}</p>
-                        <p className="text-sm text-gray-600 mb-4">{pkg.description}</p>
-                        <ul className="space-y-2 mb-6">
-                          {pkg.features.map((feature, index) => (
-                            <li key={index} className="flex items-center text-sm">
-                              <CheckCircleIcon className="h-5 w-5 text-green-500 mr-2" />
-                              {feature}
-                            </li>
-                          ))}
-                        </ul>
-                        <button
-                          onClick={() => {
-                            setSelectedPackage(pkg);
-                            setShowBookingFlow(true);
-                          }}
-                          className="w-full py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                  <div className="space-y-8">
+                    <div className="prose max-w-none mb-8">
+                      <p className="text-gray-600">
+                        Choose from our carefully curated packages designed to meet your photography needs.
+                      </p>
+                    </div>
+                    
+                    <div className="grid gap-6">
+                      {service.packages.map((pkg) => (
+                        <div 
+                          key={pkg.id}
+                          className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:border-purple-200 transition-colors"
                         >
-                          Select Package
-                        </button>
+                          <div className="p-6">
+                            <div className="flex justify-between items-start mb-4">
+                              <div>
+                                <h3 className="text-xl font-medium text-gray-900">{pkg.name}</h3>
+                                <p className="text-gray-600 mt-1">{pkg.description}</p>
+                              </div>
+                              <div className="text-right">
+                                <div className="text-2xl font-medium text-gray-900">${pkg.price}</div>
+                                <div className="text-sm text-gray-500">{pkg.duration || 'Per session'}</div>
+                              </div>
+                            </div>
+                            
+                            <div className="space-y-3">
+                              {pkg.features.map((feature, index) => (
+                                <div key={index} className="flex items-start gap-3">
+                                  <svg 
+                                    className="h-5 w-5 text-purple-500 flex-shrink-0 mt-0.5" 
+                                    fill="none" 
+                                    viewBox="0 0 24 24" 
+                                    stroke="currentColor"
+                                  >
+                                    <path 
+                                      strokeLinecap="round" 
+                                      strokeLinejoin="round" 
+                                      strokeWidth={2} 
+                                      d="M5 13l4 4L19 7" 
+                                    />
+                                  </svg>
+                                  <span className="text-gray-600">{feature}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Additional Items Section */}
+                    <div className="pt-8 border-t border-gray-100">
+                      <h3 className="text-lg font-medium text-gray-900 mb-6">Additional Items</h3>
+                      <div className="space-y-4">
+                        {service.additionalItems?.map((item) => (
+                          <div 
+                            key={item.id}
+                            className="flex items-start justify-between p-4 border border-gray-100 rounded-lg hover:border-purple-100 transition-colors"
+                          >
+                            <div className="flex-1">
+                              <h4 className="text-base font-medium text-gray-900">{item.name}</h4>
+                              <p className="text-sm text-gray-600 mt-1">{item.description}</p>
+                            </div>
+                            <div className="text-right ml-4">
+                              <div className="text-lg font-medium text-gray-900">${item.price}</div>
+                              <div className="text-sm text-gray-500">per item</div>
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                    ))}
+                    </div>
                   </div>
                 )}
 
@@ -579,8 +621,8 @@ const ServiceDetailsPage: React.FC = () => {
                 <div className="bg-gray-50 p-6 rounded-lg">
                   <ServiceEstimator
                     service={service}
-                    onBookNow={handleBookNow}
-                    selectedPackage={selectedPackage}
+                    onBookingClick={handleBookNow}
+                    initialPackage={selectedPackage}
                   />
                 </div>
               </div>
@@ -598,27 +640,20 @@ const ServiceDetailsPage: React.FC = () => {
           initialStartTime={selectedStartTime}
           initialEndTime={selectedEndTime}
           additionalItems={selectedAdditionalItems}
-          onClose={() => {
-            setShowBookingFlow(false);
-            setSelectedPackage(null);
-          }}
+          isOpen={showBookingFlow}
+          onClose={() => setShowBookingFlow(false)}
         />
       )}
 
       <div className="lg:hidden">
         <FloatingEstimator
           startingPrice={service.basePrice}
-          priceUnit="/hour"
           itemId={service.id}
         >
           <ServiceEstimator
             service={service}
-            selectedPackage={selectedPackage}
-            onBookNow={() => {
-              if (selectedPackage) {
-                setShowBookingFlow(true);
-              }
-            }}
+            onBookingClick={handleBookNow}
+            initialPackage={selectedPackage}
           />
         </FloatingEstimator>
       </div>

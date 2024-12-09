@@ -15,6 +15,7 @@ import { Breadcrumb, BreadcrumbItem } from '../../components/common';
 import { Disclosure, Transition } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/24/outline';
 import FloatingEstimator from '../../components/common/FloatingEstimator';
+import { VenuePackage, AddOn } from '../../types/venue';
 
 interface Vendor {
   id: string;
@@ -40,7 +41,7 @@ interface Venue {
   vendor: Vendor;
   vendorId: string;
   basePrice: number;
-  packages?: any[]; // Update this based on your package interface
+  packages?: VenuePackage[]; // Update this based on your package interface
 }
 
 const mockReviews = [
@@ -92,10 +93,12 @@ export default function VenueDetailsPage() {
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [selectedAddOns, setSelectedAddOns] = useState<any[]>([]);
+  const [selectedAddOns, setSelectedAddOns] = useState<AddOn[]>([]);
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedStartTime, setSelectedStartTime] = useState('');
   const [selectedEndTime, setSelectedEndTime] = useState('');
+  const [selectedPackage, setSelectedPackage] = useState<VenuePackage | null>(null);
+  const [isBookingFlowOpen, setIsBookingFlowOpen] = useState(false);
 
   const venue = venues.find(v => v.id === id);
   
@@ -106,14 +109,14 @@ export default function VenueDetailsPage() {
   const averageRating = venue.reviews.reduce((acc, review) => acc + review.rating, 0) / venue.reviews.length;
 
   const tabs = [
-    { id: 'overview', name: 'Overview' },
-    { id: 'packages', name: 'Packages' },
-    { id: 'gallery', name: 'Photos' },
-    { id: 'amenities', name: 'Amenities' },
-    { id: 'faq', name: 'FAQ' },
-    { id: 'floorplan', name: 'Floor Plan' },
-    { id: 'rules', name: 'Policies' },
-    { id: 'reviews', name: 'Reviews' },
+    { id: 'overview' as const, name: 'Overview' },
+    { id: 'packages' as const, name: 'Packages' },
+    { id: 'gallery' as const, name: 'Gallery' },
+    { id: 'amenities' as const, name: 'Amenities' },
+    { id: 'floorplan' as const, name: 'Floor Plan' },
+    { id: 'reviews' as const, name: 'Reviews' },
+    { id: 'faq' as const, name: 'FAQ' },
+    { id: 'rules' as const, name: 'Rules' }
   ];
 
   const galleryPhotos = [
@@ -274,6 +277,11 @@ export default function VenueDetailsPage() {
     { label: 'Venues', href: '/venues' },
     { label: venue.name, href: `/venues/${venue.id}` }
   ];
+
+  const handleBookNow = (selectedItems: AddOn[]) => {
+    setSelectedAddOns(selectedItems);
+    setIsBookingFlowOpen(true);
+  };
 
   return (
     <div className="min-h-screen bg-white pt-16 pb-24 lg:pb-0">
@@ -447,59 +455,6 @@ export default function VenueDetailsPage() {
                           className="w-full h-full rounded-lg shadow-lg"
                         ></iframe>
                       </div>
-                    </div>
-                  </div>
-                )}
-
-                {activeTab === 'packages' && (
-                  <div className="space-y-8">
-                    <div className="prose max-w-none mb-8">
-                      <p className="text-gray-600">
-                        Choose from our carefully curated packages designed to make your event planning easier.
-                      </p>
-                    </div>
-                    
-                    <div className="grid gap-6">
-                      {venue.packages?.map((pkg) => (
-                        <div 
-                          key={pkg.id}
-                          className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:border-purple-200 transition-colors"
-                        >
-                          <div className="p-6">
-                            <div className="flex justify-between items-start mb-4">
-                              <div>
-                                <h3 className="text-xl font-medium text-gray-900">{pkg.name}</h3>
-                                <p className="text-gray-600 mt-1">{pkg.description}</p>
-                              </div>
-                              <div className="text-right">
-                                <div className="text-2xl font-medium text-gray-900">${pkg.price}</div>
-                                <div className="text-sm text-gray-500">{pkg.duration}</div>
-                              </div>
-                            </div>
-                            
-                            <div className="space-y-3">
-                              {pkg.features.map((feature, index) => (
-                                <div key={index} className="flex items-start gap-3">
-                                  <svg 
-                                    className="h-5 w-5 text-purple-500 flex-shrink-0 mt-0.5" 
-                                    fill="none" 
-                                    viewBox="0 0 24 24" 
-                                    stroke="currentColor"
-                                  >
-                                    <path 
-                                      strokeLinecap="round" 
-                                      strokeLinejoin="round" 
-                                      strokeWidth={2} 
-                                      d="M5 13l4 4L19 7" 
-                                    />
-                                  </svg>
-                                  <span className="text-gray-600">{feature}</span>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
                     </div>
                   </div>
                 )}
@@ -746,6 +701,74 @@ export default function VenueDetailsPage() {
                     </div>
                   </div>
                 )}
+
+                {activeTab === 'packages' && (
+                  <div>
+                    <div className="space-y-6">
+                      {venue.packages?.map((pkg) => (
+                        <div 
+                          key={pkg.id}
+                          className="bg-white border border-gray-200 rounded-lg overflow-hidden"
+                        >
+                          <div className="p-6">
+                            <div className="flex items-center justify-between mb-4">
+                              <div>
+                                <h3 className="text-xl font-medium text-gray-900">{pkg.name}</h3>
+                                <p className="mt-1 text-gray-600">{pkg.description}</p>
+                              </div>
+                              <div className="text-right">
+                                <div className="text-2xl font-medium text-gray-900">${pkg.price}</div>
+                                <div className="text-sm text-gray-500">{pkg.duration || 'Per session'}</div>
+                              </div>
+                            </div>
+                            
+                            <div className="space-y-3">
+                              {pkg.features.map((feature, index) => (
+                                <div key={index} className="flex items-start gap-3">
+                                  <svg 
+                                    className="h-5 w-5 text-purple-500 flex-shrink-0 mt-0.5" 
+                                    fill="none" 
+                                    viewBox="0 0 24 24" 
+                                    stroke="currentColor"
+                                  >
+                                    <path 
+                                      strokeLinecap="round" 
+                                      strokeLinejoin="round" 
+                                      strokeWidth={2} 
+                                      d="M5 13l4 4L19 7" 
+                                    />
+                                  </svg>
+                                  <span className="text-gray-600">{feature}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="mt-8 pt-8 border-t border-gray-100">
+                      <h3 className="text-lg font-medium text-gray-900 mb-6">Additional Items</h3>
+                      <div className="space-y-4">
+                        {venue.addOns?.map((addOn) => (
+                          <div 
+                            key={addOn.id}
+                            className="flex items-start justify-between p-4 border border-gray-100 rounded-lg"
+                          >
+                            <div className="flex-1">
+                              <h4 className="text-base font-medium text-gray-900">{addOn.name}</h4>
+                              <p className="text-sm text-gray-600 mt-1">{addOn.description}</p>
+                            </div>
+                            <div className="text-right ml-4">
+                              <div className="text-lg font-medium text-gray-900">${addOn.price}</div>
+                              <div className="text-sm text-gray-500">per item</div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -753,7 +776,11 @@ export default function VenueDetailsPage() {
             <div className="hidden lg:block lg:col-span-4">
               <div className="sticky top-6">
                 <div className="bg-gray-50 p-6 rounded-lg">
-                  <VenueEstimator venue={venue} onBookNow={() => setIsBookingOpen(true)} />
+                  <VenueEstimator
+                    venue={venue}
+                    onBookingClick={handleBookNow}
+                    initialPackage={selectedPackage}
+                  />
                 </div>
               </div>
             </div>
@@ -783,21 +810,28 @@ export default function VenueDetailsPage() {
       )}
 
       {/* Booking Flow Modal */}
-      <VenueBookingFlow
-        venue={venue}
-        isOpen={isBookingOpen}
-        onClose={() => setIsBookingOpen(false)}
-      />
+      {isBookingFlowOpen && (
+        <VenueBookingFlow
+          venue={venue}
+          selectedPackage={selectedPackage}
+          initialDate={selectedDate || ''}
+          initialStartTime={selectedStartTime}
+          initialEndTime={selectedEndTime}
+          additionalItems={selectedAddOns}
+          isOpen={isBookingFlowOpen}
+          onClose={() => setIsBookingFlowOpen(false)}
+        />
+      )}
 
       <div className="lg:hidden">
         <FloatingEstimator
-          startingPrice={venue.basePrice || 100}
-          priceUnit="/hour"
+          startingPrice={venue.basePrice}
           itemId={venue.id}
         >
-          <VenueEstimator 
+          <VenueEstimator
             venue={venue}
-            onBookNow={() => setIsBookingOpen(true)}
+            onBookingClick={handleBookNow}
+            initialPackage={selectedPackage}
           />
         </FloatingEstimator>
       </div>
