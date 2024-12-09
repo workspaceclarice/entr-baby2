@@ -20,7 +20,6 @@ const FloatingEstimator = ({
       <div className="fixed bottom-6 left-4 right-4 z-50 lg:hidden">
         <div className="bg-white shadow-[0_8px_30px_rgb(0,0,0,0.12)] px-6 py-4 rounded-2xl">
           <div className="flex items-center justify-between">
-            {/* Price Section */}
             <div className="flex flex-col">
               <span className="text-sm text-gray-500 font-normal mb-1">
                 Starting at
@@ -33,12 +32,8 @@ const FloatingEstimator = ({
                   {priceUnit}
                 </span>
               </div>
-              <span className="text-xs text-gray-500 mt-0.5 font-light">
-                Base price
-              </span>
             </div>
 
-            {/* Book Now Button */}
             <button
               onClick={() => setIsExpanded(true)}
               className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3.5 rounded-xl font-medium text-base transition-colors duration-200 shadow-sm"
@@ -49,7 +44,6 @@ const FloatingEstimator = ({
         </div>
       </div>
 
-      {/* Expanded Booking Options */}
       {isExpanded && (
         <div className="fixed inset-0 z-50 bg-white lg:hidden">
           <div className="h-full flex flex-col">
@@ -67,8 +61,11 @@ const FloatingEstimator = ({
                 </svg>
               </button>
             </div>
-            <div className="flex-1 overflow-y-auto p-4">
-              {children}
+
+            <div className="flex-1 overflow-y-auto">
+              <div className="p-4">
+                {children}
+              </div>
             </div>
           </div>
         </div>

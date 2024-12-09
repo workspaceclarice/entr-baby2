@@ -6,6 +6,60 @@ const createAmenity = (name: string): Amenity => ({
   icon: '' // You can customize icons as needed
 });
 
+const samplePackages = [
+  {
+    id: 'basic',
+    name: 'Basic Package',
+    description: '4-hour venue rental with essential amenities',
+    price: 1200,
+    duration: '4 hours',
+    features: [
+      'Basic lighting and sound system',
+      'Tables and chairs setup',
+      'Security personnel',
+      'Cleaning service',
+      'Dedicated venue coordinator',
+      'Free parking'
+    ]
+  },
+  {
+    id: 'premium',
+    name: 'Premium Package',
+    description: 'Full-day venue rental with premium services',
+    price: 2500,
+    duration: '8 hours',
+    features: [
+      'Professional lighting and sound system',
+      'Tables, chairs, and linens setup',
+      'Enhanced security team',
+      'Pre and post-event cleaning',
+      'Dedicated event coordinator',
+      'VIP parking',
+      'Bridal suite access',
+      'Catering kitchen access'
+    ]
+  },
+  {
+    id: 'luxury',
+    name: 'Luxury Package',
+    description: 'All-inclusive full-day venue experience',
+    price: 3500,
+    duration: '12 hours',
+    features: [
+      'Premium lighting and sound system',
+      'Complete venue styling and setup',
+      'Full security team',
+      'Complete cleaning service',
+      'Senior event coordinator',
+      'VIP valet parking',
+      'Bridal and groom suites',
+      'Full kitchen access',
+      'Basic bar setup',
+      'Extended hours option'
+    ]
+  }
+];
+
 export const venues: Venue[] = [
   {
     id: 'grand-ballroom',
@@ -94,7 +148,8 @@ export const venues: Venue[] = [
       profileImage: 'https://example.com/profile.jpg'
     },
     vendorId: 'grand-events-01',
-    basePrice: 1000
+    basePrice: 1000,
+    packages: samplePackages
   },
   {
     id: 'urban-loft',
@@ -151,7 +206,8 @@ export const venues: Venue[] = [
       name: 'Urban Spaces LLC'
     },
     vendorId: 'urban-spaces-01',
-    basePrice: 800
+    basePrice: 800,
+    packages: samplePackages
   },
   {
     id: 'rooftop-garden',
@@ -208,7 +264,8 @@ export const venues: Venue[] = [
       name: 'Skyline Venues'
     },
     vendorId: 'skyline-venues-01',
-    basePrice: 1200
+    basePrice: 1200,
+    packages: samplePackages
   },
   {
     id: 'historic-library',
@@ -264,7 +321,8 @@ export const venues: Venue[] = [
       name: 'Heritage Venues'
     },
     vendorId: 'heritage-venues-01',
-    basePrice: 900
+    basePrice: 900,
+    packages: samplePackages
   },
   {
     id: 'beachfront-villa',
@@ -320,7 +378,8 @@ export const venues: Venue[] = [
       name: 'Coastal Luxury Venues'
     },
     vendorId: 'coastal-luxury-01',
-    basePrice: 1500
+    basePrice: 1500,
+    packages: samplePackages
   },
   {
     id: 'vineyard-estate',
@@ -376,7 +435,8 @@ export const venues: Venue[] = [
       name: 'Wine Country Events'
     },
     vendorId: 'wine-country-01',
-    basePrice: 1400
+    basePrice: 1400,
+    packages: samplePackages
   },
   {
     id: 'modern-gallery',
@@ -432,7 +492,8 @@ export const venues: Venue[] = [
       name: 'Gallery Venues Co.'
     },
     vendorId: 'gallery-venues-01',
-    basePrice: 950
+    basePrice: 950,
+    packages: samplePackages
   },
   {
     id: 'greenhouse-gardens',
@@ -488,7 +549,8 @@ export const venues: Venue[] = [
       name: 'Garden Venues Co.'
     },
     vendorId: 'garden-venues-01',
-    basePrice: 950
+    basePrice: 950,
+    packages: samplePackages
   },
   {
     id: 'tech-hub',
@@ -544,7 +606,8 @@ export const venues: Venue[] = [
       name: 'Tech Space Solutions'
     },
     vendorId: 'tech-space-01',
-    basePrice: 1100
+    basePrice: 1100,
+    packages: samplePackages
   },
   {
     id: 'mountain-lodge',
@@ -600,7 +663,8 @@ export const venues: Venue[] = [
       name: 'Mountain Retreats'
     },
     vendorId: 'mountain-retreats-01',
-    basePrice: 1300
+    basePrice: 1300,
+    packages: samplePackages
   },
   {
     id: 'jazz-club',
@@ -656,7 +720,8 @@ export const venues: Venue[] = [
       name: 'Jazz Venue Management'
     },
     vendorId: 'jazz-venues-01',
-    basePrice: 750
+    basePrice: 750,
+    packages: samplePackages
   },
   {
     id: 'desert-oasis',
@@ -712,7 +777,8 @@ export const venues: Venue[] = [
       name: 'Desert Luxury Properties'
     },
     vendorId: 'desert-luxury-01',
-    basePrice: 1100
+    basePrice: 1100,
+    packages: samplePackages
   },
   {
     id: 'film-studio',
@@ -768,7 +834,8 @@ export const venues: Venue[] = [
       name: 'Studio Operations Inc'
     },
     vendorId: 'studio-ops-01',
-    basePrice: 1600
+    basePrice: 1600,
+    packages: samplePackages
   },
   {
     id: 'floating-pavilion',
@@ -824,6 +891,7 @@ export const venues: Venue[] = [
       name: 'Maritime Venues'
     },
     vendorId: 'maritime-venues-01',
-    basePrice: 1200
+    basePrice: 1200,
+    packages: samplePackages
   }
 ]; 

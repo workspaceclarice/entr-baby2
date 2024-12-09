@@ -40,6 +40,7 @@ interface Venue {
   vendor: Vendor;
   vendorId: string;
   basePrice: number;
+  packages?: any[]; // Update this based on your package interface
 }
 
 const mockReviews = [
@@ -106,6 +107,7 @@ export default function VenueDetailsPage() {
 
   const tabs = [
     { id: 'overview', name: 'Overview' },
+    { id: 'packages', name: 'Packages' },
     { id: 'gallery', name: 'Photos' },
     { id: 'amenities', name: 'Amenities' },
     { id: 'faq', name: 'FAQ' },
@@ -274,7 +276,7 @@ export default function VenueDetailsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-white pt-16">
+    <div className="min-h-screen bg-white pt-16 pb-24 lg:pb-0">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="py-2">
           <Breadcrumb 
@@ -445,6 +447,59 @@ export default function VenueDetailsPage() {
                           className="w-full h-full rounded-lg shadow-lg"
                         ></iframe>
                       </div>
+                    </div>
+                  </div>
+                )}
+
+                {activeTab === 'packages' && (
+                  <div className="space-y-8">
+                    <div className="prose max-w-none mb-8">
+                      <p className="text-gray-600">
+                        Choose from our carefully curated packages designed to make your event planning easier.
+                      </p>
+                    </div>
+                    
+                    <div className="grid gap-6">
+                      {venue.packages?.map((pkg) => (
+                        <div 
+                          key={pkg.id}
+                          className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:border-purple-200 transition-colors"
+                        >
+                          <div className="p-6">
+                            <div className="flex justify-between items-start mb-4">
+                              <div>
+                                <h3 className="text-xl font-medium text-gray-900">{pkg.name}</h3>
+                                <p className="text-gray-600 mt-1">{pkg.description}</p>
+                              </div>
+                              <div className="text-right">
+                                <div className="text-2xl font-medium text-gray-900">${pkg.price}</div>
+                                <div className="text-sm text-gray-500">{pkg.duration}</div>
+                              </div>
+                            </div>
+                            
+                            <div className="space-y-3">
+                              {pkg.features.map((feature, index) => (
+                                <div key={index} className="flex items-start gap-3">
+                                  <svg 
+                                    className="h-5 w-5 text-purple-500 flex-shrink-0 mt-0.5" 
+                                    fill="none" 
+                                    viewBox="0 0 24 24" 
+                                    stroke="currentColor"
+                                  >
+                                    <path 
+                                      strokeLinecap="round" 
+                                      strokeLinejoin="round" 
+                                      strokeWidth={2} 
+                                      d="M5 13l4 4L19 7" 
+                                    />
+                                  </svg>
+                                  <span className="text-gray-600">{feature}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 )}

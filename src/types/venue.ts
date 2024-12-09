@@ -78,6 +78,14 @@ export interface Venue {
   };
   vendorId: string;
   basePrice: number;
+  packages?: {
+    id: string;
+    name: string;
+    description: string;
+    price: number;
+    duration: string;
+    features: string[];
+  }[];
 }
 
 export {}; 
