@@ -25,8 +25,8 @@ const VenueEstimator = ({
   const [isPackageModalOpen, setIsPackageModalOpen] = useState(false);
   const [selectedModalPackage, setSelectedModalPackage] = useState<VenuePackage | null>(null);
   const [selectedAddOns, setSelectedAddOns] = useState<AddOn[]>(
-    venue.addOns.map(addOn => ({
-      ...addOn,
+    venue.addOns.map(item => ({
+      ...item,
       selected: false
     }))
   );
@@ -107,7 +107,7 @@ const VenueEstimator = ({
   };
 
   const handleBookNowClick = () => {
-    onBookingClick(selectedAddOns);
+    onBookingClick(selectedAddOns.filter(item => item.selected));
     
     const bookingDetails = {
       date: selectedDate?.toISOString().split('T')[0] || null,
@@ -139,64 +139,70 @@ const VenueEstimator = ({
     setIsPackageModalOpen(true);
   };
 
+  // Format date for input
+  const formattedDate = selectedDate 
+    ? selectedDate.toISOString().split('T')[0]
+    : '';
+
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-6">
-      {/* Date Input */}
-      <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Date
-        </label>
-        <input
-          type="date"
-          value={selectedDate ? selectedDate.toISOString().split('T')[0] : ''}
-          onChange={(e) => setSelectedDate(new Date(e.target.value))}
-          min={new Date().toISOString().split('T')[0]}
-          className="w-full rounded-lg border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
-        />
-      </div>
-
-      {/* Time Inputs */}
-      <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Time
-        </label>
-        <div className="grid grid-cols-2 gap-4">
+    <div className="space-y-6">
+      {/* Date and Time Selection */}
+      <div>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">Select Date & Time</h3>
+        <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Start Time
+              Date
             </label>
             <input
-              type="time"
-              value={startTime}
-              onChange={handleStartTimeChange}
+              type="date"
+              value={formattedDate}
+              onChange={(e) => setSelectedDate(e.target.value ? new Date(e.target.value) : null)}
               className="w-full rounded-lg border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              End Time
-            </label>
-            <input
-              type="time"
-              value={endTime}
-              onChange={handleEndTimeChange}
-              className="w-full rounded-lg border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Start Time
+              </label>
+              <input
+                type="time"
+                value={startTime}
+                onChange={handleStartTimeChange}
+                className="w-full rounded-lg border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                End Time
+              </label>
+              <input
+                type="time"
+                value={endTime}
+                onChange={handleEndTimeChange}
+                className="w-full rounded-lg border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+              />
+            </div>
           </div>
+          {timeError && (
+            <div className="flex items-center gap-2 text-red-600 text-sm">
+              <ExclamationCircleIcon className="h-5 w-5" />
+              <span>{timeError}</span>
+            </div>
+          )}
         </div>
-        {timeError && (
-          <p className="mt-2 text-sm text-red-600">{timeError}</p>
-        )}
       </div>
 
-      {/* Packages */}
+      {/* Packages Section - EXACT copy from ServiceEstimator */}
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">Packages</h3>
         <div className="space-y-4">
           {venue.packages.map((pkg) => (
             <div
               key={pkg.id}
-              className={`p-4 border rounded-lg ${
+              onClick={() => setSelectedPackage(pkg)}
+              className={`p-4 border rounded-lg cursor-pointer ${
                 selectedPackage?.id === pkg.id
                   ? 'border-purple-500 bg-purple-50'
                   : 'border-gray-200'
@@ -218,7 +224,10 @@ const VenueEstimator = ({
               </div>
               
               <button
-                onClick={() => openPackageModal(pkg)}
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent package selection when clicking details
+                  openPackageModal(pkg);
+                }}
                 className="mt-2 flex items-center text-sm text-purple-600 hover:text-purple-700"
               >
                 View details
@@ -229,55 +238,60 @@ const VenueEstimator = ({
         </div>
       </div>
 
-      {/* Add-ons */}
-      <div className="mb-6">
-        <h3 className="text-sm font-medium text-gray-700 mb-2">Additional Items</h3>
-        <div className="space-y-4">
-          {selectedAddOns.map((addOn, index) => (
-            <div
-              key={addOn.id}
-              className="flex items-center justify-between p-4 rounded-lg border border-gray-200"
+      {/* Additional Items */}
+      <div>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">Additional Items</h3>
+        <div className="space-y-3">
+          {selectedAddOns.map((item) => (
+            <label
+              key={item.id}
+              className="flex items-start justify-between p-4 border border-gray-100 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
             >
-              <div className="flex items-center">
+              <div className="flex items-start flex-1">
                 <input
                   type="checkbox"
-                  checked={addOn.selected}
-                  onChange={() => {
-                    const newAddOns = [...selectedAddOns];
-                    newAddOns[index] = {
-                      ...addOn,
-                      selected: !addOn.selected
-                    };
-                    setSelectedAddOns(newAddOns);
-                  }}
-                  className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+                  checked={item.selected}
+                  onChange={() => toggleItem(item.id)}
+                  className="mt-1 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
                 />
                 <div className="ml-3">
-                  <h4 className="text-sm font-medium text-gray-900">{addOn.name}</h4>
-                  <p className="text-sm text-gray-500">{addOn.description}</p>
+                  <span className="block font-medium text-gray-900">
+                    {item.name}
+                  </span>
+                  <span className="block text-sm text-gray-500">
+                    {item.description}
+                  </span>
                 </div>
               </div>
               <span className="text-sm font-medium text-gray-900">
-                ${addOn.price}
+                ${item.price}
               </span>
-            </div>
+            </label>
           ))}
         </div>
       </div>
 
-      {/* Book Now Button */}
-      <button
-        onClick={handleBookNowClick}
-        disabled={!selectedDate || !startTime || !endTime || !!timeError}
-        className="w-full py-3 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
-      >
-        Book Now
-      </button>
-      {(!selectedDate || !startTime || !endTime || timeError) && (
-        <p className="text-sm text-gray-500 text-center mt-2">
-          {timeError || 'Please select date and time to continue'}
-        </p>
-      )}
+      {/* Total and Book Button */}
+      <div className="border-t pt-6">
+        <div className="flex justify-between items-center mb-4">
+          <span className="text-gray-900 font-medium">Estimated Total</span>
+          <span className="text-2xl font-semibold text-gray-900">
+            ${calculateTotal()}
+          </span>
+        </div>
+        <button
+          onClick={handleBookNowClick}
+          disabled={!selectedDate || !startTime || !endTime || !!timeError}
+          className="w-full py-3 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+        >
+          Book Now
+        </button>
+        {(!selectedDate || !startTime || !endTime || timeError) && (
+          <p className="text-sm text-gray-500 text-center mt-2">
+            {timeError || 'Please select date and time to continue'}
+          </p>
+        )}
+      </div>
 
       {/* Package Details Modal */}
       <Transition appear show={isPackageModalOpen} as={Fragment}>
@@ -299,7 +313,7 @@ const VenueEstimator = ({
           </Transition.Child>
 
           <div className="fixed inset-0 overflow-y-auto">
-            <div className="flex min-h-full items-center justify-center p-4 text-center">
+            <div className="flex min-h-full items-center justify-center p-4">
               <Transition.Child
                 as={Fragment}
                 enter="ease-out duration-300"
@@ -310,7 +324,10 @@ const VenueEstimator = ({
                 leaveTo="opacity-0 scale-95"
               >
                 <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                  <div className="flex justify-between items-start">
+                  <Dialog.Title
+                    as="div"
+                    className="flex justify-between items-start mb-4"
+                  >
                     <div>
                       <h3 className="text-lg font-medium text-gray-900">
                         {selectedModalPackage?.name}
@@ -325,45 +342,45 @@ const VenueEstimator = ({
                     >
                       <XMarkIcon className="h-5 w-5" />
                     </button>
-                  </div>
+                  </Dialog.Title>
 
-                  <div className="mt-6">
-                    <div className="space-y-6">
-                      <div>
-                        <h4 className="text-sm font-medium text-gray-700 mb-2">Features</h4>
-                        <ul className="space-y-2">
-                          {selectedModalPackage?.features.map((feature, index) => (
-                            <li key={index} className="flex items-start gap-3">
-                              <svg
-                                className="h-5 w-5 text-purple-500 flex-shrink-0"
-                                viewBox="0 0 20 20"
-                                fill="currentColor"
-                              >
-                                <path
-                                  fillRule="evenodd"
-                                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                  clipRule="evenodd"
-                                />
-                              </svg>
-                              <span className="text-gray-600">{feature}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
+                  <div className="mt-4 space-y-4">
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-700 mb-2">Features</h4>
+                      <ul className="space-y-2">
+                        {selectedModalPackage?.features.map((feature, index) => (
+                          <li key={index} className="flex items-start gap-3">
+                            <svg
+                              className="h-5 w-5 text-purple-500 flex-shrink-0"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M5 13l4 4L19 7"
+                              />
+                            </svg>
+                            <span className="text-gray-600">{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
 
-                      <div>
-                        <div className="flex justify-between items-baseline">
-                          <span className="text-gray-900 font-medium">Price</span>
-                          <span className="text-2xl font-semibold text-gray-900">
-                            ${selectedModalPackage?.price}
-                          </span>
-                        </div>
-                        {selectedModalPackage?.duration && (
-                          <p className="text-sm text-gray-500 mt-1">
-                            Duration: {selectedModalPackage.duration}
-                          </p>
-                        )}
+                    <div className="pt-4 border-t">
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-900 font-medium">Price</span>
+                        <span className="text-2xl font-semibold text-gray-900">
+                          ${selectedModalPackage?.price}
+                        </span>
                       </div>
+                      {selectedModalPackage?.duration && (
+                        <p className="text-sm text-gray-500 mt-1">
+                          Duration: {selectedModalPackage.duration}
+                        </p>
+                      )}
                     </div>
 
                     <button
